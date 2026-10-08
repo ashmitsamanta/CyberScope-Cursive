@@ -22,5 +22,6 @@ def health_check(db: Session = Depends(get_db)):
         "database": db_status,
         "graph_backend": settings.GRAPH_BACKEND,
         "ai_provider": settings.AI_PROVIDER,
+        "model": settings.PRIMARY_MODEL,
         "disclaimer": "CYBERSCOPE is a defensive research and hackathon prototype using synthetic data. Risk scores are investigative signals, not proof of criminal activity."
     }
