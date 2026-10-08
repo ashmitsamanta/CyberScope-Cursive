@@ -1,0 +1,3551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>CyberScope | TetraByte</title>
+
+<meta name="description"
+content="CyberScope - A cyber-fraud intelligence and investigation platform by TetraByte">
+
+<style>
+
+/* =========================================================
+   CYBERSCOPE
+   SINGLE FILE FRONTEND
+   HTML + CSS + JAVASCRIPT
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+    --bg: #050a12;
+    --panel: #0a1220;
+    --panel2: #0d1727;
+    --navy: #071a33;
+
+    --line: rgba(95,171,255,0.16);
+
+    --text: #eaf4ff;
+    --muted: #8da1b8;
+
+    --cyan: #36cfff;
+    --blue: #388bff;
+    --green: #5dffb1;
+
+    --danger: #ff5d7d;
+    --purple: #9b7cff;
+
+    --shadow: 0 20px 60px rgba(0,0,0,0.35);
+}
+
+
+/* =========================
+   RESET
+   ========================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input {
+    font-family: inherit;
+}
+
+
+/* =========================
+   BACKGROUND
+   ========================= */
+
+.grid-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+
+    background-image:
+        linear-gradient(
+            rgba(54,207,255,0.035) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(54,207,255,0.035) 1px,
+            transparent 1px
+        );
+
+    background-size: 50px 50px;
+
+    mask-image:
+        linear-gradient(
+            to bottom,
+            black,
+            transparent 90%
+        );
+}
+
+.noise {
+    position: fixed;
+    inset: 0;
+
+    pointer-events: none;
+    z-index: 100;
+
+    opacity: 0.025;
+
+    background-image:
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+}
+
+
+/* =========================
+   TOP NAVIGATION
+   ========================= */
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+
+    width: 100%;
+
+    background: rgba(7,26,51,0.92);
+
+    backdrop-filter: blur(18px);
+
+    border-bottom: 1px solid rgba(95,171,255,0.16);
+
+    box-shadow:
+        0 8px 35px rgba(0,0,0,0.25);
+}
+
+.nav-inner {
+    max-width: 1400px;
+    margin: auto;
+
+    min-height: 76px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 25px;
+
+    gap: 25px;
+}
+
+
+/* BRAND */
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    flex-shrink: 0;
+}
+
+.brand-mark {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #36cfff,
+            #388bff
+        );
+
+    color: #03101f;
+
+    font-weight: 900;
+
+    box-shadow:
+        0 0 25px rgba(54,207,255,0.35);
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-text strong {
+    font-family: 'Space Grotesk', sans-serif;
+
+    font-size: 19px;
+    letter-spacing: 1px;
+}
+
+.brand-text small {
+    color: var(--muted);
+
+    font-size: 10px;
+
+    margin-top: 2px;
+
+    letter-spacing: 0.8px;
+}
+
+
+/* NAV LINKS */
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 20px;
+
+    flex: 1;
+}
+
+.nav-links a {
+    position: relative;
+
+    color: #a8bdd3;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    padding: 8px 2px;
+
+    white-space: nowrap;
+
+    transition:
+        color 0.25s ease,
+        transform 0.25s ease;
+}
+
+.nav-links a::after {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 0;
+
+    width: 0;
+    height: 2px;
+
+    transform: translateX(-50%);
+
+    background: var(--cyan);
+
+    box-shadow:
+        0 0 10px rgba(54,207,255,0.7);
+
+    transition: width 0.25s ease;
+}
+
+.nav-links a:hover {
+    color: var(--cyan);
+    transform: translateY(-1px);
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+
+/* TOP BUTTON */
+
+.top-action {
+    padding: 11px 17px;
+
+    border: 1px solid rgba(54,207,255,0.35);
+
+    border-radius: 9px;
+
+    background:
+        rgba(54,207,255,0.07);
+
+    color: var(--cyan);
+
+    font-size: 12px;
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    transition: all 0.3s ease;
+}
+
+.top-action:hover {
+    background: var(--cyan);
+    color: #03101f;
+
+    box-shadow:
+        0 0 25px rgba(54,207,255,0.3);
+}
+
+
+
+/* =========================
+   SIGN IN / REGISTER BUTTONS
+   ========================= */
+
+.auth-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.signin-btn,
+.register-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 10px 14px;
+    border-radius: 9px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition:
+        color 0.25s ease,
+        background 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.25s ease;
+}
+
+.signin-btn {
+    color: #b8cbe0;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(95,171,255,0.18);
+}
+
+.signin-btn:hover {
+    color: var(--cyan);
+    background: rgba(54,207,255,0.05);
+    border-color: rgba(54,207,255,0.4);
+    transform: translateY(-1px);
+}
+
+.register-btn {
+    color: var(--cyan);
+    background: rgba(54,207,255,0.07);
+    border: 1px solid rgba(54,207,255,0.3);
+}
+
+.register-btn:hover {
+    color: #03101f;
+    background: var(--cyan);
+    border-color: var(--cyan);
+    box-shadow: 0 0 22px rgba(54,207,255,0.25);
+    transform: translateY(-1px);
+}
+
+/* =========================
+   HERO
+   ========================= */
+
+.hero {
+    max-width: 1250px;
+
+    margin: auto;
+
+    padding:
+        105px 25px
+        90px;
+
+    display: grid;
+
+    grid-template-columns:
+        0.95fr
+        1.05fr;
+
+    gap: 70px;
+
+    align-items: center;
+}
+
+.eyebrow {
+    display: inline-flex;
+
+    align-items: center;
+    gap: 9px;
+
+    padding: 7px 12px;
+
+    border:
+        1px solid rgba(54,207,255,0.18);
+
+    border-radius: 999px;
+
+    background:
+        rgba(54,207,255,0.05);
+
+    color: var(--cyan);
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 1.5px;
+}
+
+.eyebrow::before {
+    content: "";
+
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: var(--green);
+
+    box-shadow:
+        0 0 12px var(--green);
+
+    animation: pulse 1.7s infinite;
+}
+
+.hero h1 {
+    margin-top: 25px;
+
+    font-family: 'Space Grotesk', sans-serif;
+
+    font-size: clamp(48px, 6vw, 78px);
+
+    line-height: 0.98;
+
+    letter-spacing: -3px;
+}
+
+.hero h1 span {
+    color: var(--cyan);
+
+    text-shadow:
+        0 0 35px rgba(54,207,255,0.22);
+}
+
+.hero-description {
+    max-width: 610px;
+
+    margin-top: 25px;
+
+    color: var(--muted);
+
+    font-size: 16px;
+
+    line-height: 1.8;
+}
+
+
+/* BUTTONS */
+
+.hero-buttons {
+    display: flex;
+
+    gap: 13px;
+
+    margin-top: 32px;
+
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 14px 20px;
+
+    border-radius: 9px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    border: none;
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        background 0.3s ease;
+}
+
+.btn-primary {
+    background:
+        linear-gradient(
+            135deg,
+            var(--cyan),
+            var(--blue)
+        );
+
+    color: #03101f;
+
+    box-shadow:
+        0 12px 30px rgba(54,207,255,0.18);
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 18px 40px rgba(54,207,255,0.28);
+}
+
+.btn-secondary {
+    background:
+        rgba(255,255,255,0.025);
+
+    border:
+        1px solid rgba(95,171,255,0.18);
+
+    color: #d8e9fa;
+}
+
+.btn-secondary:hover {
+    transform: translateY(-3px);
+
+    border-color:
+        rgba(54,207,255,0.45);
+}
+
+
+/* TRUST */
+
+.trust-row {
+    display: flex;
+
+    gap: 30px;
+
+    margin-top: 40px;
+
+    flex-wrap: wrap;
+}
+
+.trust-item {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.trust-number {
+    font-family: 'Space Grotesk';
+
+    color: var(--cyan);
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+.trust-label {
+    color: var(--muted);
+
+    font-size: 12px;
+}
+
+
+/* =========================
+   CONSOLE CARD
+   ========================= */
+
+.console-card {
+    position: relative;
+
+    min-height: 500px;
+
+    padding: 20px;
+
+    border:
+        1px solid rgba(95,171,255,0.16);
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(10,18,32,0.98),
+            rgba(7,18,34,0.92)
+        );
+
+    box-shadow: var(--shadow);
+
+    overflow: hidden;
+}
+
+.console-card::before {
+    content: "";
+
+    position: absolute;
+
+    width: 300px;
+    height: 300px;
+
+    top: -150px;
+    right: -100px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(54,207,255,0.16),
+            transparent 65%
+        );
+
+    pointer-events: none;
+}
+
+.console-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding-bottom: 15px;
+
+    border-bottom:
+        1px solid rgba(95,171,255,0.12);
+}
+
+.console-title {
+    font-size: 11px;
+
+    color: #9fb5ca;
+
+    letter-spacing: 1.7px;
+
+    font-weight: 700;
+}
+
+.live-status {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    color: var(--green);
+
+    font-size: 11px;
+
+    font-weight: 700;
+}
+
+.live-dot {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: var(--green);
+
+    box-shadow:
+        0 0 12px var(--green);
+
+    animation: pulse 1.5s infinite;
+}
+
+
+/* GRAPH */
+
+.graph-area {
+    position: relative;
+
+    height: 340px;
+
+    margin-top: 20px;
+
+    border-radius: 14px;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(54,207,255,0.07),
+            transparent 65%
+        );
+
+    overflow: hidden;
+}
+
+.graph-grid {
+    position: absolute;
+    inset: 0;
+
+    background-image:
+        linear-gradient(
+            rgba(54,207,255,0.04) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(54,207,255,0.04) 1px,
+            transparent 1px
+        );
+
+    background-size: 30px 30px;
+}
+
+.graph-svg {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+}
+
+.graph-line {
+    fill: none;
+
+    stroke: rgba(54,207,255,0.45);
+
+    stroke-width: 1.4;
+
+    stroke-dasharray: 7 8;
+
+    animation:
+        dash 7s linear infinite;
+}
+
+.node {
+    position: absolute;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        #081727;
+
+    border:
+        1px solid rgba(54,207,255,0.5);
+
+    box-shadow:
+        0 0 22px rgba(54,207,255,0.18);
+
+    animation:
+        nodepulse 2.6s infinite;
+}
+
+.node-main {
+    width: 95px;
+    height: 95px;
+
+    left: 50%;
+    top: 48%;
+
+    transform:
+        translate(-50%, -50%);
+
+    border:
+        1px solid rgba(54,207,255,0.8);
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(54,207,255,0.18),
+            #081727 70%
+        );
+}
+
+.node-main span {
+    font-size: 11px;
+
+    font-weight: 800;
+
+    color: var(--cyan);
+
+    text-align: center;
+}
+
+.node-small {
+    width: 62px;
+    height: 62px;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    color: #bcd2e6;
+
+    text-align: center;
+}
+
+.node-phone {
+    top: 15%;
+    left: 17%;
+}
+
+.node-upi {
+    top: 17%;
+    right: 15%;
+}
+
+.node-account {
+    bottom: 14%;
+    left: 16%;
+}
+
+.node-domain {
+    bottom: 15%;
+    right: 14%;
+}
+
+
+/* CONSOLE STATS */
+
+.console-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap: 10px;
+
+    margin-top: 18px;
+}
+
+.stat {
+    padding: 12px;
+
+    border:
+        1px solid rgba(95,171,255,0.1);
+
+    border-radius: 10px;
+
+    background:
+        rgba(255,255,255,0.018);
+}
+
+.stat strong {
+    display: block;
+
+    font-family: 'Space Grotesk';
+
+    font-size: 20px;
+
+    color: #eef8ff;
+}
+
+.stat span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+    letter-spacing: 0.8px;
+}
+
+
+/* =========================
+   TICKER
+   ========================= */
+
+.ticker {
+    border-top:
+        1px solid rgba(95,171,255,0.12);
+
+    border-bottom:
+        1px solid rgba(95,171,255,0.12);
+
+    overflow: hidden;
+
+    white-space: nowrap;
+
+    background:
+        rgba(7,26,51,0.5);
+}
+
+.ticker-track {
+    display: inline-block;
+
+    padding: 17px 0;
+
+    animation:
+        ticker 25s linear infinite;
+}
+
+.ticker span {
+    margin: 0 30px;
+
+    color: #6f8499;
+
+    font-size: 11px;
+
+    letter-spacing: 1.5px;
+
+    font-weight: 700;
+}
+
+.ticker span b {
+    color: var(--cyan);
+}
+
+
+/* =========================
+   SECTION
+   ========================= */
+
+.section {
+    max-width: 1250px;
+
+    margin: auto;
+
+    padding: 105px 25px;
+}
+
+.section-heading {
+    max-width: 750px;
+
+    margin-bottom: 50px;
+}
+
+.section-heading .mini {
+    color: var(--cyan);
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+}
+
+.section-heading h2 {
+    margin-top: 13px;
+
+    font-family: 'Space Grotesk';
+
+    font-size: clamp(35px,5vw,55px);
+
+    letter-spacing: -2px;
+}
+
+.section-heading p {
+    margin-top: 15px;
+
+    color: var(--muted);
+
+    line-height: 1.8;
+}
+
+
+/* =========================
+   MODULES
+   ========================= */
+
+.modules-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap: 16px;
+}
+
+.module-card {
+    position: relative;
+
+    min-height: 220px;
+
+    padding: 25px;
+
+    border:
+        1px solid rgba(95,171,255,0.12);
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(10,18,32,0.95),
+            rgba(13,23,39,0.7)
+        );
+
+    overflow: hidden;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.35s ease,
+        border-color 0.35s ease,
+        box-shadow 0.35s ease;
+}
+
+.module-card::before {
+    content: "";
+
+    position: absolute;
+
+    width: 130px;
+    height: 130px;
+
+    top: -65px;
+    right: -65px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(54,207,255,0.15),
+            transparent 70%
+        );
+
+    transition:
+        transform 0.5s ease;
+}
+
+.module-card:hover {
+    transform: translateY(-7px);
+
+    border-color:
+        rgba(54,207,255,0.32);
+
+    box-shadow:
+        0 20px 50px rgba(0,0,0,0.25);
+}
+
+.module-card:hover::before {
+    transform: scale(1.5);
+}
+
+.module-number {
+    font-family: 'Space Grotesk';
+
+    color: rgba(54,207,255,0.7);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+}
+
+.module-icon {
+    margin-top: 22px;
+
+    width: 43px;
+    height: 43px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 11px;
+
+    background:
+        rgba(54,207,255,0.08);
+
+    border:
+        1px solid rgba(54,207,255,0.15);
+
+    color: var(--cyan);
+
+    font-size: 18px;
+}
+
+.module-card h3 {
+    margin-top: 20px;
+
+    font-family: 'Space Grotesk';
+
+    font-size: 20px;
+}
+
+.module-card p {
+    margin-top: 9px;
+
+    color: var(--muted);
+
+    font-size: 13px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================
+   ABOUT
+   ========================= */
+
+.about-box {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 25px;
+
+    padding: 35px;
+
+    border:
+        1px solid rgba(95,171,255,0.13);
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(7,26,51,0.8),
+            rgba(10,18,32,0.8)
+        );
+}
+
+.about-box h3 {
+    font-family: 'Space Grotesk';
+
+    font-size: 25px;
+}
+
+.about-box p {
+    margin-top: 12px;
+
+    color: var(--muted);
+
+    line-height: 1.8;
+
+    font-size: 14px;
+}
+
+.about-points {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap: 12px;
+}
+
+.about-point {
+    padding: 18px;
+
+    border-radius: 11px;
+
+    border:
+        1px solid rgba(95,171,255,0.1);
+
+    background:
+        rgba(255,255,255,0.018);
+}
+
+.about-point strong {
+    color: var(--cyan);
+
+    font-size: 13px;
+}
+
+.about-point span {
+    display: block;
+
+    margin-top: 6px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================
+   FOOTER
+   ========================= */
+
+footer {
+    border-top:
+        1px solid rgba(95,171,255,0.1);
+
+    padding: 30px 25px;
+
+    background:
+        #040912;
+}
+
+.footer-inner {
+    max-width: 1250px;
+
+    margin: auto;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+.footer-brand {
+    font-family: 'Space Grotesk';
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+}
+
+.footer-text {
+    color: #687b90;
+
+    font-size: 11px;
+}
+
+
+/* =========================
+   MODAL
+   ========================= */
+
+.modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 200;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background:
+        rgba(1,5,10,0.82);
+
+    backdrop-filter: blur(12px);
+}
+
+.modal.active {
+    display: flex;
+
+    animation: fadeIn 0.25s ease;
+}
+
+.modal-box {
+    position: relative;
+
+    width: min(850px,100%);
+
+    padding: 30px;
+
+    border:
+        1px solid rgba(54,207,255,0.25);
+
+    border-radius: 18px;
+
+    background:
+        #081321;
+
+    box-shadow:
+        0 30px 90px rgba(0,0,0,0.6);
+
+    animation:
+        modalUp 0.35s ease;
+}
+
+.modal-box h2 {
+    font-family: 'Space Grotesk';
+
+    font-size: 30px;
+}
+
+.modal-box p {
+    margin-top: 10px;
+
+    color: var(--muted);
+
+    line-height: 1.7;
+}
+
+.close-modal {
+    position: absolute;
+
+    top: 18px;
+    right: 18px;
+
+    width: 35px;
+    height: 35px;
+
+    border-radius: 8px;
+
+    border:
+        1px solid rgba(95,171,255,0.15);
+
+    background:
+        rgba(255,255,255,0.03);
+
+    color: #9db2c8;
+
+    cursor: pointer;
+
+    font-size: 18px;
+}
+
+.close-modal:hover {
+    color: var(--cyan);
+
+    border-color:
+        rgba(54,207,255,0.35);
+}
+
+.demo-console {
+    margin-top: 25px;
+
+    padding: 25px;
+
+    border-radius: 12px;
+
+    background:
+        #050a12;
+
+    border:
+        1px solid rgba(95,171,255,0.1);
+}
+
+.demo-row {
+    display: flex;
+
+    justify-content: space-between;
+
+    padding: 13px 0;
+
+    border-bottom:
+        1px solid rgba(95,171,255,0.08);
+
+    font-size: 13px;
+}
+
+.demo-row:last-child {
+    border-bottom: none;
+}
+
+.demo-row span {
+    color: var(--muted);
+}
+
+.demo-row strong {
+    color: var(--cyan);
+}
+
+
+/* =========================================================
+   CHATBOT
+   ========================================================= */
+
+.chat-button {
+    position: fixed;
+
+    right: 25px;
+    bottom: 25px;
+
+    width: 62px;
+    height: 62px;
+
+    border-radius: 50%;
+
+    border:
+        1px solid rgba(54,207,255,0.5);
+
+    background:
+        linear-gradient(
+            135deg,
+            #0b243e,
+            #071827
+        );
+
+    color: var(--cyan);
+
+    font-size: 25px;
+
+    cursor: pointer;
+
+    z-index: 150;
+
+    box-shadow:
+        0 0 25px rgba(54,207,255,0.25);
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+.chat-button:hover {
+    transform: scale(1.08);
+
+    box-shadow:
+        0 0 40px rgba(54,207,255,0.45);
+}
+
+.chat-button::before {
+    content: "";
+
+    position: absolute;
+
+    inset: -6px;
+
+    border-radius: 50%;
+
+    border:
+        1px solid rgba(54,207,255,0.15);
+
+    animation:
+        chatPulse 2s infinite;
+}
+
+
+/* CHAT WINDOW */
+
+.chat-window {
+    position: fixed;
+
+    right: 25px;
+    bottom: 100px;
+
+    width: 370px;
+    max-width: calc(100vw - 30px);
+
+    height: 520px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #081321,
+            #050c17
+        );
+
+    border:
+        1px solid rgba(54,207,255,0.25);
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    z-index: 149;
+
+    display: none;
+
+    flex-direction: column;
+
+    box-shadow:
+        0 25px 80px rgba(0,0,0,0.6);
+
+    animation:
+        chatOpen 0.3s ease;
+}
+
+.chat-window.active {
+    display: flex;
+}
+
+
+/* CHAT HEADER */
+
+.chat-header {
+    padding: 17px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    background:
+        rgba(7,26,51,0.95);
+
+    border-bottom:
+        1px solid rgba(95,171,255,0.13);
+}
+
+.chat-brand {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+.chat-avatar {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 10px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--cyan),
+            var(--blue)
+        );
+
+    color: #03101f;
+
+    font-weight: 900;
+
+    font-size: 13px;
+}
+
+.chat-title strong {
+    display: block;
+
+    font-family: 'Space Grotesk';
+
+    font-size: 14px;
+}
+
+.chat-title span {
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    margin-top: 3px;
+
+    color: var(--green);
+
+    font-size: 9px;
+}
+
+.chat-online {
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background: var(--green);
+
+    box-shadow:
+        0 0 8px var(--green);
+}
+
+.chat-close {
+    width: 30px;
+    height: 30px;
+
+    border-radius: 7px;
+
+    border:
+        1px solid rgba(95,171,255,0.13);
+
+    background:
+        rgba(255,255,255,0.025);
+
+    color: #8da1b8;
+
+    cursor: pointer;
+
+    font-size: 16px;
+}
+
+.chat-close:hover {
+    color: var(--cyan);
+}
+
+
+/* CHAT MESSAGES */
+
+.chat-messages {
+    flex: 1;
+
+    padding: 18px;
+
+    overflow-y: auto;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+.chat-message {
+    max-width: 85%;
+
+    padding: 11px 13px;
+
+    border-radius: 11px;
+
+    font-size: 12px;
+
+    line-height: 1.6;
+}
+
+.bot-message {
+    align-self: flex-start;
+
+    background:
+        rgba(54,207,255,0.07);
+
+    border:
+        1px solid rgba(54,207,255,0.12);
+
+    color: #bcd2e6;
+
+    border-bottom-left-radius: 3px;
+}
+
+.user-message {
+    align-self: flex-end;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(54,207,255,0.18),
+            rgba(56,139,255,0.15)
+        );
+
+    border:
+        1px solid rgba(54,207,255,0.2);
+
+    color: #eaf4ff;
+
+    border-bottom-right-radius: 3px;
+}
+
+
+/* QUICK QUESTIONS */
+
+.quick-actions {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 6px;
+
+    padding: 0 15px 10px;
+}
+
+.quick-btn {
+    padding: 7px 9px;
+
+    border-radius: 7px;
+
+    border:
+        1px solid rgba(95,171,255,0.15);
+
+    background:
+        rgba(255,255,255,0.025);
+
+    color: #91a9c0;
+
+    font-size: 9px;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.quick-btn:hover {
+    color: var(--cyan);
+
+    border-color:
+        rgba(54,207,255,0.35);
+
+    background:
+        rgba(54,207,255,0.06);
+}
+
+
+/* CHAT INPUT */
+
+.chat-input-area {
+    display: flex;
+
+    gap: 8px;
+
+    padding: 12px;
+
+    border-top:
+        1px solid rgba(95,171,255,0.12);
+
+    background:
+        rgba(4,9,18,0.8);
+}
+
+.chat-input {
+    flex: 1;
+
+    min-width: 0;
+
+    padding: 11px 12px;
+
+    border-radius: 8px;
+
+    border:
+        1px solid rgba(95,171,255,0.15);
+
+    background:
+        rgba(255,255,255,0.025);
+
+    color: white;
+
+    outline: none;
+
+    font-size: 11px;
+}
+
+.chat-input:focus {
+    border-color:
+        rgba(54,207,255,0.4);
+}
+
+.chat-input::placeholder {
+    color: #60758b;
+}
+
+.chat-send {
+    width: 42px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--cyan),
+            var(--blue)
+        );
+
+    color: #03101f;
+
+    font-weight: 900;
+
+    cursor: pointer;
+
+    transition: transform 0.2s ease;
+}
+
+.chat-send:hover {
+    transform: translateY(-2px);
+}
+
+
+/* TYPING */
+
+.typing {
+    display: flex;
+
+    gap: 4px;
+
+    align-items: center;
+}
+
+.typing span {
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background: var(--cyan);
+
+    animation:
+        typing 1s infinite;
+}
+
+.typing span:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.typing span:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+
+/* =========================
+   REVEAL
+   ========================= */
+
+.reveal {
+    opacity: 0;
+
+    transform:
+        translateY(30px);
+
+    transition:
+        opacity 0.8s ease,
+        transform 0.8s ease;
+}
+
+.reveal.visible {
+    opacity: 1;
+
+    transform:
+        translateY(0);
+}
+
+
+/* =========================
+   ANIMATIONS
+   ========================= */
+
+@keyframes pulse {
+
+    0%,100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.55;
+        transform: scale(0.82);
+    }
+}
+
+@keyframes nodepulse {
+
+    0%,100% {
+        box-shadow:
+            0 0 22px rgba(54,207,255,0.16);
+    }
+
+    50% {
+        box-shadow:
+            0 0 35px rgba(54,207,255,0.3);
+    }
+}
+
+@keyframes dash {
+
+    to {
+        stroke-dashoffset: -100;
+    }
+}
+
+@keyframes ticker {
+
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+@keyframes fadeIn {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modalUp {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(25px)
+            scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+@keyframes chatOpen {
+
+    from {
+        opacity: 0;
+        transform:
+            translateY(15px)
+            scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+@keyframes chatPulse {
+
+    0%,100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+
+    50% {
+        transform: scale(1.15);
+        opacity: 0;
+    }
+}
+
+@keyframes typing {
+
+    0%,100% {
+        transform: translateY(0);
+        opacity: 0.4;
+    }
+
+    50% {
+        transform: translateY(-3px);
+        opacity: 1;
+    }
+}
+
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 1150px) {
+
+    .nav-links {
+        gap: 12px;
+    }
+
+    .nav-links a {
+        font-size: 11px;
+    }
+}
+
+
+@media (max-width: 1000px) {
+
+    .nav-links {
+        display: none;
+    }
+
+    .auth-buttons {
+        gap: 6px;
+    }
+
+    .signin-btn,
+    .register-btn {
+        min-height: 38px;
+        padding: 9px 11px;
+        font-size: 10px;
+    }
+
+    .hero {
+        grid-template-columns: 1fr;
+
+        gap: 50px;
+    }
+
+    .modules-grid {
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+    .about-box {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .auth-buttons {
+        gap: 5px;
+    }
+
+    .signin-btn,
+    .register-btn {
+        min-height: 36px;
+        padding: 8px 9px;
+        font-size: 9px;
+    }
+
+    .top-action {
+        display: none;
+    }
+
+    .nav-inner {
+        min-height: 68px;
+    }
+
+    .hero {
+        padding:
+            75px 18px
+            60px;
+    }
+
+    .hero h1 {
+        font-size: 48px;
+
+        letter-spacing: -2px;
+    }
+
+    .console-card {
+        min-height: 450px;
+    }
+
+    .modules-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section {
+        padding:
+            75px 18px;
+    }
+
+    .about-points {
+        grid-template-columns: 1fr;
+    }
+
+    .console-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-inner {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .chat-window {
+        right: 15px;
+        bottom: 90px;
+
+        width: calc(100vw - 30px);
+
+        height: 500px;
+    }
+
+    .chat-button {
+        right: 18px;
+        bottom: 18px;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .nav-inner {
+        padding: 0 14px;
+        gap: 8px;
+    }
+
+    .brand {
+        gap: 8px;
+    }
+
+    .auth-buttons {
+        margin-left: auto;
+        gap: 4px;
+    }
+
+    .signin-btn,
+    .register-btn {
+        min-height: 34px;
+        padding: 7px 8px;
+        font-size: 8px;
+    }
+
+    .brand-text strong {
+        font-size: 16px;
+    }
+
+    .brand-text small {
+        font-size: 8px;
+    }
+
+    .brand-mark {
+        width: 37px;
+        height: 37px;
+    }
+
+    .top-action {
+        padding: 9px 12px;
+
+        font-size: 10px;
+    }
+
+    .hero h1 {
+        font-size: 42px;
+    }
+
+    .hero-description {
+        font-size: 14px;
+    }
+
+    .trust-row {
+        gap: 18px;
+    }
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="noise"></div>
+<div class="grid-bg"></div>
+
+
+<!-- =========================================================
+     TOP NAVIGATION
+     ========================================================= -->
+
+<header class="topbar">
+
+    <div class="nav-inner">
+
+        <a href="#" class="brand">
+
+            <div class="brand-mark">
+                CS
+            </div>
+
+            <div class="brand-text">
+
+                <strong>CYBERSCOPE</strong>
+
+                <small>
+                    A Project of TetraByte
+                </small>
+
+            </div>
+
+        </a>
+
+
+        <nav class="nav-links">
+
+            <a href="#overview">
+                Overview
+            </a>
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="cases.html">
+                Cases
+            </a>
+
+            <a href="fraud-graph.html">
+                Fraud Graph
+            </a>
+
+            <a href="threat-map.html">
+                Threat Map
+            </a>
+
+            <a href="entity-explorer.html">
+                Entities
+            </a>
+
+            <a href="transaction-explorer.html">
+                Transactions
+            </a>
+
+            <a href="campaign-explorer.html">
+                Campaigns
+            </a>
+
+<a href="#about">
+    About
+</a>
+
+</nav>
+
+<div class="auth-buttons">
+
+    <a href="signin.html" class="signin-btn">
+        Sign In
+    </a>
+
+    <a href="register.html" class="register-btn">
+        Register
+    </a>
+
+    <a href="#modules" class="top-action">
+        Open Console ↗
+    </a>
+
+</div>
+
+    </div>
+
+</header>
+
+
+<!-- =========================================================
+     HERO
+     ========================================================= -->
+
+<main id="overview">
+
+<section class="hero">
+
+
+    <div class="hero-content reveal">
+
+        <div class="eyebrow">
+            CYBER-FRAUD INTELLIGENCE PLATFORM
+        </div>
+
+
+        <h1>
+            See the
+            <span>
+                network
+            </span>
+            behind the fraud.
+        </h1>
+
+
+        <p class="hero-description">
+
+            CyberScope connects fragmented cyber-fraud
+            incidents into a unified intelligence view —
+            helping investigators discover relationships
+            between cases, entities, transactions and
+            coordinated campaigns.
+
+        </p>
+
+
+        <div class="hero-buttons">
+
+            <button
+                class="btn btn-primary"
+                onclick="scrollToSection('modules')">
+
+                Explore Platform →
+
+            </button>
+
+
+            <button
+                class="btn btn-secondary"
+                onclick="showDemo()">
+
+                View Live Preview
+
+            </button>
+
+        </div>
+
+
+        <div class="trust-row">
+
+            <div class="trust-item">
+
+                <span class="trust-number">
+                    01
+                </span>
+
+                <span class="trust-label">
+                    Unified Cases
+                </span>
+
+            </div>
+
+
+            <div class="trust-item">
+
+                <span class="trust-number">
+                    02
+                </span>
+
+                <span class="trust-label">
+                    Entity Links
+                </span>
+
+            </div>
+
+
+            <div class="trust-item">
+
+                <span class="trust-number">
+                    03
+                </span>
+
+                <span class="trust-label">
+                    Fraud Networks
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- INVESTIGATION CONSOLE -->
+
+    <div class="console-card reveal">
+
+        <div class="console-header">
+
+            <div class="console-title">
+                INVESTIGATION CONSOLE
+            </div>
+
+            <div class="live-status">
+
+                <span class="live-dot"></span>
+
+                SYSTEM ONLINE
+
+            </div>
+
+        </div>
+
+
+        <div class="graph-area" onclick="window.location.href='fraud-graph.html'" style="cursor:pointer;" title="Click to open Interactive Fraud Graph">
+
+            <div class="graph-grid"></div>
+
+
+            <svg
+                class="graph-svg"
+                viewBox="0 0 600 340"
+                preserveAspectRatio="none">
+
+                <path
+                    class="graph-line"
+                    d="M105 75 L300 170 L495 80" />
+
+                <path
+                    class="graph-line"
+                    d="M110 265 L300 170 L490 270" />
+
+                <path
+                    class="graph-line"
+                    d="M105 75 L490 270" />
+
+                <path
+                    class="graph-line"
+                    d="M495 80 L110 265" />
+
+            </svg>
+
+
+            <div class="node node-main">
+
+                <span>
+                    FRAUD<br>
+                    CLUSTER
+                </span>
+
+            </div>
+
+
+            <div class="node node-small node-phone">
+                PHONE
+            </div>
+
+
+            <div class="node node-small node-upi">
+                UPI ID
+            </div>
+
+
+            <div class="node node-small node-account">
+                ACCOUNT
+            </div>
+
+
+            <div class="node node-small node-domain">
+                DOMAIN
+            </div>
+
+        </div>
+
+
+        <div class="console-stats">
+
+            <div class="stat">
+
+                <strong>
+                    148
+                </strong>
+
+                <span>
+                    LINKED ENTITIES
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                <strong>
+                    27
+                </strong>
+
+                <span>
+                    ACTIVE CASES
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                <strong>
+                    63
+                </strong>
+
+                <span>
+                    RISK SIGNALS
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     TICKER
+     ========================================================= -->
+
+<div class="ticker">
+
+    <div class="ticker-track">
+
+        <span>
+            <b>●</b> CASE CORRELATION
+        </span>
+
+        <span>
+            ENTITY RESOLUTION
+        </span>
+
+        <span>
+            FRAUD NETWORK MAPPING
+        </span>
+
+        <span>
+            TRANSACTION INTELLIGENCE
+        </span>
+
+        <span>
+            CAMPAIGN DETECTION
+        </span>
+
+        <span>
+            INVESTIGATION WORKSPACE
+        </span>
+
+
+        <span>
+            <b>●</b> CASE CORRELATION
+        </span>
+
+        <span>
+            ENTITY RESOLUTION
+        </span>
+
+        <span>
+            FRAUD NETWORK MAPPING
+        </span>
+
+        <span>
+            TRANSACTION INTELLIGENCE
+        </span>
+
+        <span>
+            CAMPAIGN DETECTION
+        </span>
+
+        <span>
+            INVESTIGATION WORKSPACE
+        </span>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     MODULES
+     ========================================================= -->
+
+<section
+    class="section"
+    id="modules">
+
+
+    <div class="section-heading reveal">
+
+        <div class="mini">
+            PLATFORM MODULES
+        </div>
+
+        <h2>
+            One workspace.
+            Multiple intelligence layers.
+        </h2>
+
+        <p>
+            CyberScope brings the major stages of
+            cyber-fraud investigation into a single
+            connected environment.
+        </p>
+
+    </div>
+
+
+    <div class="modules-grid">
+
+
+        <!-- MODULE 01 -->
+
+        <a
+            href="dashboard.html"
+            class="module-card reveal">
+
+            <div class="module-number">
+                MODULE 01
+            </div>
+
+            <div class="module-icon">
+                ◈
+            </div>
+
+            <h3>
+                Overview Dashboard
+            </h3>
+
+            <p>
+                Monitor active cases, emerging fraud
+                patterns, high-risk entities and
+                investigation activity from one place.
+            </p>
+
+        </a>
+
+
+        <!-- MODULE 02 -->
+
+        <a
+            href="fraud-graph.html"
+            class="module-card reveal">
+
+            <div class="module-number">
+                MODULE 02
+            </div>
+
+            <div class="module-icon">
+                ◎
+            </div>
+
+            <h3>
+                Fraud Graph
+            </h3>
+
+            <p>
+                Visualize relationships between
+                phone numbers, accounts, domains,
+                UPI IDs and other connected entities.
+            </p>
+
+        </a>
+
+
+        <!-- MODULE 03 -->
+
+        <a
+            href="entity-explorer.html"
+            class="module-card reveal">
+
+            <div class="module-number">
+                MODULE 03
+            </div>
+
+            <div class="module-icon">
+                ◉
+            </div>
+
+            <h3>
+                Entity Explorer
+            </h3>
+
+            <p>
+                Search and inspect individual entities
+                while revealing their relationships
+                across multiple investigations.
+            </p>
+
+        </a>
+
+
+        <!-- MODULE 04 -->
+
+        <a
+            href="transaction-explorer.html"
+            class="module-card reveal">
+
+            <div class="module-number">
+                MODULE 04
+            </div>
+
+            <div class="module-icon">
+                ⇄
+            </div>
+
+            <h3>
+                Transaction Explorer
+            </h3>
+
+            <p>
+                Examine transaction flows and identify
+                potentially connected financial activity
+                across cases.
+            </p>
+
+        </a>
+
+
+        <!-- MODULE 05 -->
+
+        <a
+            href="campaign-explorer.html"
+            class="module-card reveal">
+
+            <div class="module-number">
+                MODULE 05
+            </div>
+
+            <div class="module-icon">
+                ◌
+            </div>
+
+            <h3>
+                Campaign Explorer
+            </h3>
+
+            <p>
+                Group related incidents into possible
+                coordinated campaigns using shared
+                infrastructure and entity signals.
+            </p>
+
+        </a>
+
+
+        <!-- MODULE 06 -->
+
+        <a
+            href="investigation.html"
+            class="module-card reveal">
+
+            <div class="module-number">
+                MODULE 06
+            </div>
+
+            <div class="module-icon">
+                ⌁
+            </div>
+
+            <h3>
+                Investigation Workspace
+            </h3>
+
+            <p>
+                Bring evidence, notes, linked entities
+                and case information together for
+                structured investigation.
+            </p>
+
+        </a>
+
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     ABOUT
+     ========================================================= -->
+
+<section
+    class="section"
+    id="about">
+
+
+    <div class="section-heading reveal">
+
+        <div class="mini">
+            ABOUT CYBERSCOPE
+        </div>
+
+        <h2>
+            Turning isolated incidents
+            into connected intelligence.
+        </h2>
+
+    </div>
+
+
+    <div class="about-box reveal">
+
+
+        <div>
+
+            <h3>
+                Built for connected
+                cyber-fraud investigation.
+            </h3>
+
+            <p>
+                CyberScope is designed around the idea
+                that individual fraud complaints can
+                reveal much more when their shared
+                entities and infrastructure are viewed
+                together.
+            </p>
+
+            <p>
+                This frontend prototype establishes the
+                investigation interface. Backend data
+                pipelines, databases, intelligence
+                models and automated detection systems
+                can be connected later.
+            </p>
+
+        </div>
+
+
+        <div class="about-points">
+
+
+            <div class="about-point">
+
+                <strong>
+                    CASES
+                </strong>
+
+                <span>
+                    Centralized investigation records
+                    and case monitoring.
+                </span>
+
+            </div>
+
+
+            <div class="about-point">
+
+                <strong>
+                    ENTITIES
+                </strong>
+
+                <span>
+                    Connections between phones,
+                    accounts, domains and IDs.
+                </span>
+
+            </div>
+
+
+            <div class="about-point">
+
+                <strong>
+                    NETWORKS
+                </strong>
+
+                <span>
+                    Visual representation of
+                    connected fraud infrastructure.
+                </span>
+
+            </div>
+
+
+            <div class="about-point">
+
+                <strong>
+                    INTELLIGENCE
+                </strong>
+
+                <span>
+                    A foundation for future
+                    automated risk analysis.
+                </span>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+
+
+<!-- =========================================================
+     FOOTER
+     ========================================================= -->
+
+<footer>
+
+    <div class="footer-inner">
+
+        <div class="footer-brand">
+            CYBERSCOPE
+        </div>
+
+        <div class="footer-text">
+            A Project of TetraByte • Cyber-Fraud Intelligence Platform
+        </div>
+
+    </div>
+
+</footer>
+
+
+<!-- =========================================================
+     LIVE PREVIEW MODAL
+     ========================================================= -->
+
+<div
+    class="modal"
+    id="demoModal">
+
+    <div class="modal-box">
+
+        <button
+            class="close-modal"
+            onclick="closeDemo()">
+
+            ×
+
+        </button>
+
+
+        <h2>
+            Investigation Console
+        </h2>
+
+
+        <p>
+            This is a frontend demonstration of how the
+            CyberScope investigation environment can
+            display connected intelligence.
+        </p>
+
+
+        <div class="demo-console">
+
+
+            <div class="demo-row">
+
+                <span>
+                    Case Status
+                </span>
+
+                <strong>
+                    ACTIVE
+                </strong>
+
+            </div>
+
+
+            <div class="demo-row">
+
+                <span>
+                    Connected Entities
+                </span>
+
+                <strong>
+                    148
+                </strong>
+
+            </div>
+
+
+            <div class="demo-row">
+
+                <span>
+                    Linked Cases
+                </span>
+
+                <strong>
+                    27
+                </strong>
+
+            </div>
+
+
+            <div class="demo-row">
+
+                <span>
+                    Risk Signals
+                </span>
+
+                <strong>
+                    63
+                </strong>
+
+            </div>
+
+
+            <div class="demo-row">
+
+                <span>
+                    Network Status
+                </span>
+
+                <strong>
+                    ANALYZING
+                </strong>
+
+            </div>
+
+
+        </div>
+
+        <div style="margin-top:20px; display:flex; gap:10px; justify-content:center;">
+            <a href="fraud-graph.html" class="btn btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+                ◎ Open Fraud Graph →
+            </a>
+            <a href="dashboard.html" class="btn btn-secondary" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+                Dashboard →
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     CHATBOT
+     ========================================================= -->
+
+<div
+    class="chat-window"
+    id="chatWindow">
+
+
+    <div class="chat-header">
+
+        <div class="chat-brand">
+
+            <div class="chat-avatar">
+                CS
+            </div>
+
+            <div class="chat-title">
+
+                <strong>
+                    CyberScope AI
+                </strong>
+
+                <span>
+
+                    <i class="chat-online"></i>
+
+                    ONLINE
+
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="chat-close"
+            onclick="toggleChat()">
+
+            ×
+
+        </button>
+
+    </div>
+
+
+    <div
+        class="chat-messages"
+        id="chatMessages">
+
+        <div class="chat-message bot-message">
+
+            Hello. I'm the CyberScope investigation
+            assistant. I can help you understand
+            cases, entities, fraud graphs, campaigns
+            and the investigation workflow.
+
+        </div>
+
+    </div>
+
+
+    <div class="quick-actions">
+
+        <button
+            class="quick-btn"
+            onclick="quickQuestion('What is CyberScope?')">
+
+            What is CyberScope?
+
+        </button>
+
+        <button
+            class="quick-btn"
+            onclick="quickQuestion('Explain Fraud Graph')">
+
+            Fraud Graph
+
+        </button>
+
+        <button
+            class="quick-btn"
+            onclick="quickQuestion('What are entities?')">
+
+            Entities
+
+        </button>
+
+        <button
+            class="quick-btn"
+            onclick="quickQuestion('How does investigation work?')">
+
+            Investigation
+
+        </button>
+
+    </div>
+
+
+    <div class="chat-input-area">
+
+        <input
+            type="text"
+            class="chat-input"
+            id="chatInput"
+            placeholder="Ask CyberScope..."
+            autocomplete="off">
+
+        <button
+            class="chat-send"
+            onclick="sendMessage()">
+
+            ➤
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<button
+    class="chat-button"
+    id="chatButton"
+    onclick="toggleChat()">
+
+    ◉
+
+</button>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
+<script>
+
+
+/* =========================================
+   SMOOTH SCROLL
+   ========================================= */
+
+function scrollToSection(id) {
+
+    const element =
+        document.getElementById(id);
+
+    if (!element) return;
+
+    element.scrollIntoView({
+        behavior: "smooth"
+    });
+}
+
+
+/* =========================================
+   REVEAL ANIMATIONS
+   ========================================= */
+
+const revealElements =
+    document.querySelectorAll(".reveal");
+
+const revealObserver =
+    new IntersectionObserver(
+
+        function(entries) {
+
+            entries.forEach(
+                function(entry) {
+
+                    if (
+                        entry.isIntersecting
+                    ) {
+
+                        entry.target.classList.add(
+                            "visible"
+                        );
+
+                    }
+
+                }
+            );
+
+        },
+
+        {
+            threshold: 0.12
+        }
+
+    );
+
+
+revealElements.forEach(
+    function(element) {
+
+        revealObserver.observe(element);
+
+    }
+);
+
+
+/* =========================================
+   DEMO MODAL
+   ========================================= */
+
+function showDemo() {
+
+    const modal =
+        document.getElementById(
+            "demoModal"
+        );
+
+    modal.classList.add(
+        "active"
+    );
+
+    document.body.style.overflow =
+        "hidden";
+}
+
+
+function closeDemo() {
+
+    const modal =
+        document.getElementById(
+            "demoModal"
+        );
+
+    modal.classList.remove(
+        "active"
+    );
+
+    document.body.style.overflow =
+        "";
+}
+
+
+/* CLOSE MODAL OUTSIDE */
+
+document
+    .getElementById("demoModal")
+    .addEventListener(
+        "click",
+        function(event) {
+
+            if (
+                event.target === this
+            ) {
+
+                closeDemo();
+
+            }
+
+        }
+    );
+
+
+/* ESCAPE */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            closeDemo();
+
+        }
+
+    }
+);
+
+
+/* =========================================
+   CHATBOT
+   ========================================= */
+
+function toggleChat() {
+
+    const chat =
+        document.getElementById(
+            "chatWindow"
+        );
+
+    chat.classList.toggle(
+        "active"
+    );
+
+    if (
+        chat.classList.contains("active")
+    ) {
+
+        setTimeout(
+            function() {
+
+                document
+                    .getElementById("chatInput")
+                    .focus();
+
+            },
+            250
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   ADD CHAT MESSAGE
+   ========================================= */
+
+function addMessage(
+    message,
+    type
+) {
+
+    const messages =
+        document.getElementById(
+            "chatMessages"
+        );
+
+    const div =
+        document.createElement("div");
+
+    div.className =
+        "chat-message " +
+        type;
+
+    div.textContent =
+        message;
+
+    messages.appendChild(div);
+
+    messages.scrollTop =
+        messages.scrollHeight;
+}
+
+
+/* =========================================
+   BOT RESPONSE
+   ========================================= */
+
+function getBotResponse(question) {
+
+    const q =
+        question.toLowerCase();
+
+
+    if (
+        q.includes("what is cyberscope") ||
+        q.includes("cyberscope")
+    ) {
+
+        return `
+            CyberScope is a cyber-fraud intelligence
+            platform designed to connect fragmented
+            incidents, entities, transactions and
+            possible fraud campaigns into one
+            investigation environment.
+        `;
+
+    }
+
+
+    if (
+        q.includes("fraud graph") ||
+        q.includes("graph")
+    ) {
+
+        return `
+            The Fraud Graph represents relationships
+            between entities such as phone numbers,
+            UPI IDs, bank accounts, domains and cases.
+            It helps investigators see connections that
+            may not be obvious when incidents are viewed
+            separately.
+        `;
+
+    }
+
+
+    if (
+        q.includes("entity")
+    ) {
+
+        return `
+            Entities are investigation objects such as
+            phone numbers, domains, UPI IDs, bank
+            accounts and other identifiers connected
+            to fraud incidents.
+        `;
+
+    }
+
+
+    if (
+        q.includes("case")
+    ) {
+
+        return `
+            Cases represent individual fraud incidents
+            or investigation records. CyberScope can
+            connect cases through shared entities and
+            infrastructure.
+        `;
+
+    }
+
+
+    if (
+        q.includes("transaction")
+    ) {
+
+        return `
+            Transaction Explorer is intended to help
+            investigators examine financial flows and
+            identify potentially connected transaction
+            activity across cases.
+        `;
+
+    }
+
+
+    if (
+        q.includes("campaign")
+    ) {
+
+        return `
+            Campaign Explorer groups related incidents
+            into possible coordinated campaigns using
+            shared infrastructure and entity signals.
+        `;
+
+    }
+
+
+    if (
+        q.includes("investigation")
+    ) {
+
+        return `
+            The Investigation Workspace brings evidence,
+            notes, linked entities and case information
+            together so an investigator can work from
+            one structured environment.
+        `;
+
+    }
+
+
+    if (
+        q.includes("help")
+    ) {
+
+        return `
+            I can explain CyberScope, Cases, Fraud Graph,
+            Entities, Transactions, Campaigns and the
+            Investigation Workspace.
+        `;
+
+    }
+
+
+    return `
+        I understand the question, but this frontend
+        assistant currently contains a limited set of
+        CyberScope knowledge. Try asking about the
+        Fraud Graph, Cases, Entities, Transactions,
+        Campaigns or Investigation Workspace.
+    `;
+}
+
+
+/* =========================================
+   SEND MESSAGE
+   ========================================= */
+
+async function sendMessage() {
+    const input = document.getElementById("chatInput");
+    const question = input.value.trim();
+    if (!question) return;
+
+    addMessage(question, "user-message");
+    input.value = "";
+
+    /* TYPING INDICATOR */
+    const messages = document.getElementById("chatMessages");
+    const typing = document.createElement("div");
+    typing.className = "chat-message bot-message";
+    typing.id = "typingIndicator";
+    typing.innerHTML = `
+        <div class="typing">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    `;
+    messages.appendChild(typing);
+    messages.scrollTop = messages.scrollHeight;
+
+    try {
+        const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                model: "meta/llama-3.2-11b-vision-instruct",
+                messages: [{ role: "user", content: question }]
+            })
+        });
+        if (res.ok) {
+            const data = await res.json();
+            const reply = data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : null;
+            if (reply) {
+                const indicator = document.getElementById("typingIndicator");
+                if (indicator) indicator.remove();
+                addMessage(reply, "bot-message");
+                return;
+            }
+        }
+    } catch(e) {
+        // Backend / proxy offline, fall back to local responses
+    }
+
+    setTimeout(function() {
+        const indicator = document.getElementById("typingIndicator");
+        if (indicator) indicator.remove();
+        addMessage(getBotResponse(question), "bot-message");
+    }, 450);
+}
+
+
+/* =========================================
+   QUICK QUESTIONS
+   ========================================= */
+
+function quickQuestion(question) {
+    const input = document.getElementById("chatInput");
+    input.value = question;
+    sendMessage();
+}
+
+
+/* =========================================
+   ENTER KEY
+   ========================================= */
+
+document.getElementById("chatInput").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        sendMessage();
+    }
+});
+
+
+/* =========================================
+   MODULE MOUSE EFFECT
+   ========================================= */
+
+const cards = document.querySelectorAll(".module-card");
+cards.forEach(function(card) {
+    card.addEventListener("mousemove", function(event) {
+        const rect = card.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        card.style.setProperty("--mx", x + "px");
+        card.style.setProperty("--my", y + "px");
+    });
+    card.addEventListener("mouseleave", function() {
+        card.style.removeProperty("--mx");
+        card.style.removeProperty("--my");
+    });
+});
+
+// Live Backend Stats Synchronization
+async function syncLivePlatformStats() {
+    try {
+        const res = await fetch('/api/stats/dashboard');
+        if (res.ok) {
+            const data = await res.json();
+            const statNumbers = document.querySelectorAll('.stat-item strong');
+            if (statNumbers.length >= 4) {
+                if (data.total_cases) statNumbers[0].textContent = data.total_cases;
+                if (data.total_entities) statNumbers[1].textContent = data.total_entities;
+                if (data.total_campaigns) statNumbers[2].textContent = String(data.total_campaigns).padStart(2, '0');
+                if (data.high_risk_cases) statNumbers[3].textContent = data.high_risk_cases;
+            }
+        }
+    } catch(e) {}
+}
+window.addEventListener('DOMContentLoaded', syncLivePlatformStats);
+
+</script>
+
+</body>
+</html>
