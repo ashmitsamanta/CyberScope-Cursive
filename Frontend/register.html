@@ -969,6 +969,85 @@ input.input-success {
     justify-content: center;
   }
 }
+/* ---- Password Strength Meter (Account Creation Only) ---- */
+.pw-strength {
+  margin-top: 10px;
+  padding: 12px 14px;
+  background: rgba(7, 17, 30, 0.7);
+  border: 1px solid rgba(54, 207, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: inset 0 0 15px rgba(54, 207, 255, 0.03);
+  animation: cardIn 0.3s ease both;
+}
+.pw-strength-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.pw-rating-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pw-rating-text {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+.pw-grade-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid currentColor;
+  background: rgba(0, 0, 0, 0.25);
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+.pw-score-text {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+.pw-strength-bar-track {
+  height: 6px;
+  border-radius: 6px;
+  background: rgba(141, 161, 184, 0.15);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.pw-strength-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  width: 0%;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.35s ease, box-shadow 0.35s ease;
+}
+.pw-strength-reasons {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pw-strength-reasons li {
+  font-size: 11px;
+  line-height: 1.45;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.pw-strength-reasons li.pw-tip-warning {
+  color: var(--amber);
+}
+.pw-strength-reasons li.pw-tip-success {
+  color: var(--green);
+}
+.pw-strength-reasons li .icon {
+  flex-shrink: 0;
+  font-weight: bold;
+}
 </style>
 </head>
 <body>
@@ -1192,10 +1271,44 @@ input.input-success {
 <script src="assets/supabase-client.js"></script>
 <script src="assets/password-strength.js"></script>
 <script>
-// Initialize real-time Password Strength Evaluator on DOM load
+// Initialize real-time Password Strength Evaluator for account creation
 document.addEventListener('DOMContentLoaded', function() {
-  if (window.PasswordStrength && document.getElementById('password') && document.getElementById('pwStrength')) {
-    PasswordStrength.attach('#password', '#pwStrength');
+  const pwInput = document.getElementById('password');
+  const pwContainer = document.getElementById('pwStrength');
+  if (window.PasswordStrength && pwInput && pwContainer) {
+    let _pwDebounce = null;
+    pwInput.addEventListener('input', function() {
+      const pw = this.value;
+      if (!pw) {
+        pwContainer.style.display = 'none';
+        return;
+      }
+      const evalData = PasswordStrength.evaluate(pw);
+      PasswordStrength.render(pwContainer, evalData);
+
+      clearTimeout(_pwDebounce);
+      _pwDebounce = setTimeout(async function() {
+        try {
+          const endpoint = getApiEndpoint('/api/auth/check-password');
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: pw })
+          });
+          if (res.ok) {
+            const serverData = await res.json();
+            if (pwInput.value === pw) {
+              evalData.score = serverData.score;
+              evalData.maxScore = serverData.max_score || 10;
+              evalData.grade = serverData.grade || evalData.grade;
+              evalData.rating = serverData.rating || evalData.rating;
+              evalData.reasons = serverData.reasons || evalData.reasons;
+              PasswordStrength.render(pwContainer, evalData);
+            }
+          }
+        } catch(e) { /* server offline – client evaluation stands */ }
+      }, 400);
+    });
   }
 });
 
