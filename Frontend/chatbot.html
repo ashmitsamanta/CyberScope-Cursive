@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberScope AI | Investigation Assistant</title>
+    <meta name="description" content="CyberScope AI investigation assistant">
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg: #050a12;
+            --panel: #0a1220;
+            --panel2: #0d1727;
+            --navy: #071a33;
+            --line: rgba(95, 171, 255, .16);
+            --text: #eaf4ff;
+            --muted: #8da1b8;
+            --cyan: #36cfff;
+            --blue: #388bff;
+            --green: #5dffb1;
+            --red: #ff667d;
+            --yellow: #ffd166;
+            --shadow: 0 20px 60px rgba(0, 0, 0, .35)
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: Inter, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden
+        }
+
+        body:before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -5;
+            background: radial-gradient(circle at 12% 15%, rgba(54, 207, 255, .09), transparent 27%), radial-gradient(circle at 88% 20%, rgba(56, 139, 255, .12), transparent 30%), radial-gradient(circle at 50% 100%, rgba(54, 207, 255, .06), transparent 35%)
+        }
+
+        .grid-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -4;
+            background-image: linear-gradient(rgba(54, 207, 255, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(54, 207, 255, .035) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: linear-gradient(to bottom, black, transparent 92%);
+            animation: gridMove 18s linear infinite
+        }
+
+        @keyframes gridMove {
+            from {
+                background-position: 0 0, 0 0
+            }
+
+            to {
+                background-position: 50px 50px, 50px 50px
+            }
+        }
+
+        .noise {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 100;
+            opacity: .025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E")
+        }
+
+        .glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(2px);
+            pointer-events: none;
+            z-index: -2
+        }
+
+        .glow.one {
+            width: 280px;
+            height: 280px;
+            background: rgba(54, 207, 255, .09);
+            left: -100px;
+            top: 28%;
+            animation: float1 9s ease-in-out infinite
+        }
+
+        .glow.two {
+            width: 360px;
+            height: 360px;
+            background: rgba(56, 139, 255, .08);
+            right: -150px;
+            bottom: 8%;
+            animation: float2 11s ease-in-out infinite
+        }
+
+        @keyframes float1 {
+            50% {
+                transform: translate(80px, -45px) scale(1.12)
+            }
+        }
+
+        @keyframes float2 {
+            50% {
+                transform: translate(-70px, -55px) scale(.9)
+            }
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(7, 26, 51, .9);
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--line);
+            box-shadow: 0 8px 35px rgba(0, 0, 0, .25)
+        }
+
+        .nav {
+            max-width: 1400px;
+            margin: auto;
+            min-height: 76px;
+            padding: 0 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 22px
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #fff
+        }
+
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            overflow: hidden;
+            display: grid;
+            place-items: center;
+            background: rgba(54, 207, 255, .08);
+            border: 1px solid rgba(54, 207, 255, .25);
+            box-shadow: 0 0 25px rgba(54, 207, 255, .2);
+            flex-shrink: 0
+        }
+
+        .brand-mark img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 2px
+        }
+
+        .brand-fallback {
+            font-weight: 900;
+            color: #03101f
+        }
+
+        .brand-text strong {
+            font-family: 'Space Grotesk';
+            font-size: 19px;
+            letter-spacing: 1px;
+            color: #fff
+        }
+
+        .brand-text small {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            margin-top: 2px;
+            letter-spacing: .8px
+        }
+
+        .navlinks {
+            display: none
+        }
+
+        .assistant-top-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .back-link {
+            color: #b7cce0;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 9px 12px;
+            border: 1px solid rgba(54, 207, 255, .14);
+            border-radius: 9px;
+            background: rgba(54, 207, 255, .035);
+            transition: .25s
+        }
+
+        .back-link:hover {
+            color: #fff;
+            border-color: rgba(54, 207, 255, .4);
+            background: rgba(54, 207, 255, .08);
+            transform: translateY(-1px)
+        }
+
+        .status {
+            font-size: 10px;
+            color: var(--green);
+            border: 1px solid rgba(93, 255, 177, .25);
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: rgba(93, 255, 177, .04);
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all .25s ease;
+            letter-spacing: .4px;
+            font-weight: 600;
+        }
+
+        .status.standalone {
+            color: var(--yellow);
+            border-color: rgba(255, 209, 102, .25);
+            background: rgba(255, 209, 102, .05);
+        }
+
+        .dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 10px var(--green);
+            animation: pulse 1.5s infinite;
+            flex-shrink: 0;
+        }
+
+        .status.standalone .dot {
+            background: var(--yellow);
+            box-shadow: 0 0 10px var(--yellow);
+            animation: none;
+        }
+
+        @keyframes pulse {
+            50% {
+                opacity: .35;
+                transform: scale(.75)
+            }
+        }
+
+        main {
+            max-width: 1280px;
+            margin: auto;
+            padding: 50px 24px 80px
+        }
+
+        .hero {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto 35px
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--cyan);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 15px
+        }
+
+        .eyebrow:before {
+            content: "";
+            width: 25px;
+            height: 1px;
+            background: var(--cyan);
+            box-shadow: 0 0 10px var(--cyan)
+        }
+
+        h1 {
+            font-family: 'Space Grotesk';
+            font-size: clamp(34px, 6vw, 64px);
+            line-height: 1.02;
+            letter-spacing: -2px
+        }
+
+        h1 span {
+            color: #fff;
+            text-shadow: 0 0 28px rgba(255, 255, 255, .22)
+        }
+
+        .hero p {
+            color: var(--muted);
+            max-width: 700px;
+            margin: 18px auto 0;
+            line-height: 1.7;
+            font-size: 14px
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 260px minmax(0, 1fr);
+            gap: 18px;
+            align-items: start
+        }
+
+        .panel {
+            background: linear-gradient(180deg, rgba(13, 23, 39, .94), rgba(7, 16, 29, .96));
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            overflow: hidden
+        }
+
+        .panel-head {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .panel-head strong {
+            font-family: 'Space Grotesk';
+            font-size: 13px;
+            letter-spacing: .5px
+        }
+
+        .panel-head small {
+            color: var(--muted);
+            font-size: 10px
+        }
+
+        .quick {
+            padding: 14px
+        }
+
+        .quick-title {
+            font-size: 10px;
+            color: #7890a8;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+            padding: 5px 7px 10px
+        }
+
+        .quick button {
+            width: 100%;
+            text-align: left;
+            background: rgba(54, 207, 255, .035);
+            border: 1px solid rgba(54, 207, 255, .09);
+            color: #cfe4f8;
+            border-radius: 10px;
+            padding: 11px 10px;
+            margin-bottom: 7px;
+            font: 600 11px Inter;
+            cursor: pointer;
+            transition: .25s
+        }
+
+        .quick button:hover {
+            transform: translateX(4px);
+            border-color: rgba(54, 207, 255, .32);
+            background: rgba(54, 207, 255, .08);
+            color: #fff
+        }
+
+        .mini-note {
+            margin: 10px 14px 15px;
+            padding: 12px;
+            border-radius: 10px;
+            background: rgba(93, 255, 177, .035);
+            border: 1px solid rgba(93, 255, 177, .12);
+            font-size: 10px;
+            line-height: 1.6;
+            color: #8fb5a4
+        }
+
+        .mini-note b {
+            color: var(--green)
+        }
+
+        .chat {
+            min-height: 650px;
+            display: flex;
+            flex-direction: column
+        }
+
+        .chat-head {
+            background: rgba(5, 13, 25, .65);
+            padding: 17px 20px;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .chat-brand {
+            display: flex;
+            align-items: center;
+            gap: 11px
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 11px;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            background: rgba(54, 207, 255, .08);
+            border: 1px solid rgba(54, 207, 255, .25);
+            box-shadow: 0 0 22px rgba(54, 207, 255, .2)
+        }
+
+        .chat-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 2px
+        }
+
+        .chat-title strong {
+            display: block;
+            font-size: 13px
+        }
+
+        .chat-title span {
+            display: block;
+            color: var(--green);
+            font-size: 9px;
+            letter-spacing: 1px;
+            margin-top: 3px
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 7px
+        }
+
+        .iconbtn {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: rgba(54, 207, 255, .04);
+            border: 1px solid var(--line);
+            color: #9bb0c7;
+            cursor: pointer
+        }
+
+        .iconbtn:hover {
+            color: #fff;
+            border-color: rgba(54, 207, 255, .4)
+        }
+
+        .messages {
+            flex: 1;
+            min-height: 440px;
+            max-height: 540px;
+            overflow: auto;
+            padding: 22px
+        }
+
+        .messages::-webkit-scrollbar {
+            width: 5px
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            background: rgba(54, 207, 255, .2);
+            border-radius: 10px
+        }
+
+        .msg {
+            display: flex;
+            margin-bottom: 14px;
+            animation: msgIn .3s ease
+        }
+
+        .msg.user {
+            justify-content: flex-end
+        }
+
+        .bubble {
+            max-width: 82%;
+            padding: 13px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(95, 171, 255, .14);
+            background: rgba(54, 207, 255, .035);
+            color: #d9e9f8;
+            font-size: 12.5px;
+            line-height: 1.65;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .14);
+            word-break: break-word;
+        }
+
+        .user .bubble {
+            background: linear-gradient(135deg, rgba(54, 207, 255, .18), rgba(56, 139, 255, .14));
+            border-color: rgba(54, 207, 255, .28);
+            color: #f2fbff;
+        }
+
+        .bubble strong {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .bubble em {
+            color: #b9dcfe;
+            font-style: italic;
+        }
+
+        .bubble p {
+            margin: 7px 0;
+            line-height: 1.65;
+        }
+
+        .bubble p:first-child {
+            margin-top: 0;
+        }
+
+        .bubble p:last-child {
+            margin-bottom: 0;
+        }
+
+        .bubble h1,
+        .bubble h2,
+        .bubble h3,
+        .bubble h4 {
+            color: #ffffff;
+            font-family: 'Space Grotesk', Inter, sans-serif;
+            font-size: 13.5px;
+            font-weight: 700;
+            margin: 12px 0 6px;
+            letter-spacing: .4px;
+            border-bottom: 1px solid rgba(54, 207, 255, .12);
+            padding-bottom: 4px;
+        }
+
+        .bubble h1:first-child,
+        .bubble h2:first-child,
+        .bubble h3:first-child,
+        .bubble h4:first-child {
+            margin-top: 0;
+        }
+
+        .bubble ul,
+        .bubble ol {
+            margin: 7px 0 7px 20px;
+            padding: 0;
+        }
+
+        .bubble ol {
+            list-style-type: decimal;
+        }
+
+        .bubble ul {
+            list-style-type: disc;
+        }
+
+        .bubble li {
+            margin: 4px 0;
+            line-height: 1.55;
+        }
+
+        .bubble hr.bubble-divider {
+            border: 0;
+            height: 1px;
+            background: rgba(54, 207, 255, .16);
+            margin: 12px 0;
+        }
+
+        /* Cyberpunk dark cyber aesthetic for code & pre */
+        .bubble code {
+            font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, Menlo, Monaco, monospace;
+            font-size: 11px;
+            background: rgba(54, 207, 255, .08);
+            color: var(--cyan);
+            border: 1px solid rgba(54, 207, 255, .22);
+            border-radius: 5px;
+            padding: 2px 6px;
+            word-break: break-word;
+        }
+
+        .user .bubble code {
+            background: rgba(0, 0, 0, .25);
+            border-color: rgba(255, 255, 255, .2);
+            color: #fff;
+        }
+
+        .bubble pre {
+            background: #040e1b;
+            border: 1px solid rgba(54, 207, 255, .22);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin: 10px 0;
+            overflow-x: auto;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, .5), 0 4px 14px rgba(0, 0, 0, .2);
+            position: relative;
+        }
+
+        .bubble pre code {
+            font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, Menlo, Monaco, monospace;
+            background: transparent;
+            border: none;
+            padding: 0;
+            color: #d1ecfd;
+            font-size: 11.5px;
+            line-height: 1.55;
+            display: block;
+            word-break: normal;
+            white-space: pre;
+        }
+
+        .bubble pre::-webkit-scrollbar {
+            height: 5px;
+        }
+
+        .bubble pre::-webkit-scrollbar-thumb {
+            background: rgba(54, 207, 255, .3);
+            border-radius: 10px;
+        }
+
+        .bubble pre::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, .25);
+        }
+
+        /* Code wrap with cyber language badge and copy action */
+        .bubble .code-wrap {
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid rgba(54, 207, 255, .22);
+            background: #040e1b;
+            overflow: hidden;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, .5), 0 4px 14px rgba(0, 0, 0, .25);
+        }
+
+        .bubble .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 12px;
+            background: rgba(7, 26, 51, .85);
+            border-bottom: 1px solid rgba(54, 207, 255, .12);
+            font-size: 10px;
+            color: var(--muted);
+            user-select: none;
+        }
+
+        .bubble .code-header .code-lang {
+            color: var(--cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            font-size: 9px;
+            font-family: 'Space Grotesk', Inter, sans-serif;
+        }
+
+        .bubble .code-header .code-copy-btn {
+            background: rgba(54, 207, 255, .06);
+            border: 1px solid rgba(54, 207, 255, .2);
+            color: #b7dbfc;
+            border-radius: 5px;
+            padding: 2px 8px;
+            font-size: 9.5px;
+            cursor: pointer;
+            transition: all .2s;
+            font-family: Inter, sans-serif;
+            font-weight: 600;
+        }
+
+        .bubble .code-header .code-copy-btn:hover {
+            background: rgba(54, 207, 255, .2);
+            color: #fff;
+            border-color: rgba(54, 207, 255, .5);
+        }
+
+        .bubble .code-wrap pre {
+            margin: 0;
+            border: none;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            padding: 11px 14px;
+        }
+
+        .stream-error-notice {
+            margin-top: 8px;
+            padding: 7px 11px;
+            border-radius: 7px;
+            background: rgba(255, 102, 125, .08);
+            border: 1px solid rgba(255, 102, 125, .25);
+            color: var(--red);
+            font-size: 10.5px;
+            line-height: 1.45;
+        }
+
+        .standalone-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--yellow);
+            background: rgba(255, 209, 102, .08);
+            border: 1px solid rgba(255, 209, 102, .22);
+            padding: 2px 7px;
+            border-radius: 4px;
+            margin-bottom: 7px;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+        }
+
+        .bubble .tag {
+            display: inline-block;
+            font-size: 9px;
+            padding: 3px 6px;
+            border-radius: 5px;
+            margin: 5px 3px 0 0;
+            border: 1px solid rgba(54, 207, 255, .15);
+            color: var(--cyan);
+            background: rgba(54, 207, 255, .04);
+        }
+
+        .risk-high {
+            color: #ff7587;
+        }
+
+        .risk-medium {
+            color: var(--yellow);
+        }
+
+        .risk-low {
+            color: var(--green);
+        }
+
+        @keyframes msgIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        .typing {
+            display: flex;
+            gap: 4px;
+            align-items: center
+        }
+
+        .typing i {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--cyan);
+            animation: typing 1s infinite
+        }
+
+        .typing i:nth-child(2) {
+            animation-delay: .15s
+        }
+
+        .typing i:nth-child(3) {
+            animation-delay: .3s
+        }
+
+        @keyframes typing {
+            50% {
+                transform: translateY(-4px);
+                opacity: .45
+            }
+        }
+
+        .suggestions {
+            padding: 12px 18px;
+            border-top: 1px solid var(--line);
+            display: flex;
+            gap: 7px;
+            overflow: auto
+        }
+
+        .suggestions button {
+            white-space: nowrap;
+            border: 1px solid rgba(54, 207, 255, .14);
+            background: rgba(54, 207, 255, .035);
+            color: #9fc0da;
+            border-radius: 999px;
+            padding: 8px 10px;
+            font: 600 10px Inter;
+            cursor: pointer
+        }
+
+        .suggestions button:hover {
+            color: #fff;
+            border-color: rgba(54, 207, 255, .4)
+        }
+
+        .composer {
+            padding: 15px;
+            border-top: 1px solid var(--line);
+            display: flex;
+            gap: 9px;
+            background: rgba(5, 13, 25, .65)
+        }
+
+        textarea {
+            flex: 1;
+            resize: none;
+            min-height: 48px;
+            max-height: 120px;
+            background: #07111f;
+            border: 1px solid rgba(95, 171, 255, .17);
+            border-radius: 11px;
+            color: #eaf4ff;
+            outline: none;
+            padding: 13px;
+            font: 12px Inter;
+            line-height: 1.45
+        }
+
+        textarea:focus {
+            border-color: rgba(54, 207, 255, .5);
+            box-shadow: 0 0 0 3px rgba(54, 207, 255, .05)
+        }
+
+        .send {
+            width: 52px;
+            border: 0;
+            border-radius: 11px;
+            background: linear-gradient(135deg, #36cfff, #388bff);
+            color: #03101f;
+            font-size: 18px;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 0 22px rgba(54, 207, 255, .18);
+            transition: .25s
+        }
+
+        .send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(54, 207, 255, .35)
+        }
+
+        .hint {
+            font-size: 9px;
+            color: #60768e;
+            text-align: center;
+            padding: 7px 0 0;
+            grid-column: 1/-1
+        }
+
+        footer {
+            border-top: 1px solid var(--line);
+            padding: 25px;
+            text-align: center;
+            color: #60758b;
+            font-size: 10px;
+            letter-spacing: .5px
+        }
+
+        .reveal {
+            animation: reveal .7s ease both
+        }
+
+        @keyframes reveal {
+            from {
+                opacity: 0;
+                transform: translateY(18px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        @media(max-width:900px) {
+            .navlinks {
+                display: none
+            }
+
+            .layout {
+                grid-template-columns: 1fr
+            }
+
+            .quick {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 7px
+            }
+
+            .quick-title {
+                grid-column: 1/-1
+            }
+
+            .quick button {
+                margin: 0
+            }
+
+            .mini-note {
+                display: none
+            }
+
+            .chat {
+                min-height: 620px
+            }
+        }
+
+        @media(max-width:600px) {
+            main {
+                padding: 32px 12px 50px
+            }
+
+            .nav {
+                padding: 0 12px
+            }
+
+            .brand-text small {
+                display: none
+            }
+
+            .back-link {
+                padding: 8px 9px;
+                font-size: 10px
+            }
+
+            .status {
+                padding: 5px 9px;
+                font-size: 9px;
+            }
+
+            .bubble {
+                max-width: 90%
+            }
+
+            .messages {
+                padding: 16px;
+                min-height: 400px
+            }
+
+            .quick {
+                grid-template-columns: 1fr
+            }
+
+            .hero p {
+                font-size: 12px
+            }
+
+            .composer {
+                padding: 10px
+            }
+
+            .send {
+                width: 46px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid-bg"></div>
+    <div class="noise"></div>
+    <div class="glow one"></div>
+    <div class="glow two"></div>
+    <header class="topbar">
+        <div class="nav">
+            <a class="brand" href="index.html" aria-label="CyberScope Home">
+                <div class="brand-mark"><img src="assets/logo.png" alt="CyberScope Logo"
+                        onerror="this.style.display='none';this.parentElement.innerHTML='<span class=brand-fallback>CS</span>'">
+                </div>
+                <div class="brand-text"><strong>CYBERSCOPE AI</strong><small>Investigation Assistant • TetraByte</small>
+                </div>
+            </a>
+            <div class="assistant-top-actions">
+                <a class="back-link" href="dashboard.html">Dashboard</a>
+                <a class="back-link" href="index.html">← Overview</a>
+                <div class="status" id="backend-status"><i class="dot"></i>ONLINE • AI Live</div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <section class="hero reveal">
+            <div class="eyebrow">CYBER-FRAUD INTELLIGENCE ASSISTANT</div>
+            <h1>Ask <span>CyberScope AI</span> anything.</h1>
+            <p>A standalone investigation assistant for understanding cases, entities, fraud networks, transactions,
+                campaigns, risk signals, workflows and the CyberScope platform.</p>
+        </section>
+        <div class="layout reveal">
+            <aside class="panel">
+                <div class="panel-head"><strong>ASK ABOUT</strong><small>QUICK START</small></div>
+                <div class="quick">
+                    <div class="quick-title">Platform</div>
+                    <button onclick="ask('What is CyberScope and what problem does it solve?')">What is
+                        CyberScope?</button>
+                    <button onclick="ask('Explain the complete CyberScope workflow.')">How does it work?</button>
+                    <button onclick="ask('What technologies are used in CyberScope?')">Technology stack</button>
+                    <div class="quick-title">Investigation</div>
+                    <button onclick="ask('How do I investigate a new fraud case?')">Investigate a case</button>
+                    <button onclick="ask('How should I interpret a fraud graph?')">Read a fraud graph</button>
+                    <button onclick="ask('How do I identify a suspicious entity?')">Find suspicious entities</button>
+                    <div class="quick-title">Risk & intelligence</div>
+                    <button onclick="ask('Explain high, medium and low risk signals.')">Risk levels</button>
+                    <button onclick="ask('How can shared entities reveal a fraud campaign?')">Detect campaigns</button>
+                    <button onclick="ask('How can money flow be traced between accounts?')">Trace transactions</button>
+                </div>
+                <div class="mini-note" id="mode-note"><b>AI Connected</b><br>CyberScope AI Assistant powered by NVIDIA NIM.</div>
+            </aside>
+            <section class="panel chat">
+                <div class="chat-head">
+                    <div class="chat-brand">
+                        <div class="chat-avatar"><img src="assets/logo.png" alt="CyberScope AI"
+                                onerror="this.style.display='none';this.parentElement.textContent='CS'"></div>
+                        <div class="chat-title"><strong>CyberScope AI</strong><span><i class="dot"></i> INVESTIGATION
+                                ASSISTANT</span></div>
+                    </div>
+                    <div class="chat-actions"><button class="iconbtn" onclick="clearChat()"
+                            title="Clear chat">⌫</button><button class="iconbtn" onclick="showHelp()"
+                            title="Help">?</button></div>
+                </div>
+                <div class="messages" id="messages" aria-live="polite">
+                    <div class="msg">
+                        <div class="bubble"><strong>Hello, Investigator.</strong><br>I’m the CyberScope AI assistant.
+                            Ask me about cases, fraud graphs, entities, transactions, campaigns, risk, evidence,
+                            investigation workflows, platform architecture, or how to use any module.<br><span
+                                class="tag">Cases</span><span class="tag">Fraud Graph</span><span
+                                class="tag">Entities</span><span class="tag">Transactions</span><span
+                                class="tag">Campaigns</span></div>
+                    </div>
+                </div>
+                <div class="suggestions"><button
+                        onclick="ask('Give me a complete overview of CyberScope.')">Overview</button><button
+                        onclick="ask('What information should I collect for a new case?')">New Case</button><button
+                        onclick="ask('What are the main graph entities and relationships?')">Graph
+                        schema</button><button onclick="ask('Explain risk assessment.')">Risk</button><button
+                        onclick="ask('What can an investigator do in the workspace?')">Workspace</button></div>
+                <div class="composer"><textarea id="input" placeholder="Ask CyberScope AI anything..."
+                        rows="1"></textarea><button class="send" onclick="send()">➤</button></div>
+                <div class="hint">Press Enter to send • Shift + Enter for a new line • Powered by CyberScope AI</div>
+            </section>
+        </div>
+    </main>
+    <footer>CYBERSCOPE • A Project of TetraByte • Cyber-Fraud Intelligence Platform</footer>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/supabase-client.js"></script>
+    <script>
+        const responses = [
+            { keys: ['what is cyberscope', 'cyberscope', 'platform'], html: `<strong>CyberScope</strong> is a cyber-fraud intelligence and investigation platform designed to connect fragmented incidents into one investigation view. It links cases through shared entities such as phone numbers, domains, UPI IDs, bank accounts and transaction relationships so investigators can identify patterns that isolated investigations may miss.` },
+            { keys: ['problem', 'why cyberscope', 'purpose'], html: `CyberScope addresses fragmented fraud investigations. KYC phishing, digital-arrest scams and fake utility-bill threats can be investigated separately even when they reuse infrastructure. The platform is designed to connect those signals into a unified fraud graph and investigation workspace.` },
+            { keys: ['workflow', 'how does it work', 'process'], html: `The intended workflow is: <ul><li>Submit a fraud report.</li><li>Classify the report and extract entities.</li><li>Merge entities and relationships into the fraud graph.</li><li>Find connected incidents and suspicious paths.</li><li>Review risk signals and communities.</li><li>Render the investigation graph and export a report.</li></ul>` },
+            { keys: ['technology', 'tech stack', 'stack', 'neo4j', 'fastapi'], html: `The planned architecture uses <strong>Neo4j AuraDB</strong> as the graph source of truth, <strong>FastAPI</strong> for the backend API, deterministic regex entity extraction, TF-IDF + Naive Bayes for text classification, and Cytoscape.js for graph visualization. The current standalone chatbot is frontend-only.` },
+            { keys: ['case', 'cases', 'new case', 'report'], html: `A case represents a fraud incident or investigation record. Useful information includes case title, incident type, date, priority, summary, reporter/victim details, phone numbers, domains, UPI IDs, bank accounts, transaction references, amounts, evidence, risk level, assigned investigator and notes.` },
+            { keys: ['filter', 'search cases'], html: `In the Cases module, filtering can be used to narrow investigations by information such as risk level, status, incident type or search terms. The prototype can later connect these controls to live backend queries.` },
+            { keys: ['entity', 'entities', 'phone', 'domain', 'upi', 'bank account'], html: `CyberScope entities are investigation objects connected to incidents. The architecture identifies <strong>Phone, Message, Domain, UpiId and BankAccount</strong> as graph node types. Shared entities are important because they can connect apparently separate complaints.` },
+            { keys: ['fraud graph', 'graph', 'relationship', 'relationships'], html: `The Fraud Graph visualizes relationships between investigation entities. Core relationships include <strong>SENT</strong>, <strong>CONTAINS</strong>, <strong>REQUESTS_PAYMENT_TO</strong>, <strong>LINKED_TO</strong> and <strong>TRANSFERRED_TO</strong>. A graph helps investigators see clusters, repeated infrastructure and money-flow connections.` },
+            { keys: ['transaction', 'transactions', 'money flow', 'money flow', 'transferred'], html: `Transaction Explorer is intended to help investigators examine financial flows and identify connected activity across cases. Look for repeated destination accounts, common identifiers, unusual transfer chains and relationships between transaction records and known fraud entities.` },
+            { keys: ['campaign', 'campaigns', 'coordinated'], html: `Campaign Explorer groups related incidents into possible coordinated campaigns. Shared domains, phone numbers, payment identifiers, message patterns and connected entities can provide signals that several incidents belong to the same operation.` },
+            { keys: ['risk', 'risk level', 'risk score', 'high risk', 'medium risk', 'low risk'], html: `CyberScope is designed around explainable risk signals rather than a black-box result. In a prototype, <strong class="risk-high">HIGH</strong> can indicate strong or multiple connections, <strong class="risk-medium">MEDIUM</strong> can indicate signals requiring review, and <strong class="risk-low">LOW</strong> can indicate limited suspicious linkage. Exact scoring should come from the implemented backend rules.` },
+            { keys: ['evidence', 'proof', 'supporting evidence'], html: `Useful evidence can include the original report, message content, URLs/domains, phone numbers, UPI IDs, account identifiers, transaction references, timestamps and investigator notes. Evidence should be handled according to the applicable investigation and privacy procedures.` },
+            { keys: ['workspace', 'investigation workspace', 'investigate'], html: `The Investigation Workspace is intended to bring evidence, notes, linked entities and case information into one structured environment. An investigator can use it to move from a single incident toward connected entities, transactions and possible campaigns.` },
+            { keys: ['export', 'report export', 'pdf'], html: `The architecture includes a report export route: <strong>POST /report/{id}/export</strong>. The intended output can include JSON/PDF report data. In this standalone page, export is informational because there is no live backend connection.` },
+            { keys: ['api', 'endpoint', 'routes'], html: `The planned API includes <strong>/report</strong>, <strong>/graph/{node_id}</strong>, <strong>/incidents</strong>, <strong>/campaigns</strong>, <strong>/report/{id}/export</strong> and <strong>/health</strong>. The standalone chatbot does not call these endpoints yet.` },
+            { keys: ['login', 'sign in', 'signin', 'register', 'account'], html: `The CyberScope frontend can use browser localStorage for the current prototype account/session flow. A production deployment should use server-side authentication, secure password handling and a real database rather than storing passwords in localStorage.` },
+            { keys: ['dashboard', 'overview dashboard', 'statistics', 'stats'], html: `The Dashboard is the investigator's high-level workspace. It can surface active cases, linked entities, risk signals, campaign activity, recent investigations, risk distribution and quick navigation into the main modules.` },
+            { keys: ['architecture', 'system architecture'], html: `The architecture separates the thin frontend from the backend intelligence services. Neo4j is the graph source of truth; FastAPI handles API routes; classification and entity extraction prepare incoming reports; graph services execute parameterized Cypher queries; Cytoscape.js renders returned graph JSON.` },
+            { keys: ['regex', 'entity extraction'], html: `The architecture calls for deterministic regex extraction before probabilistic ML. This makes common structured entities such as phone numbers, domains or payment identifiers easier to extract consistently before graph operations.` },
+            { keys: ['machine learning', 'ml', 'classifier', 'naive bayes', 'tf-idf'], html: `The planned classifier uses <strong>TF-IDF + Naive Bayes</strong> for text classification. This can provide a lightweight baseline for categorizing incoming fraud reports, while the graph relationships add contextual intelligence around the classification.` },
+            { keys: ['neo4j', 'aura', 'database', 'database'], html: `Neo4j AuraDB is intended to act as CyberScope's graph database and single source of truth for connected fraud intelligence. Nodes represent entities and relationships represent links between them.` },
+            { keys: ['cytoscape', 'visualization'], html: `Cytoscape.js is intended for graph visualization. The frontend should remain relatively thin: it receives graph JSON from the backend and focuses on rendering nodes, relationships and investigation interactions.` },
+            { keys: ['security', 'privacy', 'safe', 'credentials'], html: `The architecture recommends environment variables for secrets, Pydantic validation, CORS controls, parameterized Cypher queries and synthetic/public data for the MVP. Never expose database credentials or sensitive production data in frontend JavaScript.` },
+            { keys: ['help', 'what can you do', 'commands'], html: `I can explain: <ul><li>CyberScope and its purpose</li><li>Cases and new-case fields</li><li>Fraud Graph nodes and relationships</li><li>Entities and entity extraction</li><li>Transactions and money flow</li><li>Campaign detection</li><li>Risk signals and explainability</li><li>Dashboard and Investigation Workspace</li><li>Architecture, APIs and technology</li><li>Frontend authentication and prototype limitations</li></ul> Try asking a natural-language question.` }
+        ];
+        function normalize(s) { return s.toLowerCase().replace(/[^a-z0-9\s]/g, ' '); }
+        function getResponse(q) {
+            let n = normalize(q);
+            let best = null, score = 0;
+            for (const r of responses) {
+                let s = 0;
+                for (const k of r.keys) {
+                    const nk = normalize(k);
+                    if (n.includes(nk)) s += nk.length > 5 ? 3 : 2;
+                }
+                if (s > score) {
+                    score = s;
+                    best = r;
+                }
+            }
+            if (best) return best.html;
+            return `I can help with that if you frame it around the CyberScope investigation platform. You can ask about <strong>cases, entities, fraud graphs, transactions, campaigns, risk, evidence, dashboards, investigation workflows, architecture, APIs, Neo4j, FastAPI, Cytoscape.js, authentication or the prototype limitations.</strong><br><br>For example: <em>“How do shared UPI IDs connect two cases?”</em>`;
+        }
+
+        function escapeHtml(s) {
+            return (s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
+        }
+
+        let scrollPending = false;
+        function scrollToBottom() {
+            if (scrollPending) return;
+            scrollPending = true;
+            requestAnimationFrame(() => {
+                const box = document.getElementById('messages');
+                if (box) {
+                    box.scrollTop = box.scrollHeight;
+                }
+                scrollPending = false;
+            });
+        }
+
+        function addMessage(html, type = 'bot') {
+            const wrap = document.createElement('div');
+            wrap.className = 'msg ' + type;
+            const b = document.createElement('div');
+            b.className = 'bubble';
+            b.innerHTML = html;
+            wrap.appendChild(b);
+            const box = document.getElementById('messages');
+            if (box) {
+                box.appendChild(wrap);
+                scrollToBottom();
+            }
+        }
+
+        function typing() {
+            const wrap = document.createElement('div');
+            wrap.className = 'msg';
+            wrap.id = 'typing';
+            wrap.innerHTML = '<div class="bubble"><div class="typing"><i></i><i></i><i></i></div></div>';
+            const box = document.getElementById('messages');
+            if (box) {
+                box.appendChild(wrap);
+                scrollToBottom();
+            }
+        }
+
+        function addEmptyBotBubble() {
+            const wrap = document.createElement('div');
+            wrap.className = 'msg bot';
+            const b = document.createElement('div');
+            b.className = 'bubble';
+            wrap.appendChild(b);
+            const box = document.getElementById('messages');
+            if (box) {
+                box.appendChild(wrap);
+                scrollToBottom();
+            }
+            return b;
+        }
+
+        function ask(q) {
+            if (isGenerating) return;
+            const input = document.getElementById('input');
+            if (!input) return;
+            input.value = q;
+            input.style.height = 'auto';
+            send();
+        }
+
+        function showHelp() {
+            ask('What can you do?');
+        }
+
+        function clearChat() {
+            if (isGenerating && currentAbortController) {
+                currentAbortController.abort();
+            }
+            chatHistory.length = 0;
+            const box = document.getElementById('messages');
+            if (box) {
+                box.innerHTML = '<div class="msg"><div class="bubble"><strong>Chat cleared.</strong><br>Ask me anything about the CyberScope investigation platform.</div></div>';
+            }
+        }
+
+        let API_BASE = window.location.origin.startsWith('http') ? window.location.origin : 'http://localhost:8000';
+        const chatHistory = [];
+        let isGenerating = false;
+        let currentAbortController = null;
+        let isBackendLive = false;
+
+        function updateStatusBadge(online, modelName = '') {
+            isBackendLive = online;
+            const badge = document.getElementById('backend-status');
+            const note = document.getElementById('mode-note');
+            if (online) {
+                if (badge) {
+                    badge.className = 'status';
+                    badge.innerHTML = '<i class="dot"></i>ONLINE • AI Live';
+                    badge.title = modelName ? `Connected to ${modelName} (${API_BASE})` : 'Live FastAPI Backend';
+                }
+                if (note) {
+                    note.innerHTML = `<b>Live AI Connected</b><br>Model: <code>${escapeHtml(modelName || 'NVIDIA NIM')}</code>`;
+                }
+            } else {
+                if (badge) {
+                    badge.className = 'status standalone';
+                    badge.innerHTML = '<i class="dot"></i>ONLINE • Standalone';
+                    badge.title = 'Offline mode: local intelligence responses active';
+                }
+                if (note) {
+                    note.innerHTML = '<b>Standalone Mode</b><br>Local cyber-investigation intelligence active.';
+                }
+            }
+        }
+
+        async function checkBackend() {
+            const candidates = [
+                API_BASE,
+                'http://localhost:8000',
+                'http://127.0.0.1:8000'
+            ];
+            const uniqueCandidates = [...new Set(candidates.filter(Boolean))];
+
+            for (const base of uniqueCandidates) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3000);
+                    const res = await fetch(`${base}/api/health`, { cache: 'no-store', signal: controller.signal });
+                    clearTimeout(timeoutId);
+                    if (res.ok) {
+                        const data = await res.json();
+                        API_BASE = base;
+                        updateStatusBadge(true, data.model);
+                        return true;
+                    }
+                } catch (e) {}
+            }
+            updateStatusBadge(false);
+            return false;
+        }
+        checkBackend();
+
+        function updateComposerState(busy) {
+            const sendBtn = document.querySelector('.send');
+            if (sendBtn) {
+                sendBtn.disabled = busy;
+                sendBtn.style.opacity = busy ? '0.5' : '1';
+                sendBtn.style.cursor = busy ? 'not-allowed' : 'pointer';
+            }
+        }
+
+        function renderMarkdown(md) {
+            if (!md) return '';
+            let text = escapeHtml(md);
+
+            // Auto-close open code block during streaming to prevent layout flicker
+            const codeFenceCount = (text.match(/```/g) || []).length;
+            if (codeFenceCount % 2 === 1) {
+                text += '\n```';
+            }
+
+            const codeBlocks = [];
+            text = text.replace(/```(?:([a-zA-Z0-9_+-]+)?\n)?([\s\S]*?)```/g, (match, lang, code) => {
+                const id = `\x01CB${codeBlocks.length}\x01`;
+                const cleanLang = lang ? lang.trim() : 'CODE';
+                const cleanCode = code.replace(/^\n+|\n+$/g, '');
+                codeBlocks.push(
+                    `<div class="code-wrap">` +
+                    `<div class="code-header"><span class="code-lang">${cleanLang}</span><button class="code-copy-btn" type="button">Copy</button></div>` +
+                    `<pre><code class="language-${cleanLang.toLowerCase()}">${cleanCode}</code></pre>` +
+                    `</div>`
+                );
+                return `\n\n${id}\n\n`;
+            });
+
+            // Auto-close open inline code during streaming
+            const inlineFenceCount = (text.match(/`/g) || []).length;
+            if (inlineFenceCount % 2 === 1) {
+                text += '`';
+            }
+
+            const inlineCodes = [];
+            text = text.replace(/`([^`\n]+)`/g, (match, code) => {
+                const id = `\x01IC${inlineCodes.length}\x01`;
+                inlineCodes.push(`<code>${code}</code>`);
+                return id;
+            });
+
+            // Dividers (---, ***, ___)
+            text = text.replace(/^[ \t]*(?:---|\*\*\*|___)[ \t]*$/gm, '\n\n<hr class="bubble-divider">\n\n');
+
+            // Headers (# to ####)
+            text = text.replace(/^(#{1,4})\s+(.+)$/gm, (match, hashes, title) => {
+                const level = Math.min(hashes.length + 1, 4);
+                return `\n\n<h${level}>${title.trim()}</h${level}>\n\n`;
+            });
+
+            // Bold & italic
+            text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+            text = text.replace(/(^|[^\*])\*([^\*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
+
+            // Unordered lists (lines starting with -, *, or +)
+            text = text.replace(/((?:^[ \t]*[-*+][ \t]+.+(?:\n|$))+)/gm, (match) => {
+                const items = match.trim().split('\n').map(line => {
+                    const itemText = line.replace(/^[ \t]*[-*+][ \t]+/, '').trim();
+                    return `<li>${itemText}</li>`;
+                }).join('');
+                return `\n\n<ul>${items}</ul>\n\n`;
+            });
+
+            // Ordered lists (lines starting with digits followed by dot)
+            text = text.replace(/((?:^[ \t]*\d+\.[ \t]+.+(?:\n|$))+)/gm, (match) => {
+                const items = match.trim().split('\n').map(line => {
+                    const itemText = line.replace(/^[ \t]*\d+\.[ \t]+/, '').trim();
+                    return `<li>${itemText}</li>`;
+                }).join('');
+                return `\n\n<ol>${items}</ol>\n\n`;
+            });
+
+            // Paragraphs: split by 2 or more newlines
+            const blocks = text.split(/\n{2,}/);
+            text = blocks.map(b => {
+                b = b.trim();
+                if (!b) return '';
+                if (/^<(?:ul|ol|pre|div|h[1-6]|hr|blockquote)/i.test(b) || /^\x01CB\d+\x01/.test(b)) {
+                    return b;
+                }
+                return `<p>${b.replace(/\n/g, '<br>')}</p>`;
+            }).filter(Boolean).join('');
+
+            // Restore inline code and code blocks safely
+            text = text.replace(/\x01IC(\d+)\x01/g, (_, idx) => inlineCodes[idx]);
+            text = text.replace(/\x01CB(\d+)\x01/g, (_, idx) => codeBlocks[idx]);
+
+            return text;
+        }
+
+        // Copy-to-clipboard delegation for code blocks
+        document.getElementById('messages')?.addEventListener('click', (e) => {
+            const copyBtn = e.target.closest('.code-copy-btn');
+            if (!copyBtn) return;
+            const wrap = copyBtn.closest('.code-wrap') || copyBtn.closest('pre');
+            const codeEl = wrap?.querySelector('code');
+            if (!codeEl) return;
+            const textToCopy = codeEl.innerText || codeEl.textContent || '';
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const prev = copyBtn.textContent;
+                copyBtn.textContent = '✓ Copied';
+                setTimeout(() => { copyBtn.textContent = prev; }, 1600);
+            }).catch(() => {
+                copyBtn.textContent = 'Failed';
+                setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1600);
+            });
+        });
+
+        async function send() {
+            if (isGenerating) return;
+            const el = document.getElementById('input');
+            const q = el.value.trim();
+            if (!q) return;
+
+            isGenerating = true;
+            updateComposerState(true);
+
+            addMessage(escapeHtml(q), 'user');
+            chatHistory.push({ role: 'user', content: q });
+            el.value = '';
+            el.style.height = 'auto';
+            typing();
+            scrollToBottom();
+
+            currentAbortController = new AbortController();
+            let bubble = null;
+            let fullText = '';
+            let streamHadTokens = false;
+
+            try {
+                const authHeaders = (window.CyberScopeAuth && typeof window.CyberScopeAuth.getAuthHeaders === 'function')
+                    ? window.CyberScopeAuth.getAuthHeaders()
+                    : (localStorage.getItem('token') ? { 'Authorization': 'Bearer ' + localStorage.getItem('token') } : {});
+                const res = await fetch(`${API_BASE}/api/chat`, {
+                    method: 'POST',
+                    headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders),
+                    body: JSON.stringify({
+                        messages: chatHistory.slice(-8),
+                        stream: true,
+                        max_tokens: 2048,
+                        temperature: 0.3
+                    }),
+                    signal: currentAbortController.signal
+                });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status} ${res.statusText}`);
+                }
+
+                updateStatusBadge(true);
+                document.getElementById('typing')?.remove();
+                bubble = addEmptyBotBubble();
+
+                const reader = res.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop();
+
+                    for (const line of lines) {
+                        const trimmed = line.trim();
+                        if (!trimmed || !trimmed.startsWith('data:')) continue;
+                        const dataStr = trimmed.slice(5).trim();
+                        if (dataStr === '[DONE]') continue;
+
+                        try {
+                            const parsed = JSON.parse(dataStr);
+                            if (parsed.error) {
+                                throw new Error(parsed.error);
+                            }
+                            const content = parsed.choices?.[0]?.delta?.content || parsed.choices?.[0]?.text || '';
+                            if (content) {
+                                fullText += content;
+                                streamHadTokens = true;
+                                bubble.innerHTML = renderMarkdown(fullText);
+                                scrollToBottom();
+                            }
+                        } catch (pe) {
+                            if (pe.message && !pe.message.includes('JSON')) {
+                                throw pe;
+                            }
+                        }
+                    }
+                }
+
+                // Process any final tokens remaining in buffer
+                if (buffer.trim().startsWith('data:')) {
+                    const dataStr = buffer.trim().slice(5).trim();
+                    if (dataStr !== '[DONE]') {
+                        try {
+                            const parsed = JSON.parse(dataStr);
+                            const content = parsed.choices?.[0]?.delta?.content || parsed.choices?.[0]?.text || '';
+                            if (content) {
+                                fullText += content;
+                                streamHadTokens = true;
+                                bubble.innerHTML = renderMarkdown(fullText);
+                                scrollToBottom();
+                            }
+                        } catch (e) {}
+                    }
+                }
+
+                if (!fullText) {
+                    bubble.innerHTML = '<em>No response received from model.</em>';
+                } else {
+                    chatHistory.push({ role: 'assistant', content: fullText });
+                }
+            } catch (err) {
+                if (err.name === 'AbortError') {
+                    document.getElementById('typing')?.remove();
+                    if (bubble && !fullText) bubble.parentElement?.remove();
+                    return;
+                }
+
+                console.warn('Backend chat stream unavailable or failed:', err);
+                updateStatusBadge(false);
+                document.getElementById('typing')?.remove();
+
+                if (streamHadTokens && bubble) {
+                    bubble.innerHTML += `<div class="stream-error-notice">⚠️ Connection lost (${escapeHtml(err.message || 'Stream interrupted')}). Partial response displayed above.</div>`;
+                    chatHistory.push({ role: 'assistant', content: fullText });
+                } else {
+                    if (bubble) bubble.parentElement?.remove();
+                    const fallbackReply = getResponse(q);
+                    const fallbackHtml = `<div class="standalone-badge">⚡ Standalone Intelligence</div>` + fallbackReply;
+                    addMessage(fallbackHtml, 'bot');
+                    chatHistory.push({ role: 'assistant', content: fallbackReply });
+                }
+                scrollToBottom();
+            } finally {
+                isGenerating = false;
+                currentAbortController = null;
+                updateComposerState(false);
+                const inputEl = document.getElementById('input');
+                if (inputEl) inputEl.focus();
+            }
+        }
+
+        document.getElementById('input').addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                send();
+            }
+        });
+        document.getElementById('input').addEventListener('input', e => {
+            e.target.style.height = 'auto';
+            e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+        });
+    </script>
+</body>
+
+</html>

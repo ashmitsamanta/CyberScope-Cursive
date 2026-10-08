@@ -54,6 +54,9 @@ class Settings(BaseSettings):
     OPENAI_API_BASE: str = "https://api.openai.com/v1"
     NVIDIA_API_KEY: str = ""
     NVIDIA_MODEL: str = "meta/llama-3.2-11b-vision-instruct"
+    NVIDIA_BASE_URL: str = "https://integrate.api.nvidia.com/v1/chat/completions"
+    PRIMARY_MODEL: str = "meta/llama-3.2-11b-vision-instruct"
+    FALLBACK_MODEL: str = "google/diffusiongemma-26b-a4b-it"
 
     # Detection & Analysis Thresholds
     BURST_WINDOW_MINUTES: int = 15

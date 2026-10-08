@@ -190,3 +190,31 @@ def test_threat_map_frontend_contract():
         assert key in event, f"Missing key '{key}' in live feed event"
 
 
+def test_chat_streaming_contract():
+    res = client.post("/api/chat", json={
+        "messages": [{"role": "user", "content": "How does the fraud graph work?"}],
+        "stream": True
+    })
+    assert res.status_code == 200
+    assert "text/event-stream" in res.headers.get("content-type", "")
+    content = res.text
+    assert "data:" in content
+    assert "[DONE]" in content
+
+
+def test_chat_domain_intelligence_topics():
+    topics = ["graph", "case", "entity", "transaction", "campaign", "risk"]
+    for topic in topics:
+        res = client.post("/api/chat", json={
+            "messages": [{"role": "user", "content": f"Tell me about {topic}"}],
+            "stream": False
+        })
+        assert res.status_code == 200
+        data = res.json()
+        assert "choices" in data
+        assert len(data["choices"]) > 0
+        reply = data["choices"][0]["message"]["content"]
+        assert len(reply) > 20
+
+
+

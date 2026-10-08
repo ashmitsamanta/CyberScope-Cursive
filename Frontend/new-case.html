@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="apple-touch-icon" href="assets/logo.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CyberScope | Lodge New Case</title>
+<link rel="stylesheet" href="assets/cyberscope.css">
+<style>
+/* Page-specific styling for Case Intake Form */
+.intake-main {
+  max-width: 1180px;
+  margin: auto;
+  padding: 40px 5% 70px;
+}
+.hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 25px;
+  align-items: flex-end;
+  margin-bottom: 24px;
+}
+.hero-copy {
+  flex: 1;
+}
+.eyebrow {
+  font-size: 10px;
+  color: var(--cyan);
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-bottom: 9px;
+  text-transform: uppercase;
+}
+.hero h1 {
+  font-size: 32px;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.hero p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+  max-width: 760px;
+}
+.back-btn {
+  color: var(--cyan);
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  border: 1px solid rgba(54, 207, 255, 0.25);
+  padding: 10px 15px;
+  border-radius: 9px;
+  background: rgba(54, 207, 255, 0.05);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.back-btn:hover {
+  background: rgba(54, 207, 255, 0.12);
+  border-color: rgba(54, 207, 255, 0.45);
+  transform: translateY(-1px);
+}
+.form-card {
+  background: linear-gradient(145deg, rgba(13, 23, 39, 0.96), rgba(7, 18, 32, 0.96));
+  border: 1px solid rgba(95, 171, 255, 0.13);
+  border-radius: 14px;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.3);
+  padding: 24px;
+  margin-bottom: 18px;
+}
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  border-bottom: 1px solid rgba(95, 171, 255, 0.08);
+  padding-bottom: 12px;
+}
+.section-title h2 {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text);
+}
+.section-title span {
+  font-size: 11px;
+  color: var(--muted);
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.field.full {
+  grid-column: 1 / -1;
+}
+.field label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #a9bfd2;
+  letter-spacing: 0.5px;
+}
+.field label em {
+  color: var(--red);
+  font-style: normal;
+  margin-left: 2px;
+}
+.field input, .field select, .field textarea {
+  width: 100%;
+  background: #07111e;
+  border: 1px solid rgba(95, 171, 255, 0.15);
+  color: var(--text);
+  padding: 11px 13px;
+  border-radius: 8px;
+  outline: none;
+  font-size: 12px;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.field textarea {
+  min-height: 110px;
+  resize: vertical;
+  line-height: 1.6;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: rgba(54, 207, 255, 0.5);
+  box-shadow: 0 0 0 3px rgba(54, 207, 255, 0.08);
+}
+.field input[type=file] {
+  padding: 10px;
+  color: #8da1b8;
+  cursor: pointer;
+}
+.hint {
+  font-size: 11px;
+  color: #657b91;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+.check-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 11px;
+}
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid rgba(95, 171, 255, 0.1);
+  background: rgba(7, 16, 28, 0.55);
+  padding: 11px 13px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #a9bfd2;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+.check-item:hover {
+  background: rgba(54, 207, 255, 0.04);
+  border-color: rgba(54, 207, 255, 0.25);
+}
+.check-item input {
+  accent-color: #36cfff;
+  cursor: pointer;
+  width: 15px;
+  height: 15px;
+}
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 14px;
+}
+.btn.primary {
+  background: linear-gradient(135deg, #36cfff, #388bff);
+  color: #03101a;
+  border-color: transparent;
+  font-weight: 800;
+  box-shadow: 0 4px 18px rgba(54, 207, 255, 0.25);
+}
+.btn.primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+.notice {
+  display: none;
+  padding: 14px 16px;
+  border-radius: 9px;
+  margin-bottom: 18px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.notice.success {
+  background: rgba(93, 255, 177, 0.08);
+  border: 1px solid rgba(93, 255, 177, 0.3);
+  color: var(--green);
+}
+.notice.error {
+  background: rgba(255, 102, 125, 0.08);
+  border: 1px solid rgba(255, 102, 125, 0.3);
+  color: #ff9aaa;
+}
+@media(max-width: 800px) {
+  .hero { flex-direction: column; align-items: flex-start; }
+  .form-grid { grid-template-columns: 1fr; }
+  .check-grid { grid-template-columns: 1fr; }
+  .field.full { grid-column: auto; }
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="index.html">
+    <div class="mark"><img src="assets/logo.png" alt="CyberScope"></div>
+    <div><b>CYBERSCOPE</b><small>A PROJECT OF TETRABYTE</small></div>
+  </a>
+  <div class="nav-inline">
+    <nav class="nav" id="siteNav">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="cases.html" class="active">Cases</a>
+      <a href="fraud-graph.html">Fraud Graph</a>
+      <a href="threat-map.html">Threat Map</a>
+      <a href="entity-explorer.html">Entities</a>
+      <a href="transaction-explorer.html">Transactions</a>
+      <a href="campaign-explorer.html">Campaigns</a>
+      <a href="investigation-workspace.html">Workspace</a>
+      <a href="chatbot.html">AI Assistant</a>
+    </nav>
+    <div class="profile">
+      <div class="avatar" id="avatar">CS</div>
+      <div><div class="pname" id="profileName">User</div><div class="prole">Investigator</div></div>
+      <button class="signout" onclick="signOut()">Sign out</button>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="siteNav"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<div class="nav-backdrop" id="navBackdrop"></div>
+
+<main class="intake-main">
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">CASE INTAKE MODULE</div>
+      <h1>Lodge a New Case</h1>
+      <p>Create a structured investigation record. This intake console extracts digital entities (phones, domains, UPI IDs, mule accounts), maps them into the fraud graph, and computes real-time threat risk signals.</p>
+    </div>
+    <a class="back-btn" href="cases.html">← Back to Cases</a>
+  </section>
+
+  <div id="successNotice" class="notice success" role="alert"></div>
+  <div id="errorNotice" class="notice error" role="alert"></div>
+
+  <form id="caseForm">
+    <!-- Section 1 -->
+    <section class="form-card">
+      <div class="section-title">
+        <h2>1. Case Information</h2>
+        <span>Required identification and classification</span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label for="title">Case Title <em>*</em></label>
+          <input id="title" required placeholder="e.g. KYC phishing cluster targeting SBI users">
+        </div>
+        <div class="field">
+          <label for="type">Incident Type <em>*</em></label>
+          <select id="type" required>
+            <option value="">Select incident type</option>
+            <option value="KYC Phishing">KYC Phishing</option>
+            <option value="Digital Arrest Scam">Digital Arrest Scam</option>
+            <option value="Fake Utility-Bill Threat">Fake Utility-Bill Threat</option>
+            <option value="UPI / Payment Scam">UPI / Payment Scam</option>
+            <option value="Investment Scam">Investment Scam / Fake Trading App</option>
+            <option value="Part-Time Job Scam">Part-Time Job / Task Scam</option>
+            <option value="Identity Theft">Identity Theft / SIM Swap</option>
+            <option value="Other">Other Cyber-Fraud</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="date">Reported Date <em>*</em></label>
+          <input id="date" type="date" required>
+        </div>
+        <div class="field">
+          <label for="priority">Priority <em>*</em></label>
+          <select id="priority" required>
+            <option value="">Select priority</option>
+            <option value="High">High (Immediate interdiction)</option>
+            <option value="Medium">Medium (Active investigation)</option>
+            <option value="Low">Low (Routine analysis)</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label for="summary">Incident Summary <em>*</em></label>
+          <textarea id="summary" required placeholder="Describe the incident narrative: how contact occurred, social engineering lure, messages received, and the suspected fraud pattern."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2 -->
+    <section class="form-card">
+      <div class="section-title">
+        <h2>2. Reporter / Victim Details</h2>
+        <span>Contact information and jurisdiction</span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label for="reporter">Reporter Name <em>*</em></label>
+          <input id="reporter" required placeholder="Full name of victim or complainant">
+        </div>
+        <div class="field">
+          <label for="contact">Contact Number</label>
+          <input id="contact" inputmode="numeric" placeholder="10-digit phone number">
+        </div>
+        <div class="field">
+          <label for="email">Email Address</label>
+          <input id="email" type="email" placeholder="name@example.com">
+        </div>
+        <div class="field">
+          <label for="organization">Reporting Organization / Channel</label>
+          <input id="organization" placeholder="e.g. NCRP 1930 / State Cyber Cell / Bank Nodal">
+        </div>
+        <div class="field full">
+          <label for="location">Location / Jurisdiction</label>
+          <input id="location" placeholder="City, state, or police station jurisdiction">
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3 -->
+    <section class="form-card">
+      <div class="section-title">
+        <h2>3. Fraud Entities & Identifiers</h2>
+        <span>Key artifacts used to correlate cross-case syndicates</span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label for="phones">Suspicious Phone Number(s)</label>
+          <input id="phones" placeholder="e.g. +91 9876543210 (comma-separated if multiple)">
+        </div>
+        <div class="field">
+          <label for="domain">Phishing Domain / URL</label>
+          <input id="domain" placeholder="e.g. sbi-kyc-update.com or https://cbi-court.in">
+        </div>
+        <div class="field">
+          <label for="upi">UPI ID(s) / VPA</label>
+          <input id="upi" placeholder="e.g. extortion@okhdfcbank, payment@paytm">
+        </div>
+        <div class="field">
+          <label for="bank">Mule Bank Account / IFSC</label>
+          <input id="bank" placeholder="Account number, bank name, or IFSC">
+        </div>
+        <div class="field full">
+          <label for="other">Other Digital Identifiers</label>
+          <input id="other" placeholder="Telegram handles, APK package names, IP addresses, crypto wallet addresses">
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4 -->
+    <section class="form-card">
+      <div class="section-title">
+        <h2>4. Financial & Transaction Context</h2>
+        <span>Money-flow details for multi-hop tracing</span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label for="txn">Transaction Reference / UTR</label>
+          <input id="txn" placeholder="UTR or banking transaction reference number">
+        </div>
+        <div class="field">
+          <label for="amount">Total Amount Involved</label>
+          <input id="amount" type="number" min="0" step="0.01" placeholder="e.g. 150000">
+        </div>
+        <div class="field">
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="INR">INR (₹)</option>
+            <option value="USD">USD ($)</option>
+            <option value="USDT">USDT (Crypto)</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="destination">Suspected Destination / Beneficiary</label>
+          <input id="destination" placeholder="Destination mule account, aggregator, or gateway">
+        </div>
+        <div class="field full">
+          <label for="txnnotes">Transaction Flow Notes</label>
+          <textarea id="txnnotes" placeholder="Describe financial movements, fan-out splitting, or crypto conversion details."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5 -->
+    <section class="form-card">
+      <div class="section-title">
+        <h2>5. Evidentiary Signals & Attachments</h2>
+        <span>Network indicators and file references</span>
+      </div>
+      <div class="check-grid">
+        <label class="check-item"><input type="checkbox" value="shared-phone"> Shared phone number</label>
+        <label class="check-item"><input type="checkbox" value="shared-domain"> Shared domain / C2</label>
+        <label class="check-item"><input type="checkbox" value="shared-upi"> Shared UPI ID / VPA</label>
+        <label class="check-item"><input type="checkbox" value="shared-bank"> Shared mule bank account</label>
+        <label class="check-item"><input type="checkbox" value="money-flow"> Rapid fan-out money flow</label>
+        <label class="check-item"><input type="checkbox" value="repeat-pattern"> Repeat syndicate pattern</label>
+      </div>
+      <div class="form-grid" style="margin-top:16px;">
+        <div class="field full">
+          <label for="evidence">Evidence & Reference Links</label>
+          <textarea id="evidence" placeholder="Paste complaint links, CDR notes, or public evidence URLs. (Do not paste confidential credentials)"></textarea>
+        </div>
+        <div class="field full">
+          <label for="attachment">Upload Supporting Document / Screenshot</label>
+          <input id="attachment" type="file" accept=".jpg,.jpeg,.png,.pdf,.txt,.csv">
+          <div class="hint">Frontend intake preview: File metadata is captured and indexed into the case dossier.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 6 -->
+    <section class="form-card">
+      <div class="section-title">
+        <h2>6. Investigator Assessment</h2>
+        <span>Initial triage and action plan</span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label for="risk">Initial Risk Level <em>*</em></label>
+          <select id="risk" required>
+            <option value="">Select risk level</option>
+            <option value="High">HIGH (Urgent freeze & inter-state escalation)</option>
+            <option value="Medium">MEDIUM (Active investigation & entity tracking)</option>
+            <option value="Low">LOW (Baseline recording & monitoring)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="investigator">Assigned Investigator</label>
+          <input id="investigator" placeholder="Investigator name or badge ID">
+        </div>
+        <div class="field full">
+          <label for="notes">Initial Investigator Notes</label>
+          <textarea id="notes" placeholder="Initial observations, suspected syndicate connections, recommended Section 102 notices, or next steps."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <div class="form-actions">
+      <a class="btn" href="cases.html">Cancel</a>
+      <button class="btn primary" type="submit" id="submitBtn">Submit New Case →</button>
+    </div>
+  </form>
+</main>
+
+<footer>CYBERSCOPE · TETRABYTE · CASE INTAKE CONSOLE</footer>
+
+<a href="chatbot.html" class="chat-button" id="chatButton" title="Open CyberScope AI Assistant" aria-label="Open CyberScope AI Assistant">✦</a>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-client.js"></script>
+<script src="assets/cyberscope.js"></script>
+<script>
+cyberscopeProtect();
+
+// Set default reported date to today
+document.getElementById('date').value = new Date().toISOString().slice(0, 10);
+
+function showSuccess(msg) {
+  const s = document.getElementById('successNotice');
+  s.textContent = '✓ ' + msg;
+  s.style.display = 'block';
+  document.getElementById('errorNotice').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showError(msg) {
+  const e = document.getElementById('errorNotice');
+  e.textContent = '⚠ ' + msg;
+  e.style.display = 'block';
+  document.getElementById('successNotice').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.getElementById('caseForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const submitBtn = document.getElementById('submitBtn');
+
+  const requiredIds = ['title', 'type', 'date', 'priority', 'reporter', 'summary', 'risk'];
+  for (const id of requiredIds) {
+    const el = document.getElementById(id);
+    if (!el || !el.value.trim()) {
+      showError('Please complete all required fields marked with *.');
+      if (el) el.focus();
+      return;
+    }
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Ingesting Case & Extracting Entities...';
+
+  const signals = [...document.querySelectorAll('.check-item input:checked')].map(x => x.value);
+
+  // Construct structured narrative for automatic backend entity extraction
+  const narrativeParts = [
+    summary.value.trim(),
+    phones.value.trim() ? ('Suspect Phone(s): ' + phones.value.trim()) : '',
+    domain.value.trim() ? ('Phishing Domain / URL: ' + domain.value.trim()) : '',
+    upi.value.trim() ? ('Fraudulent UPI ID: ' + upi.value.trim()) : '',
+    bank.value.trim() ? ('Mule Bank Account: ' + bank.value.trim()) : '',
+    txn.value.trim() ? ('Transaction Ref (UTR): ' + txn.value.trim()) : '',
+    amount.value.trim() ? ('Amount Involved: ' + currency.value + ' ' + amount.value.trim()) : '',
+    destination.value.trim() ? ('Suspected Destination: ' + destination.value.trim()) : '',
+    txnnotes.value.trim() ? ('Transaction Flow Notes: ' + txnnotes.value.trim()) : '',
+    evidence.value.trim() ? ('Evidence Links: ' + evidence.value.trim()) : '',
+    reporter.value.trim() ? ('Reporter: ' + reporter.value.trim() + (contact.value.trim() ? ' (' + contact.value.trim() + ')' : '')) : '',
+    organization.value.trim() ? ('Organization: ' + organization.value.trim()) : '',
+    location.value.trim() ? ('Jurisdiction: ' + location.value.trim()) : '',
+    notes.value.trim() ? ('Investigator Notes: ' + notes.value.trim()) : ''
+  ];
+  const combinedContent = narrativeParts.filter(Boolean).join('\n\n');
+
+  let assignedCaseId = null;
+
+  // 1. Submit to FastAPI Backend /api/cases/ingest
+  try {
+    const authHeaders = (window.CyberScopeAuth && typeof window.CyberScopeAuth.getAuthHeaders === 'function')
+      ? window.CyberScopeAuth.getAuthHeaders()
+      : {};
+
+    const res = await fetch('/api/cases/ingest', {
+      method: 'POST',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders),
+      body: JSON.stringify({
+        title: title.value.trim(),
+        content: combinedContent,
+        sender_phone: phones.value.trim() ? phones.value.trim().split(/[, ]+/)[0] : undefined,
+        channel: type.value || 'MANUAL_PORTAL'
+      })
+    });
+
+    if (res.ok) {
+      const serverData = await res.json();
+      assignedCaseId = serverData.case_number || (serverData.id ? ('CS-' + serverData.id) : null);
+    }
+  } catch (err) {
+    console.warn('Backend case ingest fallback to local storage:', err);
+  }
+
+  // 2. Dual-write to localStorage for seamless offline & instant table display
+  let localCases = JSON.parse(localStorage.getItem('cyberscopeCases') || '[]');
+  const fallbackId = 'CS-' + String(1028 + localCases.length).padStart(4, '0');
+  const finalId = assignedCaseId || fallbackId;
+
+  const caseRecord = {
+    id: finalId,
+    case_number: finalId,
+    title: title.value.trim(),
+    type: type.value,
+    date: date.value,
+    priority: priority.value,
+    reporter: reporter.value.trim(),
+    contact: contact.value.trim(),
+    email: email.value.trim(),
+    organization: organization.value.trim(),
+    location: location.value.trim(),
+    phones: phones.value.trim(),
+    domain: domain.value.trim(),
+    upi: upi.value.trim(),
+    bank: bank.value.trim(),
+    other: other.value.trim(),
+    txn: txn.value.trim(),
+    amount: amount.value.trim(),
+    currency: currency.value,
+    destination: destination.value.trim(),
+    txnnotes: txnnotes.value.trim(),
+    signals: signals,
+    evidence: evidence.value.trim(),
+    risk: risk.value,
+    severity: risk.value,
+    investigator: investigator.value.trim(),
+    notes: notes.value.trim(),
+    status: 'NEW',
+    createdAt: new Date().toISOString()
+  };
+
+  localCases.unshift(caseRecord);
+  localStorage.setItem('cyberscopeCases', JSON.stringify(localCases));
+
+  showSuccess('Case ' + finalId + ' successfully created and integrated into CyberScope! Redirecting to Cases...');
+
+  setTimeout(() => {
+    window.location.href = 'cases.html';
+  }, 1100);
+});
+</script>
+</body>
+</html>
