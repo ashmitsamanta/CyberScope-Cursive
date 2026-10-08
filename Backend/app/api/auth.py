@@ -2,7 +2,7 @@ import re
 import hmac
 import secrets
 from datetime import datetime, timezone, timedelta
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from pydantic import BaseModel, Field
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
@@ -17,10 +17,13 @@ from app.services.auth_service import (
     hash_password,
     verify_password,
     create_access_token,
-    DEMO_USER,
 )
 from app.services.notification_service import notification_service
 from app.utils.normalization import normalize_phone
+from app.utils.password_strength import (
+    check_password_strength,
+    rate_strength,
+)
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -71,9 +74,39 @@ class LoginRequest(BaseModel):
     password: str = Field(..., description="Password")
 
 
+class CheckPasswordRequest(BaseModel):
+    password: str = Field(..., description="Password to evaluate")
+
+
+class PasswordStrengthResponse(BaseModel):
+    score: int
+    max_score: int
+    grade: str
+    rating: str
+    reasons: List[str]
+    acceptable: bool
+
+
 # ---------------------------------------------------------
 # Authentication & Verification Endpoints
 # ---------------------------------------------------------
+
+@router.post("/check-password", response_model=PasswordStrengthResponse)
+def check_password(payload: CheckPasswordRequest):
+    """
+    Evaluates password strength and returns score, grade (out of 10), rating, and improvement tips.
+    Used by the frontend for real-time feedback while the user types.
+    """
+    score, max_score, grade, rating, reasons = check_password_strength(payload.password)
+    return {
+        "score": score,
+        "max_score": max_score,
+        "grade": grade,
+        "rating": rating,
+        "reasons": reasons,
+        "acceptable": rating in ("STRONG", "MEDIUM"),
+    }
+
 
 @router.post("/check-email")
 def check_email(payload: CheckEmailRequest, db: Session = Depends(get_db)):
@@ -129,7 +162,7 @@ def register_initiate(payload: RegisterInitiateRequest, db: Session = Depends(ge
             content={"detail": "Name is required.", "code": "INVALID_NAME"}
         )
 
-    # Check if email exists in users table
+    # Check if email exists in users table (409 Conflict check)
     existing_user = db.query(User).filter(User.email == normalized_email).first()
     if existing_user:
         return JSONResponse(
@@ -137,6 +170,24 @@ def register_initiate(payload: RegisterInitiateRequest, db: Session = Depends(ge
             content={
                 "detail": "An account with this email already exists in the database. Please sign in instead.",
                 "code": "ACCOUNT_EXISTS"
+            }
+        )
+
+    # --- Password strength gate (reject TOO WEAK passwords) ---
+    pw_score, pw_max, pw_grade, pw_rating, pw_reasons = check_password_strength(payload.password)
+    if pw_rating == "TOO WEAK":
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "detail": "Password is too weak. " + " ".join(pw_reasons),
+                "code": "PASSWORD_TOO_WEAK",
+                "password_strength": {
+                    "score": pw_score,
+                    "max_score": pw_max,
+                    "grade": pw_grade,
+                    "rating": pw_rating,
+                    "reasons": pw_reasons,
+                }
             }
         )
 

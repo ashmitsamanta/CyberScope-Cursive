@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/cyberscope.css">
 <style>
 :root {
   --bg: #050a12;
@@ -1050,8 +1051,20 @@ input.input-success {
         <div>
           <label for="password">PASSWORD *</label>
           <div class="password-wrap">
-            <input id="password" type="password" autocomplete="new-password" placeholder="Minimum 6 characters" required>
+            <input id="password" type="password" autocomplete="new-password" placeholder="Minimum 8 characters (12+ recommended)" required>
             <button type="button" class="show-btn" onclick="togglePassword('password', this)">Show</button>
+          </div>
+          <!-- Password Strength Meter (0-10 Grade Scale) -->
+          <div id="pwStrength" class="pw-strength" style="display:none" data-rating="">
+            <div class="pw-strength-header">
+              <div class="pw-rating-wrap">
+                <span class="pw-rating-text" id="pwRating"></span>
+                <span class="pw-grade-badge" id="pwGrade">Grade 0/10 (F)</span>
+              </div>
+              <span class="pw-score-text" id="pwScore">Score: 0 / 10</span>
+            </div>
+            <div class="pw-strength-bar-track"><div class="pw-strength-bar-fill"></div></div>
+            <ul class="pw-strength-reasons" id="pwReasons"></ul>
           </div>
         </div>
 
@@ -1177,7 +1190,15 @@ input.input-success {
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/supabase-client.js"></script>
+<script src="assets/password-strength.js"></script>
 <script>
+// Initialize real-time Password Strength Evaluator on DOM load
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.PasswordStrength && document.getElementById('password') && document.getElementById('pwStrength')) {
+    PasswordStrength.attach('#password', '#pwStrength');
+  }
+});
+
 // State Management
 let currentRegistration = {
   name: '',
