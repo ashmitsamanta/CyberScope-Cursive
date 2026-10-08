@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel=icon type=image/png href=assets/logo.png>
+<link rel=apple-touch-icon href=assets/logo.png>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberScope | Investigator Registration & Email Verification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050a12;
+  --panel: #0a1220;
+  --panel2: #0d1727;
+  --panel3: #111e33;
+  --text: #eaf4ff;
+  --muted: #8da1b8;
+  --cyan: #36cfff;
+  --cyan-glow: rgba(54, 207, 255, 0.35);
+  --blue: #388bff;
+  --green: #5dffb1;
+  --green-glow: rgba(93, 255, 177, 0.3);
+  --danger: #ff6b7a;
+  --danger-glow: rgba(255, 107, 122, 0.25);
+  --amber: #ffb84d;
+  --border: rgba(54, 207, 255, 0.16);
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  display: grid;
+  place-items: center;
+  padding: 95px 18px 45px;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: 
+    radial-gradient(circle at 50% 10%, rgba(54, 207, 255, 0.08) 0%, transparent 60%),
+    linear-gradient(rgba(54, 207, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(54, 207, 255, 0.035) 1px, transparent 1px);
+  background-size: 100% 100%, 42px 42px, 42px 42px;
+  z-index: 0;
+}
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 74px;
+  padding: 0 6%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(54, 207, 255, 0.12);
+  background: rgba(5, 10, 18, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 10;
+}
+
+.brand {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(54, 207, 255, 0.55);
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: rgba(8, 16, 28, 0.85);
+  box-shadow: 0 0 15px rgba(54, 207, 255, 0.25);
+  flex-shrink: 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  padding: 2px;
+}
+.brand:hover .brand-mark {
+  transform: scale(1.05);
+  box-shadow: 0 0 22px rgba(54, 207, 255, 0.5);
+}
+
+.brand strong {
+  display: block;
+  letter-spacing: 2px;
+  font-size: 15px;
+  font-family: 'Space Grotesk', sans-serif;
+  color: #fff;
+}
+
+.brand small {
+  color: var(--muted);
+  font-size: 9.5px;
+  letter-spacing: 0.5px;
+}
+
+.back {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 12.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.back:hover {
+  color: var(--cyan);
+  transform: translateX(-2px);
+}
+
+/* Main Onboarding Card */
+.card {
+  position: relative;
+  z-index: 1;
+  width: min(680px, 100%);
+  padding: 38px 40px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: linear-gradient(150deg, rgba(13, 23, 39, 0.96) 0%, rgba(8, 16, 28, 0.98) 100%);
+  box-shadow: 
+    0 25px 80px rgba(0, 0, 0, 0.6),
+    0 0 50px rgba(54, 207, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  animation: cardIn 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
+  overflow: hidden;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Multi-Step Stepper */
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+  gap: 14px;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  opacity: 0.45;
+  transition: opacity 0.3s ease, color 0.3s ease;
+  user-select: none;
+}
+
+.step-item.active {
+  opacity: 1;
+}
+
+.step-item.completed {
+  opacity: 0.95;
+  color: var(--green);
+}
+
+.step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(141, 161, 184, 0.3);
+  display: grid;
+  place-items: center;
+  font-size: 11.5px;
+  font-weight: 800;
+  background: rgba(7, 17, 30, 0.7);
+  transition: all 0.3s ease;
+}
+
+.step-item.active .step-num {
+  border-color: var(--cyan);
+  background: rgba(54, 207, 255, 0.16);
+  color: var(--cyan);
+  box-shadow: 0 0 16px var(--cyan-glow);
+}
+
+.step-item.completed .step-num {
+  border-color: var(--green);
+  background: rgba(93, 255, 177, 0.16);
+  color: var(--green);
+  box-shadow: 0 0 12px var(--green-glow);
+}
+
+.step-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.step-line {
+  flex: 0 0 46px;
+  height: 2px;
+  background: rgba(141, 161, 184, 0.2);
+  border-radius: 2px;
+  transition: background 0.35s ease;
+}
+
+.step-line.completed {
+  background: linear-gradient(90deg, var(--cyan), var(--green));
+  box-shadow: 0 0 10px rgba(54, 207, 255, 0.4);
+}
+
+/* Header Headings */
+.eyebrow {
+  color: var(--cyan);
+  font-size: 10px;
+  letter-spacing: 2.2px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.card h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: -0.5px;
+  color: #fff;
+}
+
+.sub {
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.55;
+  margin-bottom: 24px;
+}
+
+/* Slide Transition Panels */
+.step-panel {
+  display: block;
+}
+
+.step-panel.hidden {
+  display: none !important;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.slide-out-left {
+  animation: slideOutLeft 0.25s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.slide-out-right {
+  animation: slideOutRight 0.25s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideOutLeft {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(-24px); }
+}
+
+@keyframes slideOutRight {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(24px); }
+}
+
+/* Grid & Inputs */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+label {
+  display: block;
+  color: #b9c8d9;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin: 15px 0 7px;
+  text-transform: uppercase;
+}
+
+.input-wrap {
+  position: relative;
+}
+
+input, select {
+  width: 100%;
+  height: 46px;
+  border: 1px solid rgba(141, 161, 184, 0.2);
+  border-radius: 10px;
+  background: #07111e;
+  color: var(--text);
+  padding: 0 14px;
+  outline: none;
+  font-size: 13.5px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+select {
+  appearance: auto;
+  cursor: pointer;
+}
+
+input:focus, select:focus {
+  border-color: rgba(54, 207, 255, 0.7);
+  box-shadow: 0 0 0 3px rgba(54, 207, 255, 0.12), 0 0 14px rgba(54, 207, 255, 0.1);
+  background: #091524;
+}
+
+/* Live duplicate warning styling */
+input.input-warning {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px var(--danger-glow) !important;
+  background: rgba(255, 107, 122, 0.04) !important;
+}
+
+input.input-success {
+  border-color: rgba(93, 255, 177, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(93, 255, 177, 0.1) !important;
+}
+
+/* Duplicate inline alert */
+.duplicate-alert {
+  display: none;
+  margin-top: 7px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: rgba(255, 107, 122, 0.08);
+  border: 1px solid rgba(255, 107, 122, 0.32);
+  color: #ff9aa5;
+  font-size: 11.5px;
+  line-height: 1.45;
+  animation: cardIn 0.2s ease both;
+}
+
+.duplicate-alert.show {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.duplicate-alert a {
+  color: var(--cyan);
+  font-weight: 700;
+  text-decoration: underline;
+  transition: color 0.15s ease;
+}
+
+.duplicate-alert a:hover {
+  color: #aae9ff;
+}
+
+/* Password Toggle */
+.password-wrap {
+  position: relative;
+}
+
+.password-wrap input {
+  padding-right: 64px;
+}
+
+.show-btn {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  height: 30px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 7px;
+  background: #0d1727;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.show-btn:hover {
+  color: var(--cyan);
+  background: #132238;
+}
+
+/* Terms */
+.terms {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 20px 0 22px;
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.6;
+  cursor: pointer;
+}
+
+.terms input {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  margin-top: 2px;
+  accent-color: var(--cyan);
+  cursor: pointer;
+}
+
+/* Buttons */
+.btn {
+  width: 100%;
+  height: 48px;
+  border: 0;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #36cfff, #1bafe3);
+  color: #03101b;
+  font-weight: 900;
+  cursor: pointer;
+  font-size: 14.5px;
+  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 18px rgba(54, 207, 255, 0.28);
+}
+
+.btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(54, 207, 255, 0.38);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Secondary Button / Action */
+.btn-secondary {
+  background: rgba(54, 207, 255, 0.08);
+  border: 1px solid rgba(54, 207, 255, 0.3);
+  color: var(--cyan);
+  box-shadow: none;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: rgba(54, 207, 255, 0.16);
+  border-color: var(--cyan);
+}
+
+/* Messages */
+.message {
+  display: none;
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  animation: cardIn 0.25s ease both;
+}
+
+.message.show {
+  display: block;
+}
+
+.message.error {
+  background: rgba(255, 107, 122, 0.09);
+  border: 1px solid rgba(255, 107, 122, 0.32);
+  color: #ff9aa5;
+}
+
+.message.success {
+  background: rgba(93, 255, 177, 0.08);
+  border: 1px solid rgba(93, 255, 177, 0.28);
+  color: var(--green);
+}
+
+.message.info {
+  background: rgba(54, 207, 255, 0.08);
+  border: 1px solid rgba(54, 207, 255, 0.32);
+  color: var(--cyan);
+}
+
+.message.conflict {
+  background: rgba(255, 184, 77, 0.09);
+  border: 1px solid rgba(255, 184, 77, 0.32);
+  color: #ffd188;
+}
+
+.conflict-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.conflict-btn {
+  padding: 6px 14px;
+  border-radius: 7px;
+  background: var(--amber);
+  color: #1a1002;
+  font-weight: 800;
+  font-size: 11.5px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: filter 0.15s ease;
+}
+
+.conflict-btn:hover {
+  filter: brightness(1.1);
+}
+
+/* Step 2 Production Verification Styles */
+.shield-badge-wrap {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 16px;
+}
+
+.shield-badge {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(54, 207, 255, 0.16), rgba(93, 255, 177, 0.1));
+  border: 1px solid rgba(54, 207, 255, 0.45);
+  display: grid;
+  place-items: center;
+  color: var(--cyan);
+  box-shadow: 0 0 24px rgba(54, 207, 255, 0.22), inset 0 0 12px rgba(54, 207, 255, 0.08);
+}
+
+.contact-masked-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(7, 17, 30, 0.75);
+  border: 1px solid rgba(54, 207, 255, 0.24);
+  border-radius: 14px;
+  padding: 13px 18px;
+  margin-bottom: 18px;
+  gap: 16px;
+  box-shadow: inset 0 0 18px rgba(54, 207, 255, 0.03);
+}
+
+.contact-masked-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.contact-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: rgba(54, 207, 255, 0.1);
+  border: 1px solid rgba(54, 207, 255, 0.25);
+  display: grid;
+  place-items: center;
+  color: var(--cyan);
+  flex-shrink: 0;
+}
+
+.contact-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.contact-label {
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.contact-val {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-divider {
+  width: 1px;
+  height: 34px;
+  background: rgba(54, 207, 255, 0.18);
+  flex-shrink: 0;
+}
+
+/* Delivery Confirmation Badges */
+.delivery-status-panel {
+  background: linear-gradient(135deg, rgba(10, 24, 42, 0.9), rgba(6, 16, 28, 0.96));
+  border: 1px solid rgba(54, 207, 255, 0.26);
+  border-radius: 14px;
+  padding: 15px 18px;
+  margin-bottom: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+}
+
+.delivery-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12px;
+  line-height: 1.48;
+  color: #c4d7ec;
+}
+
+.delivery-badge-text {
+  flex: 1;
+}
+
+.delivery-badge strong {
+  color: #ffffff;
+  font-family: var(--font-mono);
+  margin-right: 5px;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.pulse-dot.green {
+  background: var(--green);
+  box-shadow: 0 0 10px var(--green);
+  animation: pulseDot 1.6s infinite ease-in-out;
+}
+
+.pulse-dot.amber {
+  background: var(--amber);
+  box-shadow: 0 0 10px var(--amber);
+  animation: pulseDot 1.6s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.85); }
+}
+
+.delivery-advisory {
+  margin-top: 4px;
+  padding: 10px 14px;
+  border-radius: 9px;
+  background: rgba(255, 184, 77, 0.08);
+  border: 1px solid rgba(255, 184, 77, 0.3);
+  color: #ffd188;
+  font-size: 11.5px;
+  line-height: 1.5;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.delivery-advisory.hidden {
+  display: none !important;
+}
+
+.delivery-advisory svg {
+  color: var(--amber);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.delivery-advisory code {
+  background: rgba(0, 0, 0, 0.45);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  color: #ffffff;
+  border: 1px solid rgba(255, 184, 77, 0.25);
+  font-size: 11px;
+}
+
+/* Single Email OTP Input Section */
+.otp-single-box,
+.otp-card-grid {
+  margin-bottom: 22px;
+}
+
+.otp-field-box {
+  background: rgba(7, 17, 30, 0.75);
+  border: 1px solid rgba(54, 207, 255, 0.28);
+  border-radius: 16px;
+  padding: 24px 22px 20px;
+  transition: all 0.25s ease;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(54, 207, 255, 0.03);
+}
+
+.otp-field-box:focus-within {
+  border-color: rgba(54, 207, 255, 0.7);
+  box-shadow: 0 0 28px rgba(54, 207, 255, 0.18), inset 0 0 20px rgba(54, 207, 255, 0.06);
+  background: rgba(9, 21, 36, 0.92);
+}
+
+.otp-field-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-bottom: 15px;
+  color: #c4d7ec;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+}
+
+.otp-field-header svg {
+  color: var(--cyan);
+  flex-shrink: 0;
+}
+
+.otp-input-control {
+  width: 100%;
+  max-width: 320px;
+  height: 56px;
+  margin: 0 auto;
+  display: block;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 8px;
+  background: #040911;
+  border: 1px solid rgba(54, 207, 255, 0.35);
+  border-radius: 12px;
+  color: var(--cyan);
+  padding: 0 12px;
+  transition: all 0.25s ease;
+  text-transform: uppercase;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.otp-input-control::placeholder {
+  color: rgba(141, 161, 184, 0.28);
+  letter-spacing: 8px;
+  font-weight: 500;
+}
+
+.otp-input-control:focus {
+  border-color: var(--cyan);
+  background: #071322;
+  box-shadow: 0 0 0 3px rgba(54, 207, 255, 0.16), 0 0 24px rgba(54, 207, 255, 0.25);
+  color: #ffffff;
+}
+
+.otp-help {
+  font-size: 11.5px;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 12px;
+}
+
+/* Secondary Actions (Step 2) */
+.step2-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.resend-btn {
+  background: transparent;
+  border: 1px solid rgba(141, 161, 184, 0.25);
+  color: var(--muted);
+  border-radius: 9px;
+  padding: 10px 16px;
+  font-size: 12.5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.resend-btn:not(:disabled):hover {
+  color: var(--cyan);
+  border-color: var(--cyan);
+  background: rgba(54, 207, 255, 0.08);
+  box-shadow: 0 0 14px rgba(54, 207, 255, 0.15);
+}
+
+.resend-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.back-link-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 10px;
+  transition: color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.back-link-btn:hover {
+  color: var(--cyan);
+}
+
+/* Bottom Signin Link */
+.bottom {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12.5px;
+  margin-top: 24px;
+}
+
+.bottom a {
+  color: var(--cyan);
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 0.2s ease;
+}
+
+.bottom a:hover {
+  color: #7fe0ff;
+}
+
+/* Success Checkmark Animation */
+.success-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: rgba(93, 255, 177, 0.12);
+  border: 1px solid rgba(93, 255, 177, 0.4);
+  color: var(--green);
+  font-size: 13.5px;
+  font-weight: 700;
+  animation: bounceIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+@keyframes bounceIn {
+  0% { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.success-icon-wrap {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(93, 255, 177, 0.22);
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+  flex-shrink: 0;
+  box-shadow: 0 0 14px var(--green-glow);
+}
+
+@media (max-width: 650px) {
+  body {
+    padding: 85px 14px 30px;
+  }
+  .topbar {
+    padding: 0 16px;
+  }
+  .card {
+    padding: 26px 18px;
+    border-radius: 18px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .full {
+    grid-column: auto;
+  }
+  .card h1 {
+    font-size: 24px;
+  }
+  .contact-masked-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .contact-divider {
+    display: none;
+  }
+  .otp-card-grid {
+    grid-template-columns: 1fr;
+  }
+  .step2-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+  .resend-btn, .back-link-btn {
+    justify-content: center;
+  }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="index.html">
+    <div class="brand-mark"><img src="assets/logo.png" alt="CyberScope"></div>
+    <div>
+      <strong>CYBERSCOPE</strong>
+      <small>A Project of TetraByte</small>
+    </div>
+  </a>
+  <a class="back" href="index.html">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+    Back to CyberScope
+  </a>
+</header>
+
+<main class="card">
+  <!-- Interactive Stepper -->
+  <div class="stepper" aria-label="Registration Progress">
+    <div class="step-item active" id="step1Indicator">
+      <div class="step-num">1</div>
+      <div class="step-label">Account Details</div>
+    </div>
+    <div class="step-line" id="stepLine"></div>
+    <div class="step-item" id="step2Indicator">
+      <div class="step-num">2</div>
+      <div class="step-label">Email Verification</div>
+    </div>
+  </div>
+
+  <!-- STEP 1: Account Details Form -->
+  <div id="step1Panel" class="step-panel">
+    <div class="eyebrow">IDENTITY SETUP & ONBOARDING</div>
+    <h1>Create Investigator Account</h1>
+    <div class="sub">Register your credentials with the CyberScope database to access fraud graph intelligence.</div>
+
+    <form id="registerForm" novalidate>
+      <div class="grid">
+        <div class="full">
+          <label for="name">FULL NAME *</label>
+          <input id="name" type="text" autocomplete="name" placeholder="Special Agent / Officer Name" required>
+        </div>
+
+        <div>
+          <label for="phone">PHONE NUMBER *</label>
+          <input id="phone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number" required>
+        </div>
+
+        <div>
+          <label for="email">OFFICIAL EMAIL ADDRESS *</label>
+          <div class="input-wrap">
+            <input id="email" type="email" autocomplete="email" placeholder="officer@agency.gov.in" required>
+          </div>
+          <!-- Live Duplicate Detection Inline Alert -->
+          <div id="emailDuplicateAlert" class="duplicate-alert" role="alert">
+            <span>⚠️ An account with this email already exists in the database.</span>
+            <a id="alertSigninLink" href="signin.html">Sign in instead →</a>
+          </div>
+        </div>
+
+        <div>
+          <label for="role">INVESTIGATOR ROLE</label>
+          <select id="role">
+            <option value="Investigator" selected>Investigator</option>
+            <option value="Lead Investigator">Lead Investigator</option>
+            <option value="Analyst">Fraud Analyst</option>
+            <option value="Financial Forensics">Financial Forensics Officer</option>
+            <option value="Researcher">Threat Researcher</option>
+            <option value="Student">Cadet / Student</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="organization">AGENCY / ORGANIZATION</label>
+          <input id="organization" type="text" placeholder="e.g. Cyber Crime Unit / Enforcement Directorate">
+        </div>
+
+        <div>
+          <label for="password">PASSWORD *</label>
+          <div class="password-wrap">
+            <input id="password" type="password" autocomplete="new-password" placeholder="Minimum 6 characters" required>
+            <button type="button" class="show-btn" onclick="togglePassword('password', this)">Show</button>
+          </div>
+        </div>
+
+        <div>
+          <label for="confirmPassword">CONFIRM PASSWORD *</label>
+          <div class="password-wrap">
+            <input id="confirmPassword" type="password" autocomplete="new-password" placeholder="Repeat your password" required>
+            <button type="button" class="show-btn" onclick="togglePassword('confirmPassword', this)">Show</button>
+          </div>
+        </div>
+      </div>
+
+      <label class="terms">
+        <input id="terms" type="checkbox" required>
+        <span>I agree to use the CyberScope platform with authorized investigation data only according to LEA compliance terms.</span>
+      </label>
+
+      <button class="btn" id="submitBtn" type="submit">
+        <span>Proceed to Verification</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+      </button>
+
+      <div id="message" class="message"></div>
+    </form>
+
+    <div class="bottom">
+      Already have an investigator account? <a href="signin.html">Sign In</a>
+    </div>
+  </div>
+
+  <!-- STEP 2: Real Production Email Verification Screen -->
+  <div id="step2Panel" class="step-panel hidden">
+    <div class="shield-badge-wrap">
+      <div class="shield-badge" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="eyebrow">EMAIL SECURITY VERIFICATION</div>
+    <h1>Verify Your Official Email</h1>
+    <div class="sub">Enter the 6-digit security code dispatched to your official email to activate your investigator account.</div>
+
+    <!-- Masked Contact Information Display -->
+    <div class="contact-masked-card" aria-label="Verification contact target">
+      <div class="contact-masked-item">
+        <div class="contact-icon" aria-hidden="true">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div class="contact-meta">
+          <span class="contact-label">OFFICIAL EMAIL</span>
+          <span class="contact-val" id="maskedEmailDisplay">---</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivery Confirmation Badges -->
+    <div class="delivery-status-panel" aria-label="Delivery confirmation indicators">
+      <div class="delivery-badge" id="emailDeliveryBadge">
+        <span class="pulse-dot green" id="emailPulseDot" aria-hidden="true"></span>
+        <div class="delivery-badge-text">
+          <strong>[Email Service]</strong>
+          <span id="emailDeliveryMsg">Verification code dispatched to your inbox. Please check your spam folder if not received in 1 minute.</span>
+        </div>
+      </div>
+
+      <!-- Informative Advisory Note if Server Delivery Flags Report Unconfigured -->
+      <div class="delivery-advisory hidden" id="deliveryAdvisory" role="note">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <div class="advisory-content">
+          <strong>Delivery Configuration Notice:</strong>
+          <span>Live SMTP email delivery is unconfigured or encountered a delivery error. To ensure verification codes reach your actual inbox, please configure valid <code>SMTP_USER</code> and <code>SMTP_PASSWORD</code> credentials in <code>.env</code>.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Single Email OTP Form -->
+    <form id="verifyForm" novalidate>
+      <div class="otp-single-box">
+        <div class="otp-field-box">
+          <div class="otp-field-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            <span>Official Email Verification Code</span>
+          </div>
+          <input 
+            id="emailOtp" 
+            class="otp-input-control" 
+            type="text" 
+            inputmode="numeric" 
+            maxlength="6" 
+            placeholder="------" 
+            autocomplete="one-time-code"
+            autofocus
+            required>
+          <div class="otp-help">Enter the 6-digit security code received in your official email inbox</div>
+        </div>
+      </div>
+
+      <button class="btn" id="verifyBtn" type="submit">
+        <span>Verify &amp; Complete Registration</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+      </button>
+
+      <div class="step2-actions">
+        <button type="button" class="back-link-btn" onclick="goToStep(1)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Back to Edit Details
+        </button>
+        <button type="button" id="resendBtn" class="resend-btn" onclick="handleResendCodes()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          <span id="resendBtnText">Resend code in 59s...</span>
+        </button>
+      </div>
+
+      <div id="step2Message" class="message"></div>
+    </form>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+// State Management
+let currentRegistration = {
+  name: '',
+  phone: '',
+  email: '',
+  role: 'Investigator',
+  organization: '',
+  password: '',
+  delivery: null
+};
+
+let resendTimer = null;
+let resendCountdown = 60;
+let emailDebounceTimer = null;
+
+// API Path resolver for standalone file:// vs web server
+function getApiEndpoint(path) {
+  if (window.location.protocol === 'file:') {
+    return 'http://127.0.0.1:8000' + path;
+  }
+  return path;
+}
+
+// Password toggle utility
+function togglePassword(inputId, button) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const isVisible = input.type === 'text';
+  input.type = isVisible ? 'password' : 'text';
+  button.textContent = isVisible ? 'Show' : 'Hide';
+}
+
+// Message display utility (supports safe innerHTML for inline links)
+function showMessage(elementId, text, type, htmlAction) {
+  const box = document.getElementById(elementId);
+  if (!box) return;
+  if (!text) {
+    box.className = 'message';
+    box.innerHTML = '';
+    return;
+  }
+  box.className = 'message show ' + type;
+  if (htmlAction) {
+    box.innerHTML = text + htmlAction;
+  } else {
+    box.innerHTML = text;
+  }
+}
+
+// Masking Utilities
+function maskEmail(email) {
+  if (!email || typeof email !== 'string' || !email.includes('@')) return email || '';
+  const parts = email.split('@');
+  const local = parts[0];
+  const domain = parts.slice(1).join('@');
+  if (local.length <= 1) {
+    return `${local}***@${domain}`;
+  }
+  return `${local[0]}***${local[local.length - 1]}@${domain}`;
+}
+
+function maskPhone(rawPhone) {
+  if (!rawPhone) return '';
+  const digits = String(rawPhone).replace(/\D/g, '');
+  if (digits.length >= 10) {
+    const last10 = digits.slice(-10);
+    return `+91 ${last10.slice(0, 2)}*** **${last10.slice(-3)}`;
+  }
+  return rawPhone;
+}
+
+// Delivery status badge updater
+// Delivery status badge updater
+function updateDeliveryUI(delivery, email) {
+  const emailMsg = document.getElementById('emailDeliveryMsg');
+  const advisory = document.getElementById('deliveryAdvisory');
+  const emailDot = document.getElementById('emailPulseDot');
+
+  const emailDelivery = delivery && delivery.email;
+  const emailSuccess = emailDelivery && emailDelivery.success === true;
+
+  if (emailSuccess) {
+    if (emailMsg) emailMsg.textContent = (emailDelivery && emailDelivery.message) || 'Verification code dispatched to your inbox. Please check your spam folder if not received in 1 minute.';
+    if (emailDot) emailDot.className = 'pulse-dot green';
+  } else {
+    const reason = (emailDelivery && emailDelivery.message) || 'Email delivery unconfigured. Please configure SMTP credentials in .env.';
+    if (emailMsg) emailMsg.textContent = reason;
+    if (emailDot) emailDot.className = 'pulse-dot amber';
+  }
+
+  if (advisory) {
+    if (!emailSuccess) {
+      advisory.classList.remove('hidden');
+    } else {
+      advisory.classList.add('hidden');
+    }
+  }
+}
+
+// Live Duplicate Email Detection (Debounced 400ms + Blur)
+const emailInput = document.getElementById('email');
+const emailDuplicateAlert = document.getElementById('emailDuplicateAlert');
+const alertSigninLink = document.getElementById('alertSigninLink');
+
+async function checkEmailDuplicate(emailVal) {
+  const email = (emailVal || '').trim().toLowerCase();
+  if (!email || !email.includes('@') || email.length < 5) {
+    if (emailDuplicateAlert) emailDuplicateAlert.classList.remove('show');
+    if (emailInput) emailInput.classList.remove('input-warning');
+    return false;
+  }
+
+  try {
+    const res = await fetch(getApiEndpoint('/api/auth/check-email'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.exists) {
+        if (emailInput) {
+          emailInput.classList.add('input-warning');
+          emailInput.classList.remove('input-success');
+        }
+        if (alertSigninLink) {
+          alertSigninLink.href = 'signin.html?email=' + encodeURIComponent(email);
+        }
+        if (emailDuplicateAlert) {
+          emailDuplicateAlert.classList.add('show');
+        }
+        return true;
+      }
+    }
+  } catch (err) {
+    // Graceful offline/network fallback
+  }
+
+  // Not duplicate
+  if (emailInput) emailInput.classList.remove('input-warning');
+  if (emailDuplicateAlert) emailDuplicateAlert.classList.remove('show');
+  return false;
+}
+
+if (emailInput) {
+  emailInput.addEventListener('input', () => {
+    clearTimeout(emailDebounceTimer);
+    emailDebounceTimer = setTimeout(() => {
+      checkEmailDuplicate(emailInput.value);
+    }, 400);
+  });
+
+  emailInput.addEventListener('blur', () => {
+    clearTimeout(emailDebounceTimer);
+    checkEmailDuplicate(emailInput.value);
+  });
+}
+
+// Stepper Transition
+function goToStep(step) {
+  const step1Panel = document.getElementById('step1Panel');
+  const step2Panel = document.getElementById('step2Panel');
+  const step1Indicator = document.getElementById('step1Indicator');
+  const step2Indicator = document.getElementById('step2Indicator');
+  const stepLine = document.getElementById('stepLine');
+
+  if (step === 2) {
+    // Animate Step 1 out to left, Step 2 in from right
+    step1Panel.classList.add('slide-out-left');
+    setTimeout(() => {
+      step1Panel.classList.add('hidden');
+      step1Panel.classList.remove('slide-out-left');
+
+      step2Panel.classList.remove('hidden');
+      step2Panel.classList.add('slide-in-right');
+
+      step1Indicator.classList.remove('active');
+      step1Indicator.classList.add('completed');
+      stepLine.classList.add('completed');
+      step2Indicator.classList.add('active');
+
+      // Autofocus email OTP input and clear value
+      const emailOtpInput = document.getElementById('emailOtp');
+      if (emailOtpInput) {
+        emailOtpInput.value = '';
+        emailOtpInput.focus();
+      }
+    }, 200);
+
+    startResendCountdown(60);
+  } else {
+    // Animate Step 2 out to right, Step 1 in from left
+    clearInterval(resendTimer);
+    step2Panel.classList.add('slide-out-right');
+    setTimeout(() => {
+      step2Panel.classList.add('hidden');
+      step2Panel.classList.remove('slide-out-right');
+
+      step1Panel.classList.remove('hidden');
+      step1Panel.classList.add('slide-in-left');
+
+      step2Indicator.classList.remove('active');
+      step1Indicator.classList.remove('completed');
+      step1Indicator.classList.add('active');
+      stepLine.classList.remove('completed');
+    }, 200);
+  }
+}
+
+// Resend Countdown Timer (60s live countdown)
+function startResendCountdown(seconds = 60) {
+  clearInterval(resendTimer);
+  resendCountdown = seconds;
+  const resendBtn = document.getElementById('resendBtn');
+  const resendBtnText = document.getElementById('resendBtnText');
+  if (!resendBtn || !resendBtnText) return;
+
+  resendBtn.disabled = true;
+  resendBtnText.textContent = `Resend code in ${resendCountdown}s...`;
+
+  resendTimer = setInterval(() => {
+    resendCountdown--;
+    if (resendCountdown <= 0) {
+      clearInterval(resendTimer);
+      resendBtn.disabled = false;
+      resendBtnText.textContent = 'Resend Verification Code';
+    } else {
+      resendBtnText.textContent = `Resend code in ${resendCountdown}s...`;
+    }
+  }, 1000);
+}
+
+// Resend Codes Handler
+async function handleResendCodes() {
+  const resendBtn = document.getElementById('resendBtn');
+  const resendBtnText = document.getElementById('resendBtnText');
+  if (!currentRegistration.email) return;
+
+  resendBtn.disabled = true;
+  resendBtnText.textContent = 'Sending new code via Email...';
+  showMessage('step2Message', 'Sending new code via Email...', 'info');
+
+  try {
+    const res = await fetch(getApiEndpoint('/api/auth/register/resend'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: currentRegistration.email })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.delivery) {
+        currentRegistration.delivery = data.delivery;
+        updateDeliveryUI(data.delivery, currentRegistration.email);
+      }
+      showMessage('step2Message', 'New verification code dispatched to your inbox.', 'success');
+      startResendCountdown(60);
+      setTimeout(() => {
+        const msg = document.getElementById('step2Message');
+        if (msg && msg.textContent === 'New verification code dispatched to your inbox.') {
+          showMessage('step2Message', '', '');
+        }
+      }, 4000);
+    } else if (res.status === 429) {
+      const errData = await res.json().catch(() => ({}));
+      const remaining = errData.cooldown_remaining || 30;
+      showMessage('step2Message', errData.detail || `Please wait ${remaining} seconds before requesting a new verification code.`, 'error');
+      startResendCountdown(remaining);
+    } else {
+      const errData = await res.json().catch(() => ({}));
+      resendBtn.disabled = false;
+      resendBtnText.textContent = 'Resend Verification Code';
+      showMessage('step2Message', errData.detail || 'Failed to resend verification code. Please try again.', 'error');
+    }
+  } catch (err) {
+    resendBtn.disabled = false;
+    resendBtnText.textContent = 'Resend Verification Code';
+    showMessage('step2Message', 'Network error during resend. Please check connection.', 'error');
+  }
+}
+
+// STEP 1 FORM SUBMISSION
+document.getElementById('registerForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const email = document.getElementById('email').value.trim().toLowerCase();
+  const organization = document.getElementById('organization').value.trim();
+  const role = document.getElementById('role').value;
+  const password = document.getElementById('password').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+  const terms = document.getElementById('terms').checked;
+  const submitBtn = document.getElementById('submitBtn');
+
+  // Input Validations
+  if (!name || !phone || !email || !password || !confirmPassword) {
+    showMessage('message', 'Please complete all required fields.', 'error');
+    return;
+  }
+  if (!/^\d{10}$/.test(phone)) {
+    showMessage('message', 'Please enter a valid 10-digit mobile phone number.', 'error');
+    return;
+  }
+  if (password.length < 6) {
+    showMessage('message', 'Password must contain at least 6 characters.', 'error');
+    return;
+  }
+  if (password !== confirmPassword) {
+    showMessage('message', 'Passwords do not match. Please verify.', 'error');
+    return;
+  }
+  if (!terms) {
+    showMessage('message', 'Please accept the platform compliance terms to continue.', 'error');
+    return;
+  }
+
+  // Clear previous message
+  showMessage('message', '', '');
+
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = `
+    <svg style="animation:spin 1s linear infinite;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10"></path></svg>
+    <span>Initiating Verification Pipeline...</span>
+  `;
+
+  try {
+    const res = await fetch(getApiEndpoint('/api/auth/register/initiate'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        phone,
+        email,
+        role,
+        organization,
+        password
+      })
+    });
+
+    // 409 Conflict: Account Already Exists
+    if (res.status === 409) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<span>Proceed to Verification</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`;
+      
+      const warningHtml = `⚠️ An account with this email already exists in the database. <a href="signin.html?email=${encodeURIComponent(email)}">Sign in instead →</a>`;
+      showMessage('message', warningHtml, 'conflict');
+      
+      const emailInputEl = document.getElementById('email');
+      if (emailInputEl) emailInputEl.classList.add('input-warning');
+      const alertBox = document.getElementById('emailDuplicateAlert');
+      if (alertBox) alertBox.classList.add('show');
+      const alertLink = document.getElementById('alertSigninLink');
+      if (alertLink) alertLink.href = 'signin.html?email=' + encodeURIComponent(email);
+      return;
+    }
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<span>Proceed to Verification</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`;
+      showMessage('message', errData.detail || 'Registration initiation failed. Please check inputs and try again.', 'error');
+      return;
+    }
+
+    // Success: 200 verification_initiated
+    const data = await res.json();
+    currentRegistration = {
+      name,
+      phone,
+      email,
+      role,
+      organization,
+      password,
+      delivery: data.delivery || null
+    };
+
+    // Update Step 2 Masked Details
+    const maskedEmailEl = document.getElementById('maskedEmailDisplay');
+    const maskedPhoneEl = document.getElementById('maskedPhoneDisplay');
+    if (maskedEmailEl) maskedEmailEl.textContent = maskEmail(email);
+    if (maskedPhoneEl) maskedPhoneEl.textContent = maskPhone(phone);
+
+    // Update delivery confirmation badges
+    updateDeliveryUI(data.delivery, email, phone);
+
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = `<span>Proceed to Verification</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`;
+
+    // Smooth transition to Step 2
+    goToStep(2);
+
+  } catch (err) {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = `<span>Proceed to Verification</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`;
+    showMessage('message', 'Failed to reach registration server: ' + err.message, 'error');
+  }
+});
+
+// STEP 2 OTP VERIFICATION SUBMISSION
+document.getElementById('verifyForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const emailOtpInput = document.getElementById('emailOtp');
+  const emailOtp = (emailOtpInput && emailOtpInput.value ? emailOtpInput.value : '').trim().toUpperCase();
+  const verifyBtn = document.getElementById('verifyBtn');
+  const email = (currentRegistration.email || (document.getElementById('email') && document.getElementById('email').value) || '').trim().toLowerCase();
+
+  if (!email) {
+    showMessage('step2Message', 'Registration session expired or email missing. Please return to Step 1.', 'error');
+    return;
+  }
+
+  if (!emailOtp) {
+    showMessage('step2Message', 'Please enter the 6-digit email verification security code.', 'error');
+    if (emailOtpInput) emailOtpInput.focus();
+    return;
+  }
+  if (emailOtp.length !== 6) {
+    showMessage('step2Message', 'The verification code must be exactly 6 characters.', 'error');
+    if (emailOtpInput) emailOtpInput.focus();
+    return;
+  }
+
+  showMessage('step2Message', '', '');
+  verifyBtn.disabled = true;
+  verifyBtn.innerHTML = `
+    <svg style="animation:spin 1s linear infinite;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10"></path></svg>
+    <span>Verifying Identity Credentials...</span>
+  `;
+
+  try {
+    const res = await fetch(getApiEndpoint('/api/auth/register/verify'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: email,
+        email_otp: emailOtp
+      })
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      verifyBtn.disabled = false;
+      verifyBtn.innerHTML = `<span>Verify &amp; Complete Registration</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`;
+      
+      const errorMsg = errData.detail || 'Invalid verification code. Please check and try again.';
+      showMessage('step2Message', errorMsg, 'error');
+      
+      if (emailOtpInput) emailOtpInput.focus();
+      return;
+    }
+
+    const data = await res.json();
+
+    // Persist session to localStorage
+    const userObj = data.user || {
+      id: 'usr-' + Date.now(),
+      email: email,
+      name: currentRegistration.name || (email ? email.split('@')[0] : 'Investigator'),
+      role: currentRegistration.role || 'Investigator',
+      phone: currentRegistration.phone || '',
+      organization: currentRegistration.organization || '',
+      is_demo: false
+    };
+
+    localStorage.setItem('cyberscopeUser', JSON.stringify(userObj));
+    localStorage.setItem('cyberscopeSession', 'active');
+    if (data.access_token) {
+      localStorage.setItem('cyberscopeAccessToken', data.access_token);
+    }
+
+    // Success checkmark animation & message
+    const msgBox = document.getElementById('step2Message');
+    if (msgBox) {
+      msgBox.className = 'message show';
+      msgBox.innerHTML = `
+        <div class="success-banner">
+          <div class="success-icon-wrap">✓</div>
+          <div>✓ Identity Verified! Account created in database. Redirecting to workspace...</div>
+        </div>
+      `;
+    }
+
+    verifyBtn.style.background = 'linear-gradient(135deg, #5dffb1, #2ec47d)';
+    verifyBtn.style.color = '#021a0d';
+    verifyBtn.innerHTML = `<span>✓ Identity Verified</span>`;
+
+    // Seamless auto-navigation within 850ms
+    setTimeout(() => {
+      window.location.href = 'dashboard.html';
+    }, 850);
+
+  } catch (err) {
+    verifyBtn.disabled = false;
+    verifyBtn.innerHTML = `<span>Verify &amp; Complete Registration</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`;
+    showMessage('step2Message', 'Verification request failed: ' + err.message, 'error');
+  }
+});
+
+// Auto-advance & Paste Handlers for OTP Inputs
+function sanitizeOtp(val) {
+  return (val || '').replace(/[\s\-\_]/g, '').toUpperCase().slice(0, 6);
+}
+
+const emailOtpEl = document.getElementById('emailOtp');
+
+if (emailOtpEl) {
+  emailOtpEl.addEventListener('paste', function(e) {
+    e.preventDefault();
+    const clipboardData = e.clipboardData || window.clipboardData;
+    const pastedText = clipboardData ? clipboardData.getData('text') : '';
+    const clean = sanitizeOtp(pastedText);
+    this.value = clean;
+    if (clean.length === 6) {
+      const verifyBtn = document.getElementById('verifyBtn');
+      if (verifyBtn) verifyBtn.focus();
+    }
+  });
+
+  emailOtpEl.addEventListener('input', function() {
+    this.value = sanitizeOtp(this.value);
+    if (this.value.length === 6) {
+      const verifyBtn = document.getElementById('verifyBtn');
+      if (verifyBtn) verifyBtn.focus();
+    }
+  });
+}
+
+// Pre-fill email from URL parameters (e.g. redirected from signin.html)
+(function() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const emailParam = params.get('email');
+    if (emailParam) {
+      const emailInput = document.getElementById('email');
+      if (emailInput && !emailInput.value) {
+        emailInput.value = emailParam.trim();
+        if (typeof checkEmailDuplicate === 'function') {
+          checkEmailDuplicate(emailParam.trim());
+        }
+      }
+    }
+  } catch (e) {}
+})();
+</script>
+
+<style>
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+</style>
+</body>
+</html>

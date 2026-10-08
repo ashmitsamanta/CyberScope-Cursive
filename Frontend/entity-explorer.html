@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel=icon type=image/png href=assets/logo.png>
+<link rel=apple-touch-icon href=assets/logo.png>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CyberScope | Entity Explorer</title>
+<link rel="stylesheet" href="assets/cyberscope.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="index.html"><div class="mark"><img src="assets/logo.png" alt="CyberScope"></div><div><b>CYBERSCOPE</b><small>A PROJECT OF TETRABYTE</small></div></a>
+  <div class="nav-inline">
+    <nav class="nav" id="siteNav">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="cases.html">Cases</a>
+      <a href="fraud-graph.html">Fraud Graph</a>
+      <a href="threat-map.html">Threat Map</a>
+      <a href="entity-explorer.html">Entities</a>
+      <a href="transaction-explorer.html">Transactions</a>
+      <a href="campaign-explorer.html">Campaigns</a>
+      <a href="investigation-workspace.html">Workspace</a>
+    </nav>
+    <div class="profile">
+      <div class="avatar" id="avatar">CS</div>
+      <div><div class="pname" id="profileName">User</div><div class="prole">Investigator</div></div>
+      <button class="signout" onclick="signOut()">Sign out</button>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="siteNav"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<div class="nav-backdrop" id="navBackdrop"></div>
+
+<main>
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">CYBERSCOPE MODULE</div>
+      <h1>Find the identifiers connecting cases.</h1>
+      <p>Search and inspect phones, domains, UPI IDs and bank accounts that appear across fraud incidents.</p>
+    </div>
+    <div class="status"><span class="dot-pulse">●</span> SYSTEM OPERATIONAL</div>
+  </section>
+
+  <div class="grid">
+    <section class="card panel">
+      <h2>Entity Registry</h2>
+      <div class="sub">Synthetic investigation entities</div>
+      <div class="toolbar">
+        <input class="search" id="entitySearch" placeholder="Search entity value or type...">
+        <button class="btn" onclick="filterEntities()">Search</button>
+      </div>
+      <div class="table-scroll">
+        <table class="table" id="entityTable">
+          <thead><tr><th>TYPE</th><th>VALUE</th><th>CASES</th><th>LINKS</th><th>RISK</th><th>ACTIONS</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>PHONE</td><td>+91 98XX 4412</td><td>6</td><td>14</td><td><span class="tag high">HIGH</span></td>
+              <td><a href="fraud-graph.html?search=%2B91%2098XX%204412" class="btn" style="padding:4px 9px; font-size:11px; white-space:nowrap; text-decoration:none;">◎ View in Graph</a></td>
+            </tr>
+            <tr>
+              <td>DOMAIN</td><td>pay-help.in</td><td>5</td><td>11</td><td><span class="tag high">HIGH</span></td>
+              <td><a href="fraud-graph.html?search=pay-help.in" class="btn" style="padding:4px 9px; font-size:11px; white-space:nowrap; text-decoration:none;">◎ View in Graph</a></td>
+            </tr>
+            <tr>
+              <td>UPI ID</td><td>scamdesk@upi</td><td>4</td><td>8</td><td><span class="tag medium">MEDIUM</span></td>
+              <td><a href="fraud-graph.html?search=scamdesk%40upi" class="btn" style="padding:4px 9px; font-size:11px; white-space:nowrap; text-decoration:none;">◎ View in Graph</a></td>
+            </tr>
+            <tr>
+              <td>BANK ACCOUNT</td><td>AC-4482</td><td>3</td><td>7</td><td><span class="tag medium">MEDIUM</span></td>
+              <td><a href="fraud-graph.html?search=AC-4482" class="btn" style="padding:4px 9px; font-size:11px; white-space:nowrap; text-decoration:none;">◎ View in Graph</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <aside class="card panel">
+      <h2>Entity Types</h2>
+      <div class="sub">Objects available to the graph layer</div>
+      <div class="list">
+        <div class="item"><b>Phone</b><p>Contact identifier connected to reported incidents.</p></div>
+        <div class="item"><b>Domain</b><p>Website or infrastructure identifier extracted from reports.</p></div>
+        <div class="item"><b>UPI ID</b><p>Payment destination appearing in incident evidence.</p></div>
+        <div class="item"><b>Bank Account</b><p>Financial destination linked to transaction activity.</p></div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer>CYBERSCOPE · TETRABYTE · INVESTIGATION INTELLIGENCE CONSOLE</footer>
+
+<button class="chat-button" id="chatButton" aria-label="Open CyberScope assistant">✦</button>
+<div class="chat-window" id="chatWindow">
+  <div class="chat-head">
+    <div class="chat-head-title"><div class="chat-logo"><img src="assets/logo.png" alt="CyberScope"></div><div><strong>CYBERSCOPE ASSISTANT</strong><small>Investigation workspace assistant</small></div></div>
+    <button class="chat-close" id="chatClose" aria-label="Close chat">×</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-message bot-message">Hello. I can explain cases, the fraud graph, entities, transactions, campaigns and the investigation workspace.</div>
+  </div>
+  <div class="chat-quick">
+    <button data-q="What is the Fraud Graph?">Fraud Graph</button>
+    <button data-q="What is a case?">Cases</button>
+    <button data-q="What are entities?">Entities</button>
+    <button data-q="Tell me about transactions">Transactions</button>
+    <button data-q="What is Campaign Explorer?">Campaigns</button>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chatInput" placeholder="Ask CyberScope...">
+    <button class="chat-send" id="chatSend">→</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-client.js"></script>
+<script src="assets/cyberscope.js"></script>
+<script>
+cyberscopeProtect();
+function filterEntities(){
+  var q = document.getElementById('entitySearch').value.toLowerCase();
+  document.querySelectorAll('#entityTable tbody tr').forEach(function(r){
+    r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+async function loadLiveEntities(){
+  try {
+    var authHeaders = (window.CyberScopeAuth && typeof window.CyberScopeAuth.getAuthHeaders === 'function')
+      ? window.CyberScopeAuth.getAuthHeaders()
+      : {};
+    var res = await fetch('/api/entities', { headers: authHeaders });
+    if(res.ok){
+      var entities = await res.json();
+      if(Array.isArray(entities) && entities.length > 0){
+        var tbody = document.querySelector('#entityTable tbody');
+        if(tbody){
+          tbody.innerHTML = '';
+          entities.forEach(function(e){
+            var tr = document.createElement('tr');
+            var riskScore = typeof e.risk_score === 'number' ? e.risk_score : 50;
+            var badgeClass = riskScore >= 70 ? 'high' : (riskScore >= 40 ? 'medium' : 'low');
+            var badgeText = riskScore >= 70 ? 'HIGH' : (riskScore >= 40 ? 'MEDIUM' : 'LOW');
+            var eId = e.id !== undefined ? encodeURIComponent(e.id) : '';
+            var eVal = encodeURIComponent(e.value || '');
+            var graphHref = 'fraud-graph.html?' + (eId ? ('entity_id=' + eId + '&') : '') + 'search=' + eVal;
+            tr.innerHTML = '<td>' + (e.entity_type || 'ENTITY').toUpperCase() + '</td>' +
+                           '<td>' + (e.value || '') + '</td>' +
+                           '<td>' + (e.case_count || 1) + '</td>' +
+                           '<td>' + (e.degree || 1) + '</td>' +
+                           '<td><span class="tag ' + badgeClass + '">' + badgeText + '</span></td>' +
+                           '<td><a href="' + graphHref + '" class="btn" style="padding:4px 9px; font-size:11px; white-space:nowrap; text-decoration:none;">◎ View in Graph</a></td>';
+            tbody.appendChild(tr);
+          });
+          checkUrlSearch();
+        }
+      }
+    }
+  } catch(e) {}
+}
+
+function checkUrlSearch(){
+  var params = new URLSearchParams(window.location.search);
+  var s = params.get('search');
+  if(s){
+    var input = document.getElementById('entitySearch');
+    if(input){
+      input.value = s;
+      filterEntities();
+    }
+  }
+}
+checkUrlSearch();
+loadLiveEntities();
+</script>
+</body>
+</html>

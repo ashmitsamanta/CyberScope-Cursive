@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel=icon type=image/png href=assets/logo.png>
+<link rel=apple-touch-icon href=assets/logo.png>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CyberScope | Cases</title>
+<link rel="stylesheet" href="assets/cyberscope.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="index.html"><div class="mark"><img src="assets/logo.png" alt="CyberScope"></div><div><b>CYBERSCOPE</b><small>A PROJECT OF TETRABYTE</small></div></a>
+  <div class="nav-inline">
+    <nav class="nav" id="siteNav">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="cases.html">Cases</a>
+      <a href="fraud-graph.html">Fraud Graph</a>
+      <a href="threat-map.html">Threat Map</a>
+      <a href="entity-explorer.html">Entities</a>
+      <a href="transaction-explorer.html">Transactions</a>
+      <a href="campaign-explorer.html">Campaigns</a>
+      <a href="investigation-workspace.html">Workspace</a>
+    </nav>
+    <div class="profile">
+      <div class="avatar" id="avatar">CS</div>
+      <div><div class="pname" id="profileName">User</div><div class="prole">Investigator</div></div>
+      <button class="signout" onclick="signOut()">Sign out</button>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="siteNav"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<div class="nav-backdrop" id="navBackdrop"></div>
+
+<main>
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">CYBERSCOPE MODULE</div>
+      <h1>Investigate every incident in context.</h1>
+      <p>Review reported incidents, risk levels and connected evidence from one structured case console.</p>
+    </div>
+    <div class="status"><span class="dot-pulse">●</span> SYSTEM OPERATIONAL</div>
+  </section>
+
+  <div class="grid">
+    <section class="card panel">
+      <h2>Active Investigation Cases</h2>
+      <div class="sub">Synthetic demo records · connected case view</div>
+      <div class="toolbar">
+        <input class="search" id="caseSearch" placeholder="Search case ID, title or status...">
+        <button class="btn" onclick="filterCases()">Filter</button>
+        <button class="btn" onclick="createNewCase()">+ New Case</button>
+      </div>
+      <div class="table-scroll">
+        <table class="table" id="caseTable">
+          <thead><tr><th>CASE</th><th>INCIDENT</th><th>ENTITIES</th><th>RISK</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
+          <tbody>
+            <tr onclick="window.location.href='investigation-workspace.html?case_id=1'" style="cursor:pointer">
+              <td>CS-1027</td><td>KYC phishing cluster</td><td>14</td><td><span class="tag high">HIGH</span></td><td>Investigating</td>
+              <td onclick="event.stopPropagation()"><button class="btn" style="padding:4px 9px; font-size:11px; white-space:nowrap;" onclick="event.stopPropagation(); window.location.href='fraud-graph.html?case_id=1'">◎ Explore Graph</button></td>
+            </tr>
+            <tr onclick="window.location.href='investigation-workspace.html?case_id=2'" style="cursor:pointer">
+              <td>CS-1024</td><td>Fake utility-bill payment</td><td>9</td><td><span class="tag high">HIGH</span></td><td>Escalated</td>
+              <td onclick="event.stopPropagation()"><button class="btn" style="padding:4px 9px; font-size:11px; white-space:nowrap;" onclick="event.stopPropagation(); window.location.href='fraud-graph.html?case_id=2'">◎ Explore Graph</button></td>
+            </tr>
+            <tr onclick="window.location.href='investigation-workspace.html?case_id=3'" style="cursor:pointer">
+              <td>CS-1019</td><td>Digital-arrest impersonation</td><td>7</td><td><span class="tag medium">MEDIUM</span></td><td>Review</td>
+              <td onclick="event.stopPropagation()"><button class="btn" style="padding:4px 9px; font-size:11px; white-space:nowrap;" onclick="event.stopPropagation(); window.location.href='fraud-graph.html?case_id=3'">◎ Explore Graph</button></td>
+            </tr>
+            <tr onclick="window.location.href='investigation-workspace.html?case_id=4'" style="cursor:pointer">
+              <td>CS-1013</td><td>UPI collection scam</td><td>5</td><td><span class="tag medium">MEDIUM</span></td><td>Open</td>
+              <td onclick="event.stopPropagation()"><button class="btn" style="padding:4px 9px; font-size:11px; white-space:nowrap;" onclick="event.stopPropagation(); window.location.href='fraud-graph.html?case_id=4'">◎ Explore Graph</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <aside class="card panel">
+      <h2>Case Risk Summary</h2>
+      <div class="sub">Current synthetic case distribution</div>
+      <div class="grid3">
+        <div class="card metric"><label>HIGH RISK</label><strong>11</strong><small>+3 linked</small></div>
+        <div class="card metric"><label>MEDIUM</label><strong>10</strong><small>+2 linked</small></div>
+        <div class="card metric"><label>OPEN</label><strong>27</strong><small>active cases</small></div>
+      </div>
+      <div class="list" style="margin-top:15px">
+        <div class="item"><b>Most connected case</b><p>CS-1027 · 14 linked entities</p></div>
+        <div class="item"><b>Latest signal</b><p>Shared payment destination detected</p></div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer>CYBERSCOPE · TETRABYTE · INVESTIGATION INTELLIGENCE CONSOLE</footer>
+
+<button class="chat-button" id="chatButton" aria-label="Open CyberScope assistant">◉</button>
+<div class="chat-window" id="chatWindow">
+  <div class="chat-head">
+    <div class="chat-head-title"><div class="chat-logo"><img src="assets/logo.png" alt="CyberScope"></div><div><strong>CYBERSCOPE ASSISTANT</strong><small>Investigation workspace assistant</small></div></div>
+    <button class="chat-close" id="chatClose" aria-label="Close chat">×</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-message bot-message">Hello. I can explain cases, the fraud graph, entities, transactions, campaigns and the investigation workspace.</div>
+  </div>
+  <div class="chat-quick">
+    <button data-q="What is the Fraud Graph?">Fraud Graph</button>
+    <button data-q="What is a case?">Cases</button>
+    <button data-q="What are entities?">Entities</button>
+    <button data-q="Tell me about transactions">Transactions</button>
+    <button data-q="What is Campaign Explorer?">Campaigns</button>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chatInput" placeholder="Ask CyberScope...">
+    <button class="chat-send" id="chatSend">→</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-client.js"></script>
+<script src="assets/cyberscope.js"></script>
+<script>
+cyberscopeProtect();
+function filterCases(){
+  var q = document.getElementById('caseSearch').value.toLowerCase();
+  document.querySelectorAll('#caseTable tbody tr').forEach(function(r){
+    r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+async function loadLiveCases(){
+  try {
+    var authHeaders = (window.CyberScopeAuth && typeof window.CyberScopeAuth.getAuthHeaders === 'function')
+      ? window.CyberScopeAuth.getAuthHeaders()
+      : {};
+    var res = await fetch('/api/cases', { headers: authHeaders });
+    if(res.ok){
+      var cases = await res.json();
+      if(Array.isArray(cases) && cases.length > 0){
+        var tbody = document.querySelector('#caseTable tbody');
+        if(tbody){
+          tbody.innerHTML = '';
+          cases.forEach(function(c){
+            var tr = document.createElement('tr');
+            tr.style.cursor = 'pointer';
+            var cid = c.id || c.case_id;
+            var caseParam = encodeURIComponent(cid || c.case_number || '');
+            tr.onclick = function(){ window.location.href = 'investigation-workspace.html?case_id=' + caseParam; };
+            var badgeClass = (c.severity || '').toLowerCase() === 'high' || (c.severity || '').toLowerCase() === 'critical' ? 'high' : 'medium';
+            tr.innerHTML = '<td>' + (c.case_number || ('CS-' + (c.id || ''))) + '</td>' +
+                           '<td>' + (c.title || 'Reported Incident') + '</td>' +
+                           '<td>' + (c.entity_count || 0) + '</td>' +
+                           '<td><span class="tag ' + badgeClass + '">' + (c.severity || 'MEDIUM').toUpperCase() + '</span></td>' +
+                           '<td>' + (c.status || 'Active') + '</td>' +
+                           '<td onclick="event.stopPropagation()"><button class="btn" style="padding:4px 9px; font-size:11px; white-space:nowrap;" onclick="event.stopPropagation(); window.location.href=\'fraud-graph.html?case_id=' + caseParam + '\'">◎ Explore Graph</button></td>';
+            tbody.appendChild(tr);
+          });
+          checkUrlSearch();
+        }
+      }
+    }
+  } catch(e) {}
+}
+
+function checkUrlSearch(){
+  var params = new URLSearchParams(window.location.search);
+  var s = params.get('search');
+  if(s){
+    var input = document.getElementById('caseSearch');
+    if(input){
+      input.value = s;
+      filterCases();
+    }
+  }
+}
+checkUrlSearch();
+loadLiveCases();
+
+async function createNewCase(){
+  var title = prompt('Enter investigation title / incident name:');
+  if(!title) return;
+  var lure = prompt('Enter scam lure text, SMS, or victim complaint:');
+  if(!lure) return;
+  try {
+    var res = await fetch('/api/cases/ingest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: title,
+        content: lure,
+        channel: 'PORTAL_INGEST'
+      })
+    });
+    if(res.ok){
+      alert('Case successfully created & entities extracted!');
+      loadLiveCases();
+    } else {
+      alert('Case created in workspace demo session.');
+    }
+  } catch(e) {
+    alert('Case created in workspace demo session.');
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel=icon type=image/png href=assets/logo.png>
+<link rel=apple-touch-icon href=assets/logo.png>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CyberScope | Dashboard</title>
+<link rel="stylesheet" href="assets/cyberscope.css">
+</head>
+<body>
+<div class="auth-gate" id="authGate">
+  <div class="auth-gate-box">
+    <div class="auth-gate-mark"><img src="assets/logo.png" alt="CyberScope"></div>
+    <div class="eyebrow">AUTHENTICATION REQUIRED</div>
+    <h2>Sign in to access CyberScope</h2>
+    <p>You need an active CyberScope account session before you can open the investigation dashboard.</p>
+    <div class="auth-gate-actions">
+      <a class="auth-signin" href="signin.html?redirect=dashboard.html">Sign In →</a>
+      <a class="auth-register" href="register.html">Create Account</a>
+    </div>
+  </div>
+</div>
+
+<header class="topbar">
+  <a class="brand" href="index.html"><div class="mark"><img src="assets/logo.png" alt="CyberScope"></div><div><b>CYBERSCOPE</b><small>A PROJECT OF TETRABYTE</small></div></a>
+  <div class="nav-inline">
+    <nav class="nav" id="siteNav">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="cases.html">Cases</a>
+      <a href="fraud-graph.html">Fraud Graph</a>
+      <a href="threat-map.html">Threat Map</a>
+      <a href="entity-explorer.html">Entities</a>
+      <a href="transaction-explorer.html">Transactions</a>
+      <a href="campaign-explorer.html">Campaigns</a>
+      <a href="investigation-workspace.html">Workspace</a>
+    </nav>
+    <div class="profile">
+      <div class="avatar" id="avatar">CS</div>
+      <div><div class="pname" id="profileName">User</div><div class="prole">Investigator</div></div>
+      <button class="signout" onclick="signOut()">Sign out</button>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="siteNav"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<div class="nav-backdrop" id="navBackdrop"></div>
+
+<main>
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">INVESTIGATION WORKSPACE</div>
+      <h1>Hi, <span id="welcomeName">User</span> 👋</h1>
+      <p>Welcome back. Here's your current fraud-intelligence overview.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+      <div class="status"><span class="dot-pulse">●</span> SYSTEM OPERATIONAL</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+        <a href="threat-map.html" class="btn" style="padding:6px 12px; font-size:11px; text-decoration:none; display:inline-flex; align-items:center; gap:5px; background:rgba(255,93,125,0.1); border-color:var(--danger,#ff5d7d); color:var(--danger,#ff5d7d);">🗺️ Live Threat Map →</a>
+        <a href="fraud-graph.html" class="btn" style="padding:6px 12px; font-size:11px; text-decoration:none; display:inline-flex; align-items:center; gap:5px; background:rgba(54,207,255,0.08); border-color:var(--cyan); color:var(--cyan);">◎ Open Fraud Graph →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="card stat"><div class="stat-label">ACTIVE CASES</div><div class="stat-value" id="statCases">27</div><div class="trend">↑ 8.4% this month</div></div>
+    <div class="card stat" onclick="window.location.href='fraud-graph.html'" style="cursor:pointer;" title="Explore in Fraud Graph"><div class="stat-label">LINKED ENTITIES</div><div class="stat-value" id="statEntities">148</div><div class="trend" style="color:var(--cyan);">◎ Open Graph →</div></div>
+    <div class="card stat"><div class="stat-label">RISK SIGNALS</div><div class="stat-value" id="statSignals">63</div><div class="trend">↑ 9 detected today</div></div>
+    <div class="card stat" onclick="window.location.href='campaign-explorer.html'" style="cursor:pointer;" title="View Campaigns"><div class="stat-label">ACTIVE CAMPAIGNS</div><div class="stat-value" id="statCampaigns">09</div><div class="trend">↑ 2 under review</div></div>
+  </section>
+
+  <section class="dashboard-grid">
+    <div>
+      <div class="card panel">
+        <h2>Fraud Activity</h2>
+        <div class="sub">Investigation signals detected over the recent activity window</div>
+        <div class="chart" id="chart"></div>
+      </div>
+      <div class="card panel cases">
+        <h2>Recent Investigations</h2>
+        <div class="sub">Latest cases requiring attention</div>
+        <div id="recentCasesList">
+        <div class="case" onclick="window.location.href='investigation-workspace.html?case_id=1'" style="cursor:pointer">
+          <div class="case-id">CS-1027</div>
+          <div><div class="case-title">KYC phishing network</div><div class="case-meta">8 linked entities · Updated 12 min ago</div></div>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px;">
+            <div class="badge high">HIGH RISK</div>
+            <button class="btn" style="padding:2px 7px; font-size:10px; white-space:nowrap; border-color:rgba(54,207,255,0.4);" onclick="event.stopPropagation(); window.location.href='fraud-graph.html?case_id=1'">◎ Graph</button>
+          </div>
+        </div>
+        <div class="case" onclick="window.location.href='investigation-workspace.html?case_id=2'" style="cursor:pointer">
+          <div class="case-id">CS-1026</div>
+          <div><div class="case-title">Fake utility-bill campaign</div><div class="case-meta">14 linked entities · Updated 38 min ago</div></div>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px;">
+            <div class="badge medium">MEDIUM</div>
+            <button class="btn" style="padding:2px 7px; font-size:10px; white-space:nowrap; border-color:rgba(54,207,255,0.4);" onclick="event.stopPropagation(); window.location.href='fraud-graph.html?case_id=2'">◎ Graph</button>
+          </div>
+        </div>
+        <div class="case" onclick="window.location.href='investigation-workspace.html?case_id=3'" style="cursor:pointer">
+          <div class="case-id">CS-1025</div>
+          <div><div class="case-title">UPI transaction cluster</div><div class="case-meta">21 linked entities · Updated 1 hr ago</div></div>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px;">
+            <div class="badge high">HIGH RISK</div>
+            <button class="btn" style="padding:2px 7px; font-size:10px; white-space:nowrap; border-color:rgba(54,207,255,0.4);" onclick="event.stopPropagation(); window.location.href='fraud-graph.html?case_id=3'">◎ Graph</button>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card panel">
+        <h2>Risk Distribution</h2>
+        <div class="sub">Current signals by severity</div>
+        <div class="risk-row"><div class="risk-head"><span>Critical</span><b>12%</b></div><div class="risk-track"><div class="risk-fill high" style="width:12%"></div></div></div>
+        <div class="risk-row"><div class="risk-head"><span>High</span><b>28%</b></div><div class="risk-track"><div class="risk-fill high" style="width:28%"></div></div></div>
+        <div class="risk-row"><div class="risk-head"><span>Medium</span><b>36%</b></div><div class="risk-track"><div class="risk-fill medium" style="width:36%"></div></div></div>
+        <div class="risk-row"><div class="risk-head"><span>Low</span><b>24%</b></div><div class="risk-track"><div class="risk-fill" style="width:24%"></div></div></div>
+      </div>
+      <div class="card panel activity">
+        <h2>Intelligence Activity</h2>
+        <div class="sub">Recent platform events</div>
+        <div class="activity-item"><div class="dot"></div><div><div class="activity-text">New phone entity linked to <b>CS-1027</b></div><div class="activity-time">12 minutes ago</div></div></div>
+        <div class="activity-item"><div class="dot"></div><div><div class="activity-text">Risk signal raised for a connected UPI ID</div><div class="activity-time">31 minutes ago</div></div></div>
+        <div class="activity-item"><div class="dot"></div><div><div class="activity-text">Campaign cluster updated with 4 new links</div><div class="activity-time">54 minutes ago</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="quick">
+    <a href="cases.html">▣ &nbsp; Open Case Management →</a>
+    <a href="fraud-graph.html">◎ &nbsp; Explore Fraud Graph →</a>
+    <a href="threat-map.html">🗺️ &nbsp; Indian Threat Map →</a>
+    <a href="investigation-workspace.html">⌁ &nbsp; Investigation Workspace →</a>
+  </section>
+</main>
+
+<button class="chat-button" id="chatButton" aria-label="Open CyberScope assistant">✦</button>
+<div class="chat-window" id="chatWindow">
+  <div class="chat-head">
+    <div class="chat-head-title"><div class="chat-logo"><img src="assets/logo.png" alt="CyberScope"></div><div><strong>CYBERSCOPE ASSISTANT</strong><small>Investigation workspace assistant</small></div></div>
+    <button class="chat-close" id="chatClose" aria-label="Close chat">×</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-message bot-message">Hello! I'm the CyberScope assistant. I can explain cases, entities, the Fraud Graph, transactions, campaigns and the Investigation Workspace.</div>
+  </div>
+  <div class="chat-quick">
+    <button data-q="What is the Fraud Graph?">Fraud Graph</button>
+    <button data-q="What are entities?">Entities</button>
+    <button data-q="What is a case?">Cases</button>
+    <button data-q="What is Campaign Explorer?">Campaigns</button>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chatInput" placeholder="Ask about CyberScope...">
+    <button class="chat-send" id="chatSend">→</button>
+  </div>
+</div>
+
+<footer>© 2026 CyberScope · A Project of TetraByte</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-client.js"></script>
+<script src="assets/cyberscope.js"></script>
+<script>
+function dashboardRequireAuth(){
+  var session = localStorage.getItem('cyberscopeSession');
+  var user = cyberscopeUser();
+  var gate = document.getElementById('authGate');
+  if(session !== 'active' || !user || (!user.name && !user.email)){
+    if(gate){
+      gate.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    return false;
+  }
+  return true;
+}
+function dashboardLoadUser(){
+  var user = cyberscopeUser();
+  if(!dashboardRequireAuth()) return;
+  var name = (user.name || user.email || 'Investigator').trim();
+  var role = user.role || 'Investigator';
+  var welcomeEl = document.getElementById('welcomeName');
+  var profileEl = document.getElementById('profileName');
+  var avatarEl = document.getElementById('avatar');
+  var roleEl = document.querySelector('.prole');
+  if(welcomeEl) welcomeEl.textContent = name.split(/\s+/)[0];
+  if(profileEl) profileEl.textContent = name;
+  if(avatarEl) avatarEl.textContent = cyberscopeInitials(name);
+  if(roleEl) roleEl.textContent = role;
+
+  // Background session verification with Supabase
+  if(window.CyberScopeAuth && typeof window.CyberScopeAuth.verifySession === 'function'){
+    window.CyberScopeAuth.verifySession().then(function(valid){
+      if(!valid){
+        var localUser = cyberscopeUser();
+        var localSession = localStorage.getItem('cyberscopeSession');
+        if (localSession === 'active' && localUser && (localUser.email || localUser.id)) {
+          return;
+        }
+        var gate = document.getElementById('authGate');
+        if(gate){
+          gate.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        }
+      }
+    });
+  }
+}
+dashboardLoadUser();
+
+var heights = [45,58,42,72,55,80,64,88,61,76,52,92,70,83,66,96,74,86,60,78,68,90,73,84,63,94,77,82,69,88];
+var chart = document.getElementById('chart');
+heights.forEach(function(h,i){
+  var b = document.createElement('div');
+  b.className = 'bar';
+  b.style.height = h + '%';
+  b.style.animationDelay = (i*0.02) + 's';
+  chart.appendChild(b);
+});
+
+async function syncLiveDashboardData(){
+  try {
+    var authHeaders = (window.CyberScopeAuth && typeof window.CyberScopeAuth.getAuthHeaders === 'function')
+      ? window.CyberScopeAuth.getAuthHeaders()
+      : {};
+    var res = await fetch('/api/stats/dashboard', { headers: authHeaders });
+    if(res.ok){
+      var data = await res.json();
+      if(data.total_cases) document.getElementById('statCases').textContent = data.total_cases;
+      if(data.total_entities) document.getElementById('statEntities').textContent = data.total_entities;
+      if(data.total_signals) document.getElementById('statSignals').textContent = data.total_signals;
+      if(data.total_campaigns) document.getElementById('statCampaigns').textContent = String(data.total_campaigns).padStart(2,'0');
+    }
+    var cRes = await fetch('/api/cases?limit=3', { headers: authHeaders });
+    if(cRes.ok){
+      var cases = await cRes.json();
+      if(Array.isArray(cases) && cases.length > 0){
+        var container = document.getElementById('recentCasesList');
+        if(container){
+          container.innerHTML = '';
+          cases.forEach(function(c){
+            var div = document.createElement('div');
+            div.className = 'case';
+            div.style.cursor = 'pointer';
+            var cid = c.id || c.case_id;
+            var caseParam = encodeURIComponent(cid || c.case_number || '');
+            div.onclick = function(){ window.location.href = 'investigation-workspace.html?case_id=' + caseParam; };
+            var badgeClass = (c.severity || '').toLowerCase() === 'high' || (c.severity || '').toLowerCase() === 'critical' ? 'high' : 'medium';
+            div.innerHTML = '<div class="case-id">' + (c.case_number || ('CS-' + (c.id || ''))) + '</div>' +
+                            '<div><div class="case-title">' + (c.title || 'Fraud Incident') + '</div>' +
+                            '<div class="case-meta">' + (c.entity_count || 0) + ' linked entities · ' + (c.status || 'Active') + '</div></div>' +
+                            '<div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px;">' +
+                              '<div class="badge ' + badgeClass + '">' + (c.severity || 'MEDIUM').toUpperCase() + '</div>' +
+                              '<button class="btn" style="padding:2px 7px; font-size:10px; white-space:nowrap; border-color:rgba(54,207,255,0.4);" onclick="event.stopPropagation(); window.location.href=\'fraud-graph.html?case_id=' + caseParam + '\'">◎ Graph</button>' +
+                            '</div>';
+            container.appendChild(div);
+          });
+        }
+      }
+    }
+  } catch(e) {}
+}
+syncLiveDashboardData();
+</script>
+</body>
+</html>
+

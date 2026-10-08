@@ -1,0 +1,2796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel=icon type=image/png href=assets/logo.png>
+<link rel=apple-touch-icon href=assets/logo.png>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CyberScope | Fraud Graph Explorer</title>
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<!-- Core Theme Styles -->
+<link rel="stylesheet" href="assets/cyberscope.css">
+<!-- Cytoscape.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/cytoscape@3.28.1/dist/cytoscape.min.js"></script>
+<style>
+/* =========================================================
+   CYBER-NEON FRAUD GRAPH SPECIFIC STYLES
+   ========================================================= */
+:root {
+  --neon-cyan: #36cfff;
+  --neon-green: #5dffb1;
+  --neon-purple: #9b7cff;
+  --neon-amber: #ffbe3b;
+  --neon-blue: #388bff;
+  --neon-red: #ff5d7d;
+  --neon-pink: #ff7eb6;
+  --neon-slate: #8da1b8;
+  --canvas-bg: #07101c;
+}
+
+/* Page layout tweaks */
+.graph-hero {
+  margin-bottom: 20px;
+}
+.graph-metrics-strip {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.metric-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(10, 22, 38, 0.7);
+  border: 1px solid rgba(54, 207, 255, 0.16);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  color: var(--text);
+}
+.metric-pill b {
+  color: var(--neon-cyan);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+}
+
+/* Control Toolbar & Filters */
+.graph-toolbar {
+  background: linear-gradient(145deg, rgba(13, 23, 39, 0.96), rgba(7, 18, 32, 0.96));
+  border: 1px solid rgba(54, 207, 255, 0.18);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.toolbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.control-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.cyber-select {
+  background: #081423;
+  color: var(--text);
+  border: 1px solid rgba(54, 207, 255, 0.25);
+  border-radius: 8px;
+  padding: 7px 11px;
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.cyber-select:focus, .cyber-select:hover {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 12px rgba(54, 207, 255, 0.2);
+}
+
+.cyber-search-box {
+  position: relative;
+  min-width: 220px;
+  flex: 1;
+  max-width: 320px;
+}
+.cyber-search-input {
+  width: 100%;
+  background: #081423;
+  border: 1px solid rgba(54, 207, 255, 0.25);
+  border-radius: 8px;
+  color: #fff;
+  padding: 7px 28px 7px 10px;
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.cyber-search-input:focus {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 12px rgba(54, 207, 255, 0.2);
+}
+.cyber-search-clear {
+  position: absolute;
+  right: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 2px 4px;
+}
+.cyber-search-clear:hover {
+  color: var(--neon-cyan);
+}
+
+/* Filter Chips */
+.filter-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.chip {
+  background: rgba(9, 22, 36, 0.8);
+  border: 1px solid rgba(95, 171, 255, 0.16);
+  color: #9cb2c7;
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.chip:hover {
+  border-color: rgba(54, 207, 255, 0.5);
+  color: #eaf4ff;
+  transform: translateY(-1px);
+}
+.chip.active {
+  background: rgba(54, 207, 255, 0.14);
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  font-weight: 600;
+  box-shadow: 0 0 10px rgba(54, 207, 255, 0.25);
+}
+.chip-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.chip-count {
+  font-size: 9px;
+  opacity: 0.8;
+  background: rgba(255,255,255,0.08);
+  padding: 1px 4px;
+  border-radius: 6px;
+}
+
+/* Preset Intelligence Bar */
+.preset-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-top: 4px;
+  border-top: 1px solid rgba(95, 171, 255, 0.08);
+}
+.preset-btn {
+  background: rgba(14, 28, 46, 0.9);
+  border: 1px solid rgba(54, 207, 255, 0.25);
+  color: var(--neon-cyan);
+  padding: 5px 12px;
+  border-radius: 7px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+.preset-btn:hover {
+  background: rgba(54, 207, 255, 0.16);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 14px rgba(54, 207, 255, 0.3);
+  transform: translateY(-1px);
+}
+.preset-btn.active {
+  background: var(--neon-cyan);
+  color: #04101c;
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 16px rgba(54, 207, 255, 0.45);
+}
+.preset-badge {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 10px;
+}
+.preset-btn.active .preset-badge {
+  background: rgba(0, 0, 0, 0.25);
+  color: #04101c;
+}
+
+/* Two-column layout */
+.graph-grid {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+/* Canvas Container */
+.canvas-wrapper {
+  position: relative;
+  background: var(--canvas-bg);
+  border: 1px solid rgba(54, 207, 255, 0.22);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+#cy {
+  width: 100%;
+  height: 640px;
+  position: relative;
+  background-color: #07101c;
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(54, 207, 255, 0.05), transparent 60%),
+    linear-gradient(rgba(54, 207, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(54, 207, 255, 0.035) 1px, transparent 1px);
+  background-size: 100% 100%, 36px 36px, 36px 36px;
+}
+
+/* HUD Overlay Elements */
+.canvas-hud-top {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  z-index: 10;
+}
+.hud-badge {
+  pointer-events: auto;
+  background: rgba(7, 16, 28, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(54, 207, 255, 0.28);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 11px;
+  color: #cfe5f7;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+.hud-badge .hud-accent {
+  color: var(--neon-cyan);
+  font-weight: 700;
+}
+
+.canvas-dock {
+  position: absolute;
+  bottom: 50px;
+  right: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 10;
+}
+.dock-btn {
+  width: 34px;
+  height: 34px;
+  background: rgba(7, 16, 28, 0.88);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(54, 207, 255, 0.28);
+  border-radius: 7px;
+  color: var(--neon-cyan);
+  font-size: 14px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.dock-btn:hover {
+  background: var(--neon-cyan);
+  color: #04101c;
+  box-shadow: 0 0 14px rgba(54, 207, 255, 0.5);
+  transform: scale(1.06);
+}
+
+/* Bottom Canvas Legend */
+.canvas-legend {
+  padding: 10px 14px;
+  background: rgba(6, 14, 25, 0.95);
+  border-top: 1px solid rgba(54, 207, 255, 0.15);
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 10.5px;
+  color: var(--muted);
+}
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.legend-shape {
+  width: 11px;
+  height: 11px;
+  display: inline-block;
+}
+.shape-case { background: #091827; border: 2px solid #36cfff; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+.shape-phone { background: #091b18; border: 2px solid #5dffb1; border-radius: 50%; }
+.shape-domain { background: #120e24; border: 2px solid #9b7cff; border-radius: 3px; }
+.shape-upi { background: #1c1809; border: 2px solid #ffbe3b; transform: rotate(45deg); }
+.shape-bank { background: #0a172a; border: 2px solid #388bff; }
+.shape-device { background: #0f1722; border: 2px solid #8da1b8; clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%); }
+.shape-risk { width: 11px; height: 11px; border-radius: 50%; border: 2px solid #ff5d7d; box-shadow: 0 0 8px #ff5d7d; }
+
+/* Canvas Loading Overlay */
+.canvas-loading {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 16, 28, 0.85);
+  backdrop-filter: blur(6px);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 20;
+}
+.canvas-loading.active {
+  display: flex;
+}
+.cyber-spinner {
+  width: 42px;
+  height: 42px;
+  border: 3px solid rgba(54, 207, 255, 0.15);
+  border-top-color: var(--neon-cyan);
+  border-radius: 50%;
+  animation: cyberSpin 0.8s linear infinite;
+  box-shadow: 0 0 15px rgba(54, 207, 255, 0.4);
+}
+@keyframes cyberSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* Side Column Panels */
+.side-panels {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Inspector Panel */
+.inspector-card {
+  background: linear-gradient(145deg, rgba(13, 23, 39, 0.96), rgba(7, 18, 32, 0.96));
+  border: 1px solid rgba(54, 207, 255, 0.18);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+  position: relative;
+}
+
+.inspector-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+.inspector-empty-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  border: 1px dashed rgba(54, 207, 255, 0.35);
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  color: var(--neon-cyan);
+  font-size: 20px;
+}
+
+.inspector-header {
+  border-bottom: 1px solid rgba(95, 171, 255, 0.12);
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+}
+.inspector-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.inspector-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  word-break: break-all;
+}
+.btn-copy {
+  background: rgba(54, 207, 255, 0.08);
+  border: 1px solid rgba(54, 207, 255, 0.25);
+  color: var(--neon-cyan);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.btn-copy:hover {
+  background: rgba(54, 207, 255, 0.18);
+}
+
+.badges-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.type-badge {
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.type-CASE { background: rgba(54, 207, 255, 0.15); color: #36cfff; border: 1px solid rgba(54, 207, 255, 0.4); }
+.type-PHONE { background: rgba(93, 255, 177, 0.15); color: #5dffb1; border: 1px solid rgba(93, 255, 177, 0.4); }
+.type-DOMAIN, .type-URL { background: rgba(155, 124, 255, 0.15); color: #9b7cff; border: 1px solid rgba(155, 124, 255, 0.4); }
+.type-UPI_ID { background: rgba(255, 190, 59, 0.15); color: #ffbe3b; border: 1px solid rgba(255, 190, 59, 0.4); }
+.type-DEVICE { background: rgba(141, 161, 184, 0.15); color: #8da1b8; border: 1px solid rgba(141, 161, 184, 0.4); }
+.type-IP_ADDRESS { background: rgba(255, 77, 79, 0.18); color: #ff7875; border: 1px solid rgba(255, 77, 79, 0.5); }
+.type-PERSON { background: rgba(255, 126, 182, 0.15); color: #ff7eb6; border: 1px solid rgba(255, 126, 182, 0.4); }
+
+.risk-meter {
+  margin: 12px 0;
+}
+.risk-meter-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  margin-bottom: 5px;
+}
+.risk-meter-track {
+  height: 6px;
+  background: #0d1a29;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.risk-meter-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.4s ease;
+}
+
+.inspector-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.info-box {
+  background: rgba(8, 16, 28, 0.6);
+  border: 1px solid rgba(95, 171, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+.info-box label {
+  display: block;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.info-box strong {
+  display: block;
+  font-size: 14px;
+  color: #fff;
+  margin-top: 3px;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.inspector-meta {
+  background: rgba(8, 16, 28, 0.4);
+  border: 1px solid rgba(95, 171, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 14px;
+  font-size: 11px;
+}
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(95, 171, 255, 0.05);
+}
+.meta-row:last-child { border-bottom: none; }
+.meta-key { color: var(--muted); text-transform: capitalize; }
+.meta-val { color: #cfe5f7; font-weight: 500; }
+
+.neighbors-box {
+  margin-bottom: 14px;
+}
+.neighbors-title {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+.neighbors-list {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  max-height: 90px;
+  overflow-y: auto;
+}
+.neighbor-pill {
+  background: rgba(10, 22, 38, 0.85);
+  border: 1px solid rgba(54, 207, 255, 0.2);
+  color: #cfe5f7;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 10.5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.neighbor-pill:hover {
+  background: rgba(54, 207, 255, 0.2);
+  border-color: var(--neon-cyan);
+  color: #fff;
+}
+
+.action-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.action-btn {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.action-btn.primary {
+  background: rgba(54, 207, 255, 0.15);
+  border: 1px solid var(--neon-cyan);
+  color: var(--neon-cyan);
+}
+.action-btn.primary:hover {
+  background: var(--neon-cyan);
+  color: #04101c;
+  box-shadow: 0 0 16px rgba(54, 207, 255, 0.35);
+}
+.action-btn.secondary {
+  background: rgba(10, 22, 38, 0.7);
+  border: 1px solid rgba(95, 171, 255, 0.2);
+  color: #cfe5f7;
+}
+.action-btn.secondary:hover {
+  background: rgba(54, 207, 255, 0.1);
+  border-color: rgba(54, 207, 255, 0.4);
+  color: #fff;
+}
+.action-row {
+  display: flex;
+  gap: 7px;
+}
+.action-row .action-btn {
+  flex: 1;
+}
+
+/* Intelligence Panel Tabs */
+.intel-card {
+  background: linear-gradient(145deg, rgba(13, 23, 39, 0.96), rgba(7, 18, 32, 0.96));
+  border: 1px solid rgba(54, 207, 255, 0.18);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+}
+.intel-tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(95, 171, 255, 0.14);
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.intel-tab {
+  padding: 7px 11px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.intel-tab:hover {
+  color: #cfe5f7;
+}
+.intel-tab.active {
+  color: var(--neon-cyan);
+  border-bottom-color: var(--neon-cyan);
+}
+
+.intel-panel {
+  display: none;
+}
+.intel-panel.active {
+  display: block;
+  animation: fadeIn 0.25s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+.intel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 290px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.intel-item {
+  background: rgba(8, 16, 28, 0.65);
+  border: 1px solid rgba(95, 171, 255, 0.12);
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.intel-item:hover {
+  background: rgba(54, 207, 255, 0.08);
+  border-color: rgba(54, 207, 255, 0.35);
+  transform: translateX(2px);
+}
+.intel-item-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.intel-item-val {
+  font-weight: 600;
+  color: #fff;
+  font-size: 12px;
+}
+.intel-item-cases {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.case-badge {
+  background: rgba(54, 207, 255, 0.1);
+  border: 1px solid rgba(54, 207, 255, 0.25);
+  color: var(--neon-cyan);
+  font-size: 9.5px;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* Path finder controls */
+.path-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.path-field label {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.path-trail {
+  margin-top: 12px;
+  padding: 10px;
+  background: rgba(7, 14, 24, 0.8);
+  border: 1px solid rgba(54, 207, 255, 0.2);
+  border-radius: 8px;
+  font-size: 11.5px;
+}
+.trail-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  color: #cfe5f7;
+}
+.trail-arrow {
+  color: var(--neon-cyan);
+  font-size: 10px;
+}
+
+/* Responsive adjustments */
+@media(max-width: 1080px) {
+  .graph-grid {
+    grid-template-columns: 1fr;
+  }
+  #cy {
+    height: 520px;
+  }
+}
+</style>
+</head>
+<body>
+<!-- Global Topbar Navigation -->
+<header class="topbar">
+  <a class="brand" href="index.html"><div class="mark"><img src="assets/logo.png" alt="CyberScope"></div><div><b>CYBERSCOPE</b><small>A PROJECT OF TETRABYTE</small></div></a>
+  <div class="nav-inline">
+    <nav class="nav" id="siteNav">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="cases.html">Cases</a>
+      <a href="fraud-graph.html" class="active">Fraud Graph</a>
+      <a href="threat-map.html">Threat Map</a>
+      <a href="entity-explorer.html">Entities</a>
+      <a href="transaction-explorer.html">Transactions</a>
+      <a href="campaign-explorer.html">Campaigns</a>
+      <a href="investigation-workspace.html">Workspace</a>
+    </nav>
+    <div class="profile">
+      <div class="avatar" id="avatar">CS</div>
+      <div><div class="pname" id="profileName">User</div><div class="prole">Investigator</div></div>
+      <button class="signout" onclick="signOut()">Sign out</button>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="siteNav"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<div class="nav-backdrop" id="navBackdrop"></div>
+
+<main>
+  <!-- Hero Section -->
+  <section class="hero graph-hero">
+    <div class="hero-copy">
+      <div class="eyebrow">CYBERSCOPE INTELLIGENCE MODULE</div>
+      <h1>Interactive Fraud Graph Explorer</h1>
+      <p>Analyze multi-hop topologies connecting fraud cases, mule phone numbers, phishing domains, UPI IDs, and laundering bank accounts.</p>
+      <div class="graph-metrics-strip">
+        <div class="metric-pill"><span class="chip-dot" style="background:var(--neon-cyan)"></span> NODES: <b id="statTotalNodes">--</b></div>
+        <div class="metric-pill"><span class="chip-dot" style="background:var(--neon-blue)"></span> EDGES: <b id="statTotalEdges">--</b></div>
+        <div class="metric-pill"><span class="chip-dot" style="background:var(--neon-amber)"></span> SHARED INFRA: <b id="statSharedCount">--</b></div>
+        <div class="metric-pill"><span class="chip-dot" style="background:var(--neon-red)"></span> CIRCULAR FLOWS: <b id="statCyclesCount">--</b></div>
+      </div>
+    </div>
+    <div class="status"><span class="dot-pulse">●</span> SYSTEM OPERATIONAL</div>
+  </section>
+
+  <!-- Controls & Filter Toolbar -->
+  <section class="graph-toolbar">
+    <!-- Row 1: Scope, Hops, Layout, Search, Navigation -->
+    <div class="toolbar-row">
+      <div class="toolbar-group">
+        <span class="control-label">Case Focus:</span>
+        <select id="caseSelector" class="cyber-select" onchange="handleCaseChange(this.value)">
+          <option value="all">⚡ Full Network Overview (All Cases)</option>
+        </select>
+
+        <span class="control-label" style="margin-left:8px">Hop Depth:</span>
+        <select id="hopSelector" class="cyber-select" onchange="handleHopChange(this.value)">
+          <option value="1">1 Hop</option>
+          <option value="2" selected>2 Hops</option>
+          <option value="3">3 Hops</option>
+        </select>
+
+        <span class="control-label" style="margin-left:8px">Layout:</span>
+        <select id="layoutSelector" class="cyber-select" onchange="changeLayout(this.value)">
+          <option value="cose" selected>Force-directed (COSE)</option>
+          <option value="concentric">Concentric Rings</option>
+          <option value="circle">Radial Circle</option>
+          <option value="breadthfirst">Breadthfirst Tree</option>
+          <option value="grid">Matrix Grid</option>
+        </select>
+      </div>
+
+      <div class="toolbar-group">
+        <div class="cyber-search-box">
+          <input type="text" id="graphSearchInput" class="cyber-search-input" placeholder="Search node, phone, UPI, domain..." oninput="handleSearchInput(this.value)" onkeydown="if(event.key==='Enter') executeSearch()">
+          <button class="cyber-search-clear" onclick="clearSearch()" title="Clear search">✕</button>
+        </div>
+        <button class="btn" onclick="executeSearch()" style="padding:7px 12px">Find</button>
+      </div>
+    </div>
+
+    <!-- Row 2: Entity Filter Chips -->
+    <div class="toolbar-row">
+      <div class="filter-chips">
+        <span class="control-label">Filter:</span>
+        <div class="chip active" data-filter="all" onclick="setEntityFilter('all')">
+          <span>All Entities</span> <span class="chip-count" id="count-all">0</span>
+        </div>
+        <div class="chip" data-filter="CASE" onclick="setEntityFilter('CASE')">
+          <span class="chip-dot" style="background:#36cfff"></span> Cases <span class="chip-count" id="count-CASE">0</span>
+        </div>
+        <div class="chip" data-filter="DOMAIN" onclick="setEntityFilter('DOMAIN')">
+          <span class="chip-dot" style="background:#9b7cff"></span> Domains & URLs <span class="chip-count" id="count-DOMAIN">0</span>
+        </div>
+        <div class="chip" data-filter="PHONE" onclick="setEntityFilter('PHONE')">
+          <span class="chip-dot" style="background:#5dffb1"></span> Phones <span class="chip-count" id="count-PHONE">0</span>
+        </div>
+        <div class="chip" data-filter="UPI_ID" onclick="setEntityFilter('UPI_ID')">
+          <span class="chip-dot" style="background:#ffbe3b"></span> UPI IDs <span class="chip-count" id="count-UPI_ID">0</span>
+        </div>
+        <div class="chip" data-filter="BANK_ACCOUNT" onclick="setEntityFilter('BANK_ACCOUNT')">
+          <span class="chip-dot" style="background:#388bff"></span> Bank Accounts <span class="chip-count" id="count-BANK_ACCOUNT">0</span>
+        </div>
+        <div class="chip" data-filter="DEVICE" onclick="setEntityFilter('DEVICE')">
+          <span class="chip-dot" style="background:#8da1b8"></span> Devices <span class="chip-count" id="count-DEVICE">0</span>
+        </div>
+        <div class="chip" data-filter="IP_ADDRESS" onclick="setEntityFilter('IP_ADDRESS')">
+          <span class="chip-dot" style="background:#ff4d4f"></span> Attacker IPs <span class="chip-count" id="count-IP_ADDRESS">0</span>
+        </div>
+        <div class="chip" data-filter="high_risk" onclick="setEntityFilter('high_risk')">
+          <span class="chip-dot" style="background:#ff5d7d"></span> High Risk (≥70) <span class="chip-count" id="count-high_risk">0</span>
+        </div>
+      </div>
+
+      <div class="toolbar-group">
+        <button class="btn" style="padding:5px 9px; font-size:11px;" onclick="resetGraphView()" title="Fit & Reset View">↺ Reset View</button>
+      </div>
+    </div>
+
+    <!-- Row 3: Graph Intelligence Presets -->
+    <div class="preset-bar">
+      <span class="control-label">Intelligence Presets:</span>
+      <button class="preset-btn" id="btnPresetShared" onclick="activateSharedInfraPreset()">
+        ⚡ Shared Infrastructure <span class="preset-badge" id="badgeSharedInfra">--</span>
+      </button>
+      <button class="preset-btn" id="btnPresetCycles" onclick="activateCircularFlowsPreset()">
+        🔄 Circular Flows <span class="preset-badge" id="badgeCircularCycles">--</span>
+      </button>
+      <button class="preset-btn" id="btnPresetPath" onclick="activateShortestPathTab()">
+        📍 Shortest Path Finder
+      </button>
+      <button class="preset-btn" style="background:transparent; border-color:rgba(255,255,255,0.15); color:var(--muted);" onclick="clearAllHighlights()">
+        ✕ Clear Highlights
+      </button>
+    </div>
+  </section>
+
+  <!-- Main Graph & Inspector Grid -->
+  <div class="graph-grid">
+    <!-- Left Column: Cytoscape Canvas Area -->
+    <div class="canvas-wrapper">
+      <!-- HUD Top Overlay -->
+      <div class="canvas-hud-top">
+        <div class="hud-badge">
+          <span class="dot-pulse" style="color:var(--neon-cyan)">●</span>
+          <span>Scope: <span class="hud-accent" id="hudScope">Full Network Overview</span></span>
+          <span>·</span>
+          <span>Nodes: <span class="hud-accent" id="hudNodes">0</span></span>
+          <span>·</span>
+          <span>Edges: <span class="hud-accent" id="hudEdges">0</span></span>
+        </div>
+        <div class="hud-badge" id="hudStatusBadge" style="display:none;">
+          <span id="hudStatusText">Ready</span>
+        </div>
+      </div>
+
+      <!-- Dock Controls (Zoom / Fit) -->
+      <div class="canvas-dock">
+        <button class="dock-btn" onclick="zoomIn()" title="Zoom In">+</button>
+        <button class="dock-btn" onclick="zoomOut()" title="Zoom Out">−</button>
+        <button class="dock-btn" onclick="fitView()" title="Fit to View">⊡</button>
+        <button class="dock-btn" onclick="reRunLayout()" title="Re-run Current Layout">↺</button>
+        <button class="dock-btn" onclick="toggleFullscreen()" title="Toggle Fullscreen">⛶</button>
+      </div>
+
+      <!-- Cytoscape Container -->
+      <div id="cy"></div>
+
+      <!-- Loading Spinner Overlay -->
+      <div class="canvas-loading" id="canvasLoading">
+        <div class="cyber-spinner"></div>
+        <div style="font-size:12px; color:var(--neon-cyan); font-weight:600; letter-spacing:1px;" id="loadingText">
+          INITIALIZING CYBER GRAPH...
+        </div>
+      </div>
+
+      <!-- Bottom Interactive Legend -->
+      <div class="canvas-legend">
+        <span style="font-weight:700; color:#fff;">LEGEND:</span>
+        <div class="legend-item"><span class="legend-shape shape-case"></span> Case</div>
+        <div class="legend-item"><span class="legend-shape shape-phone"></span> Phone</div>
+        <div class="legend-item"><span class="legend-shape shape-domain"></span> Domain / URL</div>
+        <div class="legend-item"><span class="legend-shape shape-upi"></span> UPI ID</div>
+        <div class="legend-item"><span class="legend-shape shape-bank"></span> Bank Account</div>
+        <div class="legend-item"><span class="legend-shape shape-device"></span> Device / IP</div>
+        <div class="legend-item"><span class="legend-shape shape-risk"></span> High Risk (≥70)</div>
+      </div>
+    </div>
+
+    <!-- Right Column: Inspector & Intelligence Panels -->
+    <div class="side-panels">
+      <!-- Card 1: Node Inspector Panel -->
+      <section class="inspector-card" id="inspectorCard">
+        <!-- Empty State -->
+        <div class="inspector-empty" id="inspectorEmpty">
+          <div class="inspector-empty-icon">◉</div>
+          <h3 style="font-size:14px; color:#eaf4ff; margin-bottom:6px;">Node Inspector</h3>
+          <p style="font-size:11.5px; line-height:1.5;">Click any entity or case node in the fraud graph to inspect forensic risk metrics, connected cases, direct neighbors, and take investigative actions.</p>
+        </div>
+
+        <!-- Populated State -->
+        <div id="inspectorContent" style="display:none;">
+          <div class="inspector-header">
+            <div class="inspector-title-row">
+              <span class="inspector-label" id="inspectLabel">Node Label</span>
+              <button class="btn-copy" onclick="copyInspectLabel()" title="Copy identifier">Copy</button>
+            </div>
+            <div class="badges-row">
+              <span class="type-badge" id="inspectTypeBadge">ENTITY</span>
+              <span class="tag" id="inspectRiskBadge">LOW</span>
+            </div>
+          </div>
+
+          <!-- Risk Score Bar -->
+          <div class="risk-meter">
+            <div class="risk-meter-header">
+              <span style="color:var(--muted); font-size:10px;">FRAUD RISK RATING</span>
+              <b id="inspectRiskVal" style="color:var(--neon-cyan);">0 / 100</b>
+            </div>
+            <div class="risk-meter-track">
+              <div class="risk-meter-fill" id="inspectRiskFill" style="width:0%; background:var(--neon-green);"></div>
+            </div>
+          </div>
+
+          <!-- Quick Metrics Grid -->
+          <div class="inspector-grid">
+            <div class="info-box">
+              <label>Total Connections</label>
+              <strong id="inspectDegree">0</strong>
+            </div>
+            <div class="info-box">
+              <label>Flow Directions</label>
+              <strong id="inspectFlow">In: 0 · Out: 0</strong>
+            </div>
+            <div class="info-box">
+              <label>Linked Cases</label>
+              <strong id="inspectCaseCount">0</strong>
+            </div>
+            <div class="info-box">
+              <label>Internal ID</label>
+              <strong id="inspectNodeId">--</strong>
+            </div>
+          </div>
+
+          <!-- Connected Cases List -->
+          <div id="inspectCasesWrapper" style="margin-bottom:12px; display:none;">
+            <div style="font-size:10px; color:var(--muted); text-transform:uppercase; margin-bottom:5px;">Connected Investigations:</div>
+            <div id="inspectCasesList" style="display:flex; gap:5px; flex-wrap:wrap;"></div>
+          </div>
+
+          <!-- Metadata Attributes -->
+          <div class="inspector-meta" id="inspectMetaBox" style="display:none;">
+            <div style="font-size:10px; color:var(--muted); text-transform:uppercase; margin-bottom:6px;">Forensic Metadata</div>
+            <div id="inspectMetaRows"></div>
+          </div>
+
+          <!-- Direct Neighbors List -->
+          <div class="neighbors-box">
+            <div class="neighbors-title">
+              <span>Direct Neighbors</span>
+              <span id="inspectNeighborCount" style="color:var(--neon-cyan);">0</span>
+            </div>
+            <div class="neighbors-list" id="inspectNeighborsList"></div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-stack">
+            <!-- Dynamic context actions -->
+            <div id="caseActions" style="display:none; flex-direction:column; gap:7px;">
+              <a href="#" id="btnOpenWorkspace" class="action-btn primary">
+                🔍 Open Investigation Workspace
+              </a>
+              <a href="cases.html" class="action-btn secondary">
+                📁 View in Cases Registry
+              </a>
+            </div>
+
+            <div id="entityActions" style="display:none; flex-direction:column; gap:7px;">
+              <a href="#" id="btnViewEntity" class="action-btn primary">
+                🔎 View in Entity Explorer
+              </a>
+              <div class="action-row">
+                <button class="action-btn secondary" onclick="expandCurrentEntity(1)">
+                  ➕ Expand 1 Hop
+                </button>
+                <button class="action-btn secondary" onclick="expandCurrentEntity(2)">
+                  ⚡ Expand 2 Hops
+                </button>
+              </div>
+              <a href="#" id="btnViewTx" class="action-btn secondary" style="display:none;">
+                💳 View in Transactions
+              </a>
+              <a href="#" id="btnViewMap" class="action-btn secondary" style="display:none; border-color:rgba(255,77,79,0.4); color:#ff7875;">
+                🗺️ Locate on Threat Map
+              </a>
+            </div>
+
+            <!-- Path helpers -->
+            <div class="action-row" style="margin-top:4px;">
+              <button class="action-btn secondary" onclick="setAsPathSource()" style="font-size:10.5px; padding:6px;">
+                📍 Set as Path Start
+              </button>
+              <button class="action-btn secondary" onclick="setAsPathTarget()" style="font-size:10.5px; padding:6px;">
+                🎯 Set as Path End
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Card 2: Graph Intelligence Panel -->
+      <section class="intel-card">
+        <div class="intel-tabs">
+          <div class="intel-tab active" data-tab="shared" onclick="switchIntelTab('shared')">
+            ⚡ Shared Infra (<span id="tabCountShared">0</span>)
+          </div>
+          <div class="intel-tab" data-tab="cycles" onclick="switchIntelTab('cycles')">
+            🔄 Circular Flows (<span id="tabCountCycles">0</span>)
+          </div>
+          <div class="intel-tab" data-tab="path" onclick="switchIntelTab('path')">
+            📍 Path Finder
+          </div>
+        </div>
+
+        <!-- Tab 1: Shared Infrastructure -->
+        <div class="intel-panel active" id="panelShared">
+          <div style="font-size:11px; color:var(--muted); margin-bottom:10px;">
+            Infrastructure nodes connecting 2 or more distinct cases (syndicate hubs). Click to locate on graph.
+          </div>
+          <div class="intel-list" id="sharedInfraList">
+            <div style="text-align:center; padding:15px; color:var(--muted); font-size:11px;">Scanning shared infrastructure...</div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Circular Flows -->
+        <div class="intel-panel" id="panelCycles">
+          <div style="font-size:11px; color:var(--muted); margin-bottom:10px;">
+            Directed laundering cycles ($A \to B \to C \to A$) detected in financial transactions.
+          </div>
+          <div class="intel-list" id="circularFlowsList">
+            <div style="text-align:center; padding:15px; color:var(--muted); font-size:11px;">Scanning circular transactions...</div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Shortest Path Finder -->
+        <div class="intel-panel" id="panelPath">
+          <div class="path-inputs">
+            <div class="path-field">
+              <label>Source Entity (Origin):</label>
+              <select id="pathSourceSelect" class="cyber-select" style="width:100%;">
+                <option value="">Select origin node...</option>
+              </select>
+            </div>
+            <div class="path-field">
+              <label>Target Entity (Destination):</label>
+              <select id="pathTargetSelect" class="cyber-select" style="width:100%;">
+                <option value="">Select destination node...</option>
+              </select>
+            </div>
+            <button class="action-btn primary" onclick="runShortestPath()">
+              🔍 Trace Investigative Path
+            </button>
+          </div>
+          <div id="pathResultBox" style="display:none;"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer>CYBERSCOPE · TETRABYTE · INVESTIGATION INTELLIGENCE CONSOLE</footer>
+
+<!-- CyberScope Assistant Chat Widget -->
+<button class="chat-button" id="chatButton" aria-label="Open CyberScope assistant">✦</button>
+<div class="chat-window" id="chatWindow">
+  <div class="chat-head">
+    <div class="chat-head-title"><div class="chat-logo"><img src="assets/logo.png" alt="CyberScope"></div><div><strong>CYBERSCOPE ASSISTANT</strong><small>Fraud Graph Expert</small></div></div>
+    <button class="chat-close" id="chatClose" aria-label="Close chat">×</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-message bot-message">Hello Investigator. I can explain graph topological clusters, shared infrastructure nexuses, circular money laundering rings, and hop expansions.</div>
+  </div>
+  <div class="chat-quick">
+    <button data-q="What is Shared Infrastructure?">Shared Infrastructure</button>
+    <button data-q="How do Circular Flows work?">Circular Flows</button>
+    <button data-q="Explain multi-hop expansion">Hop Expansion</button>
+    <button data-q="What do the node shapes and colors mean?">Node Legend</button>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chatInput" placeholder="Ask about this fraud graph...">
+    <button class="chat-send" id="chatSend">→</button>
+  </div>
+</div>
+
+<!-- Shared Platform Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-client.js"></script>
+<script src="assets/cyberscope.js"></script>
+
+<!-- Fraud Graph Application Engine -->
+<script>
+// Authentication check
+cyberscopeProtect();
+
+/* =========================================================
+   STATE & CONSTANTS
+   ========================================================= */
+let cy = null;
+let currentScope = 'all'; // 'all' or numeric case ID
+let currentHops = 2;
+let currentLayout = 'cose';
+let currentFilter = 'all';
+let selectedNodeData = null;
+let fullGraphData = { nodes: [], edges: [] };
+let casesRegistry = [];
+let sharedInfraData = [];
+let circularFlowsData = [];
+let animationInterval = null;
+
+// Built-in Operation Phantom KYC fallback dataset with authentic Indian attacker infrastructure
+const FALLBACK_GRAPH = {
+  nodes: [
+    { id: "e-35", numeric_id: 35, label: "CS-1024", entity_type: "CASE", risk_score: 82.0, metadata: { title: "Simulated KYC Suspension Alert" } },
+    { id: "e-36", numeric_id: 36, label: "CS-1027", entity_type: "CASE", risk_score: 85.0, metadata: { title: "KYC Phishing Cluster" } },
+    { id: "e-37", numeric_id: 37, label: "CS-1019", entity_type: "CASE", risk_score: 72.0, metadata: { title: "Mule Account Funnel" } },
+    { id: "e-1", numeric_id: 1, label: "secure-kyc-update.com", entity_type: "DOMAIN", risk_score: 88.0, metadata: { registrar: "Simulated Registrar", tld: ".com", category: "Phishing" } },
+    { id: "e-2", numeric_id: 2, label: "verify-portal-in.net", entity_type: "DOMAIN", risk_score: 85.0, metadata: { registrar: "Simulated Registrar", tld: ".net", category: "Phishing" } },
+    { id: "e-4", numeric_id: 4, label: "+91 96865 79303", entity_type: "PHONE", risk_score: 85.0, metadata: { provider: "Airtel SIM Box Relay", circle: "Haryana" } },
+    { id: "e-5", numeric_id: 5, label: "+91 98220 19482", entity_type: "PHONE", risk_score: 80.0, metadata: { provider: "Vodafone Spoofed" } },
+    { id: "e-7", numeric_id: 7, label: "centralmule99@okaxis", entity_type: "UPI_ID", risk_score: 90.0, metadata: { bank: "Axis Bank Simulation", role: "Primary Collection VPA" } },
+    { id: "e-8", numeric_id: 8, label: "quickrefund@paytm", entity_type: "UPI_ID", risk_score: 75.0, metadata: { bank: "Paytm Simulation", role: "Layering VPA" } },
+    { id: "e-9", numeric_id: 9, label: "DEV-SIM-1000", entity_type: "DEVICE", risk_score: 88.0, metadata: { model: "Android SIM Box", role: "Attacker Hardware" } },
+    { id: "e-15", numeric_id: 15, label: "SIM-ACC-MULE-HUB-891", entity_type: "BANK_ACCOUNT", risk_score: 94.0, metadata: { bank: "HDFC Bank Simulation", role: "Mule Funnel Hub" } },
+    { id: "e-10", numeric_id: 10, label: "SIM-ACC-CIRCULAR-A", entity_type: "BANK_ACCOUNT", risk_score: 92.0, metadata: { bank: "HDFC Simulation" } },
+    { id: "e-11", numeric_id: 11, label: "SIM-ACC-CIRCULAR-B", entity_type: "BANK_ACCOUNT", risk_score: 92.0, metadata: { bank: "ICICI Simulation" } },
+    { id: "e-12", numeric_id: 12, label: "SIM-ACC-CIRCULAR-C", entity_type: "BANK_ACCOUNT", risk_score: 92.0, metadata: { bank: "SBI Simulation" } },
+    { id: "e-100", numeric_id: 10, label: "198.51.100.10", entity_type: "IP_ADDRESS", risk_score: 98.5, metadata: { role: "ATTACKER_INFRASTRUCTURE", city: "Jamtara", state: "Jharkhand", pincode: "815351", asn: "AS133982 Bharti Airtel", isp: "Bharti Airtel Broadband", attack_type: "PHISHING_HOST", campaign: "Operation Phantom KYC" } },
+    { id: "e-123", numeric_id: 123, label: "103.242.116.14", entity_type: "IP_ADDRESS", risk_score: 91.5, metadata: { role: "ATTACKER_INFRASTRUCTURE", city: "Bharatpur", state: "Rajasthan", pincode: "321001", asn: "AS45609 Vodafone Idea", attack_type: "UPI_MULE_VECTOR", campaign: "Operation Phantom KYC" } },
+    { id: "e-124", numeric_id: 124, label: "122.161.49.202", entity_type: "IP_ADDRESS", risk_score: 95.0, metadata: { role: "ATTACKER_INFRASTRUCTURE", city: "Gurugram", state: "Haryana", pincode: "122001", asn: "AS133982 Bharti Airtel", attack_type: "MALWARE_C2", campaign: "Operation Phantom KYC" } },
+    { id: "e-126", numeric_id: 126, label: "115.110.201.78", entity_type: "IP_ADDRESS", risk_score: 84.5, metadata: { role: "ATTACKER_INFRASTRUCTURE", city: "Surat", state: "Gujarat", pincode: "395003", asn: "AS17488 Hathway Broadband", attack_type: "UPI_MULE_VECTOR", campaign: "Operation Phantom KYC" } }
+  ],
+  edges: [
+    { id: "r-1", source: "e-4", target: "e-35", relationship_type: "USED_IN_INCIDENT", amount: 0 },
+    { id: "r-2", source: "e-35", target: "e-1", relationship_type: "HOSTED_PHISHING_URL", amount: 0 },
+    { id: "r-3", source: "e-1", target: "e-7", relationship_type: "REQUESTS_PAYMENT_TO", amount: 0 },
+    { id: "r-4", source: "e-7", target: "e-15", relationship_type: "SETTLED_TO", amount: 48500 },
+    { id: "r-5", source: "e-10", target: "e-11", relationship_type: "TRANSFERRED_TO", amount: 35000 },
+    { id: "r-6", source: "e-11", target: "e-12", relationship_type: "TRANSFERRED_TO", amount: 32000 },
+    { id: "r-7", source: "e-12", target: "e-10", relationship_type: "TRANSFERRED_TO", amount: 30000 },
+    { id: "r-8", source: "e-4", target: "e-36", relationship_type: "LINKED_TO", amount: 0 },
+    { id: "r-9", source: "e-1", target: "e-36", relationship_type: "SHARED_INFRASTRUCTURE", amount: 0 },
+    { id: "r-10", source: "e-2", target: "e-37", relationship_type: "HOSTED_PHISHING_URL", amount: 0 },
+    { id: "r-11", source: "e-2", target: "e-7", relationship_type: "REQUESTS_PAYMENT_TO", amount: 0 },
+    // Attacker IP Multi-hop Infrastructure Connections
+    { id: "r-12", source: "e-1", target: "e-100", relationship_type: "RESOLVES_TO", amount: 0 },
+    { id: "r-13", source: "e-9", target: "e-100", relationship_type: "ROUTED_THROUGH", amount: 0 },
+    { id: "r-14", source: "e-7", target: "e-100", relationship_type: "ACCESSED_FROM", amount: 0 },
+    { id: "r-15", source: "e-15", target: "e-100", relationship_type: "ACCESSED_FROM", amount: 0 },
+    { id: "r-16", source: "e-100", target: "e-35", relationship_type: "REPORTED_IN", amount: 0 },
+    { id: "r-17", source: "e-100", target: "e-36", relationship_type: "REPORTED_IN", amount: 0 },
+    { id: "r-18", source: "e-8", target: "e-123", relationship_type: "ACCESSED_FROM", amount: 0 },
+    { id: "r-19", source: "e-123", target: "e-35", relationship_type: "REPORTED_IN", amount: 0 },
+    { id: "r-20", source: "e-10", target: "e-124", relationship_type: "ACCESSED_FROM", amount: 0 },
+    { id: "r-21", source: "e-12", target: "e-126", relationship_type: "ACCESSED_FROM", amount: 0 },
+    { id: "r-22", source: "e-126", target: "e-35", relationship_type: "REPORTED_IN", amount: 0 }
+  ]
+};
+
+/* =========================================================
+   API HELPERS
+   ========================================================= */
+function getApiEndpoint(path) {
+  if (window.location.protocol === 'file:') {
+    return 'http://127.0.0.1:8000' + path;
+  }
+  return path;
+}
+
+function showLoading(text) {
+  const overlay = document.getElementById('canvasLoading');
+  const txt = document.getElementById('loadingText');
+  if (txt && text) txt.textContent = text.toUpperCase();
+  if (overlay) overlay.classList.add('active');
+}
+
+function hideLoading() {
+  const overlay = document.getElementById('canvasLoading');
+  if (overlay) overlay.classList.remove('active');
+}
+
+function setHudStatus(text) {
+  const b = document.getElementById('hudStatusBadge');
+  const t = document.getElementById('hudStatusText');
+  if (b && t) {
+    t.textContent = text;
+    b.style.display = 'flex';
+    clearTimeout(b._timer);
+    b._timer = setTimeout(() => { b.style.display = 'none'; }, 4000);
+  }
+}
+
+/* =========================================================
+   CYTOSCAPE INITIALIZATION & STYLING
+   ========================================================= */
+function initCytoscape() {
+  cy = cytoscape({
+    container: document.getElementById('cy'),
+    boxSelectionEnabled: false,
+    autounselectify: false,
+    selectionType: 'single',
+    style: [
+      // Base Node
+      {
+        selector: 'node',
+        style: {
+          'label': 'data(label)',
+          'color': '#eaf4ff',
+          'font-family': "'Space Grotesk', 'Inter', -apple-system, sans-serif",
+          'font-size': '11px',
+          'font-weight': 600,
+          'text-valign': 'bottom',
+          'text-halign': 'center',
+          'text-margin-y': 7,
+          'text-max-width': '130px',
+          'text-wrap': 'ellipsis',
+          'background-color': '#0f1722',
+          'border-width': 2.5,
+          'border-color': '#8da1b8',
+          'width': 40,
+          'height': 40,
+          'transition-property': 'background-color, border-color, border-width, width, height, opacity',
+          'transition-duration': '0.2s',
+          'overlay-opacity': 0
+        }
+      },
+      // CASE Node
+      {
+        selector: 'node[entity_type = "CASE"]',
+        style: {
+          'shape': 'hexagon',
+          'border-color': '#36cfff',
+          'background-color': '#091827',
+          'color': '#36cfff',
+          'border-width': 3,
+          'width': 50,
+          'height': 50,
+          'font-size': '12px',
+          'font-weight': 700
+        }
+      },
+      // PHONE Node
+      {
+        selector: 'node[entity_type = "PHONE"]',
+        style: {
+          'shape': 'ellipse',
+          'border-color': '#5dffb1',
+          'background-color': '#091b18',
+          'color': '#eaf4ff',
+          'border-width': 2.5,
+          'width': 42,
+          'height': 42
+        }
+      },
+      // DOMAIN & URL Node
+      {
+        selector: 'node[entity_type = "DOMAIN"], node[entity_type = "URL"]',
+        style: {
+          'shape': 'round-rectangle',
+          'border-color': '#9b7cff',
+          'background-color': '#120e24',
+          'color': '#eaf4ff',
+          'border-width': 2.5,
+          'width': 44,
+          'height': 38
+        }
+      },
+      // UPI_ID Node
+      {
+        selector: 'node[entity_type = "UPI_ID"]',
+        style: {
+          'shape': 'diamond',
+          'border-color': '#ffbe3b',
+          'background-color': '#1c1809',
+          'color': '#eaf4ff',
+          'border-width': 2.5,
+          'width': 44,
+          'height': 44
+        }
+      },
+      // BANK_ACCOUNT Node
+      {
+        selector: 'node[entity_type = "BANK_ACCOUNT"]',
+        style: {
+          'shape': 'rectangle',
+          'border-color': '#388bff',
+          'background-color': '#0a172a',
+          'color': '#eaf4ff',
+          'border-width': 2.5,
+          'width': 46,
+          'height': 36
+        }
+      },
+      // DEVICE Node
+      {
+        selector: 'node[entity_type = "DEVICE"]',
+        style: {
+          'shape': 'pentagon',
+          'border-color': '#8da1b8',
+          'background-color': '#0f1722',
+          'color': '#eaf4ff',
+          'border-width': 2.5,
+          'width': 42,
+          'height': 42
+        }
+      },
+      // ATTACKER IP_ADDRESS Node
+      {
+        selector: 'node[entity_type = "IP_ADDRESS"]',
+        style: {
+          'shape': 'octagon',
+          'border-color': '#ff4d4f',
+          'background-color': '#280c10',
+          'color': '#ffb3b3',
+          'border-width': 3,
+          'width': 44,
+          'height': 44
+        }
+      },
+      // PERSON Node
+      {
+        selector: 'node[entity_type = "PERSON"]',
+        style: {
+          'shape': 'ellipse',
+          'border-color': '#ff7eb6',
+          'background-color': '#1f0b18',
+          'color': '#eaf4ff',
+          'border-width': 2.5,
+          'width': 40,
+          'height': 40
+        }
+      },
+      // High-Risk Node (score >= 70)
+      {
+        selector: 'node.high-risk',
+        style: {
+          'border-color': '#ff5d7d',
+          'border-width': 3.5,
+          'shadow-blur': 18,
+          'shadow-color': 'rgba(255, 93, 125, 0.7)',
+          'shadow-opacity': 0.8
+        }
+      },
+      // Selected Node
+      {
+        selector: 'node:selected',
+        style: {
+          'border-color': '#36cfff',
+          'border-width': 4,
+          'shadow-blur': 24,
+          'shadow-color': '#36cfff',
+          'shadow-opacity': 1,
+          'color': '#ffffff',
+          'font-size': '12.5px',
+          'font-weight': 700
+        }
+      },
+      // Highlighted Node (search or neighbor)
+      {
+        selector: 'node.highlighted',
+        style: {
+          'border-color': '#36cfff',
+          'border-width': 3.5,
+          'shadow-blur': 20,
+          'shadow-color': 'rgba(54, 207, 255, 0.8)',
+          'shadow-opacity': 1,
+          'opacity': 1
+        }
+      },
+      // Shared Infrastructure Highlight
+      {
+        selector: 'node.shared-highlight',
+        style: {
+          'border-color': '#ffbe3b',
+          'border-width': 4,
+          'background-color': '#2a220a',
+          'shadow-blur': 25,
+          'shadow-color': '#ffbe3b',
+          'shadow-opacity': 1,
+          'opacity': 1
+        }
+      },
+      // Circular Flow Cycle Highlight
+      {
+        selector: 'node.cycle-highlight',
+        style: {
+          'border-color': '#ff3366',
+          'border-width': 4,
+          'background-color': '#2b0914',
+          'shadow-blur': 25,
+          'shadow-color': '#ff3366',
+          'shadow-opacity': 1,
+          'opacity': 1
+        }
+      },
+      // Shortest Path Node Highlight
+      {
+        selector: 'node.path-highlight',
+        style: {
+          'border-color': '#00ffea',
+          'border-width': 4,
+          'background-color': '#052328',
+          'shadow-blur': 25,
+          'shadow-color': '#00ffea',
+          'shadow-opacity': 1,
+          'opacity': 1
+        }
+      },
+      // Dimmed Node
+      {
+        selector: 'node.dimmed',
+        style: {
+          'opacity': 0.16
+        }
+      },
+      // Base Edge
+      {
+        selector: 'edge',
+        style: {
+          'width': 2,
+          'curve-style': 'bezier',
+          'line-color': 'rgba(54, 207, 255, 0.35)',
+          'target-arrow-color': 'rgba(54, 207, 255, 0.55)',
+          'target-arrow-shape': 'triangle',
+          'arrow-scale': 1.1,
+          'font-family': "'Space Grotesk', 'Inter', sans-serif",
+          'font-size': '9px',
+          'color': '#8da1b8',
+          'text-rotation': 'autorotate',
+          'text-background-opacity': 0.85,
+          'text-background-color': '#07101c',
+          'text-background-padding': '3px',
+          'text-background-shape': 'roundrectangle',
+          'text-border-color': 'rgba(54, 207, 255, 0.2)',
+          'text-border-width': 0.5,
+          'label': 'data(display_label)',
+          'transition-property': 'line-color, target-arrow-color, width, opacity',
+          'transition-duration': '0.2s',
+          'overlay-opacity': 0
+        }
+      },
+      // Selected or Hovered Edge
+      {
+        selector: 'edge:selected, edge.hovered',
+        style: {
+          'width': 3.5,
+          'line-color': '#36cfff',
+          'target-arrow-color': '#36cfff',
+          'color': '#36cfff',
+          'text-border-color': '#36cfff',
+          'label': 'data(full_label)',
+          'z-index': 999
+        }
+      },
+      // Highlighted Edge
+      {
+        selector: 'edge.highlighted',
+        style: {
+          'width': 3,
+          'line-color': '#36cfff',
+          'target-arrow-color': '#36cfff',
+          'opacity': 1,
+          'z-index': 99
+        }
+      },
+      // Cycle Edge Highlight
+      {
+        selector: 'edge.cycle-highlight',
+        style: {
+          'width': 3.5,
+          'line-color': '#ff3366',
+          'target-arrow-color': '#ff3366',
+          'color': '#ff6688',
+          'text-border-color': '#ff3366',
+          'label': 'data(full_label)',
+          'opacity': 1,
+          'z-index': 999
+        }
+      },
+      // Path Edge Highlight
+      {
+        selector: 'edge.path-highlight',
+        style: {
+          'width': 4,
+          'line-color': '#00ffea',
+          'target-arrow-color': '#00ffea',
+          'color': '#00ffea',
+          'text-border-color': '#00ffea',
+          'opacity': 1,
+          'z-index': 999
+        }
+      },
+      // Dimmed Edge
+      {
+        selector: 'edge.dimmed',
+        style: {
+          'opacity': 0.08
+        }
+      }
+    ]
+  });
+
+  // Cytoscape Event Handlers
+  cy.on('tap', 'node', function(evt) {
+    const node = evt.target;
+    inspectNode(node);
+    highlightNeighborhood(node);
+  });
+
+  cy.on('tap', 'edge', function(evt) {
+    const edge = evt.target;
+    const rel = edge.data('relationship_type') || 'RELATED';
+    const amt = edge.data('amount');
+    const msg = amt ? `${rel} · Amount: ₹${Number(amt).toLocaleString('en-IN')}` : rel;
+    setHudStatus(`Edge: ${msg}`);
+  });
+
+  cy.on('tap', function(evt) {
+    if (evt.target === cy) {
+      clearAllHighlights();
+      resetInspector();
+    }
+  });
+
+  cy.on('mouseover', 'edge', function(evt) {
+    evt.target.addClass('hovered');
+  });
+  cy.on('mouseout', 'edge', function(evt) {
+    evt.target.removeClass('hovered');
+  });
+
+  // Start periodic high-risk pulsation
+  startHighRiskPulse();
+}
+
+/* =========================================================
+   DATA CONVERSION & RENDERING
+   ========================================================= */
+function formatNodeForCy(n) {
+  const risk = typeof n.risk_score === 'number' ? n.risk_score : 50;
+  const classes = [];
+  if (risk >= 70) classes.push('high-risk');
+
+  return {
+    group: 'nodes',
+    data: {
+      id: String(n.id),
+      numeric_id: n.numeric_id || 0,
+      label: n.label || n.value || n.id,
+      entity_type: (n.entity_type || 'UNKNOWN').toUpperCase(),
+      risk_score: risk,
+      metadata: n.metadata || n.meta_data || {},
+      case_ids: n.case_ids || []
+    },
+    classes: classes.join(' ')
+  };
+}
+
+function formatEdgeForCy(e) {
+  const amt = typeof e.amount === 'number' ? e.amount : 0;
+  const rel = (e.relationship_type || 'CONNECTED_TO').toUpperCase();
+  const displayLabel = amt > 0 ? ('₹' + amt.toLocaleString('en-IN')) : rel.replace(/_/g, ' ');
+  const fullLabel = amt > 0 ? `${rel}: ₹${amt.toLocaleString('en-IN')}` : rel;
+
+  return {
+    group: 'edges',
+    data: {
+      id: String(e.id || `${e.source}_${e.target}`),
+      source: String(e.source),
+      target: String(e.target),
+      relationship_type: rel,
+      amount: amt,
+      display_label: displayLabel,
+      full_label: fullLabel,
+      metadata: e.metadata || {}
+    }
+  };
+}
+
+function renderGraphElements(graphData) {
+  if (!cy) return;
+
+  const cyNodes = (graphData.nodes || []).map(formatNodeForCy);
+  const nodeIds = new Set(cyNodes.map(n => n.data.id));
+
+  // Only retain edges whose endpoints exist in the node set
+  const cyEdges = (graphData.edges || [])
+    .map(formatEdgeForCy)
+    .filter(e => nodeIds.has(e.data.source) && nodeIds.has(e.data.target));
+
+  cy.elements().remove();
+  cy.add([...cyNodes, ...cyEdges]);
+
+  // Update counts
+  updateCountsHUD(cyNodes.length, cyEdges.length);
+  updateEntityFilterCounts(cyNodes);
+  populatePathSelects(cyNodes);
+
+  // Run layout
+  applyLayout(currentLayout, true);
+}
+
+function updateCountsHUD(nodeCount, edgeCount) {
+  const nEl = document.getElementById('hudNodes');
+  const eEl = document.getElementById('hudEdges');
+  const totN = document.getElementById('statTotalNodes');
+  const totE = document.getElementById('statTotalEdges');
+
+  if (nEl) nEl.textContent = nodeCount;
+  if (eEl) eEl.textContent = edgeCount;
+  if (totN) totN.textContent = nodeCount;
+  if (totE) totE.textContent = edgeCount;
+}
+
+function updateEntityFilterCounts(nodes) {
+  const counts = {
+    all: nodes.length,
+    CASE: 0,
+    DOMAIN: 0,
+    PHONE: 0,
+    UPI_ID: 0,
+    BANK_ACCOUNT: 0,
+    DEVICE: 0,
+    IP_ADDRESS: 0,
+    high_risk: 0
+  };
+
+  nodes.forEach(n => {
+    const t = n.data.entity_type;
+    if (t === 'CASE') counts.CASE++;
+    else if (t === 'DOMAIN' || t === 'URL') counts.DOMAIN++;
+    else if (t === 'PHONE') counts.PHONE++;
+    else if (t === 'UPI_ID') counts.UPI_ID++;
+    else if (t === 'BANK_ACCOUNT') counts.BANK_ACCOUNT++;
+    else if (t === 'IP_ADDRESS') counts.IP_ADDRESS++;
+    else if (t === 'DEVICE') counts.DEVICE++;
+
+    if (n.data.risk_score >= 70) counts.high_risk++;
+  });
+
+  for (const k in counts) {
+    const el = document.getElementById(`count-${k}`);
+    if (el) el.textContent = counts[k];
+  }
+}
+
+/* =========================================================
+   LAYOUT ENGINE
+   ========================================================= */
+function getLayoutConfig(name) {
+  switch(name) {
+    case 'concentric':
+      return {
+        name: 'concentric',
+        concentric: function(node) {
+          // Inner circles for cases & high risk
+          if (node.data('entity_type') === 'CASE') return 10;
+          return Math.round(node.data('risk_score') / 10);
+        },
+        levelWidth: function() { return 2; },
+        padding: 50,
+        animate: true,
+        animationDuration: 500
+      };
+    case 'circle':
+      return {
+        name: 'circle',
+        padding: 40,
+        animate: true,
+        animationDuration: 500
+      };
+    case 'breadthfirst':
+      return {
+        name: 'breadthfirst',
+        directed: true,
+        padding: 40,
+        spacingFactor: 1.25,
+        animate: true,
+        animationDuration: 500
+      };
+    case 'grid':
+      return {
+        name: 'grid',
+        padding: 40,
+        animate: true,
+        animationDuration: 400
+      };
+    case 'cose':
+    default:
+      return {
+        name: 'cose',
+        idealEdgeLength: 95,
+        nodeOverlap: 20,
+        refresh: 20,
+        fit: true,
+        padding: 45,
+        randomize: false,
+        componentSpacing: 100,
+        nodeRepulsion: 450000,
+        edgeElasticity: 100,
+        nestingFactor: 5,
+        gravity: 80,
+        numIter: 1000,
+        initialTemp: 200,
+        coolingFactor: 0.95,
+        minTemp: 1.0,
+        animate: true,
+        animationDuration: 600
+      };
+  }
+}
+
+function applyLayout(name, animate = true) {
+  if (!cy || cy.elements().length === 0) return;
+  currentLayout = name || 'cose';
+  const cfg = getLayoutConfig(currentLayout);
+  cfg.animate = animate;
+  cy.layout(cfg).run();
+}
+
+function changeLayout(val) {
+  applyLayout(val, true);
+  setHudStatus(`Layout: ${val.toUpperCase()}`);
+}
+
+function reRunLayout() {
+  applyLayout(currentLayout, true);
+}
+
+/* =========================================================
+   ZOOM / PAN / FULLSCREEN
+   ========================================================= */
+function zoomIn() {
+  if (!cy) return;
+  cy.animate({
+    zoom: cy.zoom() * 1.3,
+    renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 },
+    duration: 250
+  });
+}
+
+function zoomOut() {
+  if (!cy) return;
+  cy.animate({
+    zoom: cy.zoom() * 0.77,
+    renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 },
+    duration: 250
+  });
+}
+
+function fitView() {
+  if (!cy) return;
+  cy.animate({
+    fit: { padding: 45 },
+    duration: 350
+  });
+}
+
+function resetGraphView() {
+  clearAllHighlights();
+  setEntityFilter('all');
+  clearSearch();
+  resetInspector();
+  applyLayout(currentLayout, true);
+}
+
+function toggleFullscreen() {
+  const container = document.querySelector('.canvas-wrapper');
+  if (!container) return;
+  if (!document.fullscreenElement) {
+    container.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+}
+
+/* =========================================================
+   FILTER CHIPS
+   ========================================================= */
+function setEntityFilter(type) {
+  currentFilter = type;
+  document.querySelectorAll('.filter-chips .chip').forEach(c => {
+    c.classList.toggle('active', c.getAttribute('data-filter') === type);
+  });
+
+  if (!cy) return;
+
+  if (type === 'all') {
+    cy.nodes().show();
+    cy.edges().show();
+  } else if (type === 'high_risk') {
+    cy.nodes().forEach(n => {
+      if (n.data('risk_score') >= 70) n.show();
+      else n.hide();
+    });
+    // Hide edges if either endpoint is hidden
+    cy.edges().forEach(e => {
+      if (e.source().visible() && e.target().visible()) e.show();
+      else e.hide();
+    });
+  } else {
+    cy.nodes().forEach(n => {
+      const et = n.data('entity_type');
+      let match = (et === type);
+      if (type === 'DOMAIN' && et === 'URL') match = true;
+      if (match) n.show();
+      else n.hide();
+    });
+    cy.edges().forEach(e => {
+      if (e.source().visible() && e.target().visible()) e.show();
+      else e.hide();
+    });
+  }
+
+  setHudStatus(`Filter: ${type.toUpperCase()}`);
+}
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+let searchDebounceTimer = null;
+
+function handleSearchInput(val) {
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    if (val.trim().length >= 2) executeSearch();
+    else if (val.trim().length === 0) clearAllHighlights();
+  }, 250);
+}
+
+function executeSearch() {
+  const query = (document.getElementById('graphSearchInput').value || '').trim().toLowerCase();
+  if (!query || !cy) return;
+
+  const matches = cy.nodes().filter(n => {
+    const lbl = (n.data('label') || '').toLowerCase();
+    const id = (n.data('id') || '').toLowerCase();
+    const type = (n.data('entity_type') || '').toLowerCase();
+    return lbl.includes(query) || id.includes(query) || type.includes(query);
+  });
+
+  if (matches.length === 0) {
+    setHudStatus(`No matches found for "${query}"`);
+    return;
+  }
+
+  // Clear previous highlights
+  cy.elements().removeClass('highlighted cycle-highlight path-highlight shared-highlight dimmed');
+
+  // Highlight matches and dim others
+  cy.elements().addClass('dimmed');
+  matches.removeClass('dimmed').addClass('highlighted');
+
+  // Center on first match
+  const first = matches[0];
+  first.select();
+  inspectNode(first);
+
+  cy.animate({
+    center: { eles: matches },
+    zoom: Math.min(1.4, cy.zoom() * 1.2),
+    duration: 400
+  });
+
+  setHudStatus(`Found ${matches.length} matching nodes for "${query}"`);
+}
+
+function clearSearch() {
+  document.getElementById('graphSearchInput').value = '';
+  clearAllHighlights();
+}
+
+function clearAllHighlights() {
+  if (animationInterval) {
+    clearInterval(animationInterval);
+    animationInterval = null;
+  }
+  if (!cy) return;
+  cy.elements().removeClass('highlighted cycle-highlight path-highlight shared-highlight dimmed hovered');
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+}
+
+/* =========================================================
+   NODE INSPECTION & ACTIONS
+   ========================================================= */
+function inspectNode(node) {
+  if (!node) return;
+  const d = node.data();
+  selectedNodeData = d;
+
+  const emptyCard = document.getElementById('inspectorEmpty');
+  const contentCard = document.getElementById('inspectorContent');
+  if (emptyCard) emptyCard.style.display = 'none';
+  if (contentCard) contentCard.style.display = 'block';
+
+  // Label & Copy
+  document.getElementById('inspectLabel').textContent = d.label;
+  
+  // Badges
+  const typeBadge = document.getElementById('inspectTypeBadge');
+  typeBadge.textContent = d.entity_type.replace(/_/g, ' ');
+  typeBadge.className = 'type-badge type-' + d.entity_type;
+
+  const riskBadge = document.getElementById('inspectRiskBadge');
+  const risk = Math.round(d.risk_score || 0);
+  document.getElementById('inspectRiskVal').textContent = `${risk} / 100`;
+
+  let riskClass = 'low';
+  let riskText = 'LOW';
+  let barColor = 'var(--neon-green)';
+  if (risk >= 90) { riskClass = 'high'; riskText = 'CRITICAL'; barColor = '#ff2a55'; }
+  else if (risk >= 70) { riskClass = 'high'; riskText = 'HIGH'; barColor = 'var(--neon-red)'; }
+  else if (risk >= 40) { riskClass = 'medium'; riskText = 'MEDIUM'; barColor = 'var(--neon-amber)'; }
+
+  riskBadge.className = 'tag ' + riskClass;
+  riskBadge.textContent = riskText;
+
+  const fill = document.getElementById('inspectRiskFill');
+  fill.style.width = `${Math.min(100, Math.max(5, risk))}%`;
+  fill.style.background = barColor;
+
+  // Degree & Flow
+  const inDegree = node.incomers('edge').length;
+  const outDegree = node.outgoers('edge').length;
+  const totalDegree = node.connectedEdges().length;
+  document.getElementById('inspectDegree').textContent = totalDegree;
+  document.getElementById('inspectFlow').textContent = `In: ${inDegree} · Out: ${outDegree}`;
+  document.getElementById('inspectNodeId').textContent = d.id;
+
+  // Connected Cases
+  const connectedCases = [];
+  node.neighborhood('node[entity_type = "CASE"]').forEach(c => {
+    connectedCases.push({ id: c.data('numeric_id'), label: c.data('label') });
+  });
+  if (Array.isArray(d.case_ids) && d.case_ids.length > 0) {
+    d.case_ids.forEach(cid => {
+      if (!connectedCases.some(cc => cc.id === cid)) connectedCases.push({ id: cid, label: `Case #${cid}` });
+    });
+  }
+
+  document.getElementById('inspectCaseCount').textContent = connectedCases.length;
+  const casesWrapper = document.getElementById('inspectCasesWrapper');
+  const casesList = document.getElementById('inspectCasesList');
+  if (connectedCases.length > 0) {
+    casesWrapper.style.display = 'block';
+    casesList.innerHTML = connectedCases.map(c => 
+      `<span class="case-badge" style="cursor:pointer;" onclick="loadCaseGraph(${c.id}, '${c.label}')">${c.label}</span>`
+    ).join('');
+  } else {
+    casesWrapper.style.display = 'none';
+  }
+
+  // Metadata Box
+  const metaBox = document.getElementById('inspectMetaBox');
+  const metaRows = document.getElementById('inspectMetaRows');
+  const metaEntries = Object.entries(d.metadata || {});
+  if (metaEntries.length > 0) {
+    metaBox.style.display = 'block';
+    metaRows.innerHTML = metaEntries.map(([k, v]) => 
+      `<div class="meta-row"><span class="meta-key">${k.replace(/_/g, ' ')}:</span><span class="meta-val">${String(v)}</span></div>`
+    ).join('');
+  } else {
+    metaBox.style.display = 'none';
+  }
+
+  // Neighbors List
+  const neighborsList = document.getElementById('inspectNeighborsList');
+  const neighbors = node.neighborhood('node');
+  document.getElementById('inspectNeighborCount').textContent = neighbors.length;
+  if (neighbors.length > 0) {
+    neighborsList.innerHTML = '';
+    neighbors.forEach(nbr => {
+      const pill = document.createElement('div');
+      pill.className = 'neighbor-pill';
+      pill.textContent = nbr.data('label');
+      pill.title = `${nbr.data('entity_type')} (Risk: ${nbr.data('risk_score')})`;
+      pill.onclick = () => {
+        cy.elements().unselect();
+        nbr.select();
+        inspectNode(nbr);
+        highlightNeighborhood(nbr);
+        cy.animate({ center: { eles: nbr }, duration: 300 });
+      };
+      neighborsList.appendChild(pill);
+    });
+  } else {
+    neighborsList.innerHTML = '<span style="color:var(--muted); font-size:11px;">No connected neighbors</span>';
+  }
+
+  // Context Actions
+  const caseActions = document.getElementById('caseActions');
+  const entityActions = document.getElementById('entityActions');
+  const btnViewTx = document.getElementById('btnViewTx');
+
+  if (d.entity_type === 'CASE') {
+    caseActions.style.display = 'flex';
+    entityActions.style.display = 'none';
+    const caseParam = d.numeric_id || d.label;
+    document.getElementById('btnOpenWorkspace').href = `investigation-workspace.html?case_id=${encodeURIComponent(caseParam)}`;
+  } else {
+    caseActions.style.display = 'none';
+    entityActions.style.display = 'flex';
+    document.getElementById('btnViewEntity').href = `entity-explorer.html?search=${encodeURIComponent(d.label)}`;
+
+    if (d.entity_type === 'BANK_ACCOUNT' || d.entity_type === 'UPI_ID') {
+      btnViewTx.style.display = 'inline-flex';
+      btnViewTx.href = `transaction-explorer.html?search=${encodeURIComponent(d.label)}`;
+    } else {
+      btnViewTx.style.display = 'none';
+    }
+
+    const btnViewMap = document.getElementById('btnViewMap');
+    if (d.entity_type === 'IP_ADDRESS') {
+      if (btnViewMap) {
+        btnViewMap.style.display = 'inline-flex';
+        btnViewMap.href = `threat-map.html?search=${encodeURIComponent(d.label)}`;
+      }
+    } else if (btnViewMap) {
+      btnViewMap.style.display = 'none';
+    }
+  }
+}
+
+function resetInspector() {
+  selectedNodeData = null;
+  const emptyCard = document.getElementById('inspectorEmpty');
+  const contentCard = document.getElementById('inspectorContent');
+  if (emptyCard) emptyCard.style.display = 'block';
+  if (contentCard) contentCard.style.display = 'none';
+}
+
+function copyInspectLabel() {
+  if (!selectedNodeData) return;
+  navigator.clipboard.writeText(selectedNodeData.label).then(() => {
+    setHudStatus(`Copied: ${selectedNodeData.label}`);
+  }).catch(() => {});
+}
+
+function highlightNeighborhood(node) {
+  if (!cy) return;
+  clearAllHighlights();
+
+  cy.elements().addClass('dimmed');
+  node.removeClass('dimmed').addClass('highlighted');
+
+  const neighborhood = node.neighborhood();
+  neighborhood.removeClass('dimmed').addClass('highlighted');
+}
+
+/* =========================================================
+   HOP EXPANSION (DYNAMIC MERGE)
+   ========================================================= */
+async function expandCurrentEntity(hops = 1) {
+  if (!selectedNodeData || !selectedNodeData.numeric_id) {
+    alert('Select an entity node with a valid ID to expand.');
+    return;
+  }
+
+  const entId = selectedNodeData.numeric_id;
+  showLoading(`Expanding ${hops}-hop neighborhood for ${selectedNodeData.label}...`);
+
+  try {
+    const res = await fetch(getApiEndpoint(`/api/graph/entity/${entId}?hops=${hops}`));
+    if (res.ok) {
+      const data = await res.json();
+      mergeElementsIntoCy(data);
+      setHudStatus(`Expanded ${hops} hops (+${data.nodes.length} nodes)`);
+    } else {
+      setHudStatus('Neighborhood expansion failed. Server error.');
+    }
+  } catch (err) {
+    console.warn('Live expand error, falling back to local simulation:', err);
+    setHudStatus('Neighborhood expansion: Simulated network response');
+  } finally {
+    hideLoading();
+  }
+}
+
+function mergeElementsIntoCy(graphData) {
+  if (!cy || !graphData) return;
+
+  const currentIds = new Set(cy.nodes().map(n => n.data('id')));
+  const newNodes = (graphData.nodes || [])
+    .filter(n => !currentIds.has(String(n.id)))
+    .map(formatNodeForCy);
+
+  newNodes.forEach(n => currentIds.add(n.data.id));
+
+  const currentEdgeIds = new Set(cy.edges().map(e => e.data('id')));
+  const newEdges = (graphData.edges || [])
+    .filter(e => !currentEdgeIds.has(String(e.id || `${e.source}_${e.target}`)))
+    .filter(e => currentIds.has(String(e.source)) && currentIds.has(String(e.target)))
+    .map(formatEdgeForCy);
+
+  if (newNodes.length > 0 || newEdges.length > 0) {
+    cy.add([...newNodes, ...newEdges]);
+    updateCountsHUD(cy.nodes().length, cy.edges().length);
+    updateEntityFilterCounts(cy.nodes().map(n => ({ data: n.data() })));
+    populatePathSelects(cy.nodes().map(n => ({ data: n.data() })));
+    applyLayout(currentLayout, true);
+  }
+}
+
+/* =========================================================
+   GRAPH INTELLIGENCE PRESETS
+   ========================================================= */
+// 1. Shared Infrastructure
+async function fetchSharedInfrastructure() {
+  try {
+    const res = await fetch(getApiEndpoint('/api/graph/shared-infrastructure'));
+    if (res.ok) {
+      const d = await res.json();
+      sharedInfraData = d.shared_infrastructure || [];
+    } else {
+      sharedInfraData = [];
+    }
+  } catch (e) {
+    sharedInfraData = [
+      { node_id: "e-1", numeric_id: 1, entity_type: "DOMAIN", value: "secure-kyc-update.com", connected_case_count: 5, connected_cases: ["CS-1024", "CS-1025", "CS-1026", "CS-1027", "CS-1028"], risk_score: 88.0 },
+      { node_id: "e-4", numeric_id: 4, entity_type: "PHONE", value: "+91 96865 79303", connected_case_count: 3, connected_cases: ["CS-1024", "CS-1027", "CS-1031"], risk_score: 85.0 }
+    ];
+  }
+
+  // Update badges & UI
+  const badge = document.getElementById('badgeSharedInfra');
+  const countTab = document.getElementById('tabCountShared');
+  const statEl = document.getElementById('statSharedCount');
+  const len = sharedInfraData.length;
+
+  if (badge) badge.textContent = len;
+  if (countTab) countTab.textContent = len;
+  if (statEl) statEl.textContent = len;
+
+  renderSharedInfraList();
+}
+
+function renderSharedInfraList() {
+  const container = document.getElementById('sharedInfraList');
+  if (!container) return;
+
+  if (sharedInfraData.length === 0) {
+    container.innerHTML = '<div style="text-align:center; padding:15px; color:var(--muted); font-size:11px;">No multi-case infrastructure hubs found.</div>';
+    return;
+  }
+
+  container.innerHTML = sharedInfraData.map((item, idx) => {
+    const risk = Math.round(item.risk_score || 70);
+    const cases = (item.connected_cases || []).slice(0, 4);
+    return `
+      <div class="intel-item" onclick="focusSharedInfraItem(${idx})">
+        <div class="intel-item-head">
+          <span class="type-badge type-${item.entity_type}">${item.entity_type}</span>
+          <span class="tag high">${risk} RISK</span>
+        </div>
+        <div class="intel-item-val">${item.value}</div>
+        <div style="font-size:10px; color:var(--muted); margin-top:3px;">
+          Linked across <b>${item.connected_case_count || (item.connected_cases||[]).length} cases:</b>
+        </div>
+        <div class="intel-item-cases">
+          ${cases.map(c => `<span class="case-badge">${c}</span>`).join('')}
+          ${(item.connected_cases||[]).length > 4 ? `<span class="case-badge">+${item.connected_cases.length - 4}</span>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function focusSharedInfraItem(idx) {
+  const item = sharedInfraData[idx];
+  if (!item || !cy) return;
+
+  clearAllHighlights();
+  document.getElementById('btnPresetShared').classList.add('active');
+
+  const targetNode = cy.getElementById(item.node_id);
+  if (targetNode.length) {
+    cy.elements().addClass('dimmed');
+    targetNode.removeClass('dimmed').addClass('shared-highlight');
+
+    // Highlight connecting case nodes
+    const nbrCases = targetNode.neighborhood('node[entity_type = "CASE"]');
+    nbrCases.removeClass('dimmed').addClass('highlighted');
+    targetNode.edgesWith(nbrCases).removeClass('dimmed').addClass('highlighted');
+
+    targetNode.select();
+    inspectNode(targetNode);
+
+    cy.animate({
+      center: { eles: targetNode.union(nbrCases) },
+      zoom: 1.25,
+      duration: 400
+    });
+    setHudStatus(`Focused Shared Infrastructure: ${item.value}`);
+  } else {
+    // If not in current view, load full graph
+    handleCaseChange('all').then(() => {
+      setTimeout(() => focusSharedInfraItem(idx), 600);
+    });
+  }
+}
+
+function activateSharedInfraPreset() {
+  switchIntelTab('shared');
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btnPresetShared').classList.add('active');
+
+  if (sharedInfraData.length > 0) {
+    focusSharedInfraItem(0);
+  }
+}
+
+// 2. Circular Flows
+async function fetchCircularFlows() {
+  try {
+    const res = await fetch(getApiEndpoint('/api/graph/circular-flows'));
+    if (res.ok) {
+      const d = await res.json();
+      circularFlowsData = d.cycles || [];
+    } else {
+      circularFlowsData = [];
+    }
+  } catch (e) {
+    circularFlowsData = [
+      {
+        length: 3,
+        cycle: ["e-10", "e-11", "e-12"],
+        nodes: [
+          { id: "e-10", label: "SIM-ACC-CIRCULAR-A", entity_type: "BANK_ACCOUNT" },
+          { id: "e-11", label: "SIM-ACC-CIRCULAR-B", entity_type: "BANK_ACCOUNT" },
+          { id: "e-12", label: "SIM-ACC-CIRCULAR-C", entity_type: "BANK_ACCOUNT" }
+        ],
+        explanation: "Circular fund movement: SIM-ACC-CIRCULAR-A -> B -> C -> A"
+      }
+    ];
+  }
+
+  const badge = document.getElementById('badgeCircularCycles');
+  const countTab = document.getElementById('tabCountCycles');
+  const statEl = document.getElementById('statCyclesCount');
+  const len = circularFlowsData.length;
+
+  if (badge) badge.textContent = len;
+  if (countTab) countTab.textContent = len;
+  if (statEl) statEl.textContent = len;
+
+  renderCircularFlowsList();
+}
+
+function renderCircularFlowsList() {
+  const container = document.getElementById('circularFlowsList');
+  if (!container) return;
+
+  if (circularFlowsData.length === 0) {
+    container.innerHTML = '<div style="text-align:center; padding:15px; color:var(--muted); font-size:11px;">No directed circular money laundering loops detected.</div>';
+    return;
+  }
+
+  container.innerHTML = circularFlowsData.map((cycleItem, idx) => {
+    const nodeNames = (cycleItem.nodes || []).map(n => n.label || n.id).join(' → ');
+    return `
+      <div class="intel-item" style="border-left: 3px solid var(--neon-red);" onclick="animateCycle(${idx})">
+        <div class="intel-item-head">
+          <span style="font-size:10px; font-weight:700; color:var(--neon-red);">LOOP DETECTED (${cycleItem.length || (cycleItem.cycle||[]).length} HOPS)</span>
+          <button class="btn" style="padding:2px 7px; font-size:10px; border-color:var(--neon-red); color:var(--neon-red);">▶ Animate</button>
+        </div>
+        <div style="font-size:11px; color:#fff; font-weight:500; margin-top:4px;">
+          ${nodeNames} → ${(cycleItem.nodes||[])[0]?.label || ''}
+        </div>
+        <div style="font-size:10px; color:var(--muted); margin-top:5px; line-height:1.4;">
+          ${cycleItem.explanation || 'Suspected mule round-tripping for AML evasion.'}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function animateCycle(idx) {
+  const cycleItem = circularFlowsData[idx];
+  if (!cycleItem || !cy) return;
+
+  clearAllHighlights();
+  document.getElementById('btnPresetCycles').classList.add('active');
+
+  const cycleNodeIds = cycleItem.cycle || (cycleItem.nodes || []).map(n => n.id);
+  const cycleNodes = cy.nodes().filter(n => cycleNodeIds.includes(n.id()));
+
+  if (cycleNodes.length === 0) {
+    // If nodes aren't present in current view, load full network first
+    handleCaseChange('all').then(() => {
+      setTimeout(() => animateCycle(idx), 600);
+    });
+    return;
+  }
+
+  // Dim background
+  cy.elements().addClass('dimmed');
+  cycleNodes.removeClass('dimmed').addClass('cycle-highlight');
+
+  // Highlight connecting edges between cycle nodes
+  const cycleEdges = cycleNodes.edgesWith(cycleNodes);
+  cycleEdges.removeClass('dimmed').addClass('cycle-highlight');
+
+  // Center on cycle
+  cy.animate({
+    center: { eles: cycleNodes },
+    zoom: 1.35,
+    duration: 500
+  });
+
+  // Sequential pulse animation along directed flow
+  let step = 0;
+  if (animationInterval) clearInterval(animationInterval);
+  animationInterval = setInterval(() => {
+    const activeNodeId = cycleNodeIds[step % cycleNodeIds.length];
+    const n = cy.getElementById(activeNodeId);
+    if (n.length) {
+      n.style({ 'shadow-blur': 35, 'border-width': 5 });
+      setTimeout(() => {
+        if (n.length) n.style({ 'shadow-blur': 25, 'border-width': 4 });
+      }, 350);
+    }
+    step++;
+  }, 600);
+
+  setHudStatus(`Animating ${cycleNodeIds.length}-step Circular Flow`);
+}
+
+function activateCircularFlowsPreset() {
+  switchIntelTab('cycles');
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btnPresetCycles').classList.add('active');
+
+  if (circularFlowsData.length > 0) {
+    animateCycle(0);
+  }
+}
+
+// 3. Shortest Path Finder
+function populatePathSelects(nodes) {
+  const src = document.getElementById('pathSourceSelect');
+  const tgt = document.getElementById('pathTargetSelect');
+  if (!src || !tgt) return;
+
+  const prevSrc = src.value;
+  const prevTgt = tgt.value;
+
+  src.innerHTML = '<option value="">Select origin entity...</option>';
+  tgt.innerHTML = '<option value="">Select destination entity...</option>';
+
+  const sorted = [...nodes].sort((a, b) => a.data.label.localeCompare(b.data.label));
+  sorted.forEach(n => {
+    const opt1 = document.createElement('option');
+    opt1.value = n.data.numeric_id || n.data.id;
+    opt1.textContent = `${n.data.label} (${n.data.entity_type})`;
+    src.appendChild(opt1);
+
+    const opt2 = document.createElement('option');
+    opt2.value = n.data.numeric_id || n.data.id;
+    opt2.textContent = `${n.data.label} (${n.data.entity_type})`;
+    tgt.appendChild(opt2);
+  });
+
+  if (prevSrc) src.value = prevSrc;
+  if (prevTgt) tgt.value = prevTgt;
+}
+
+function setAsPathSource() {
+  if (!selectedNodeData) return;
+  const src = document.getElementById('pathSourceSelect');
+  if (src) {
+    src.value = selectedNodeData.numeric_id || selectedNodeData.id;
+    switchIntelTab('path');
+    setHudStatus(`Path Origin: ${selectedNodeData.label}`);
+  }
+}
+
+function setAsPathTarget() {
+  if (!selectedNodeData) return;
+  const tgt = document.getElementById('pathTargetSelect');
+  if (tgt) {
+    tgt.value = selectedNodeData.numeric_id || selectedNodeData.id;
+    switchIntelTab('path');
+    setHudStatus(`Path Destination: ${selectedNodeData.label}`);
+  }
+}
+
+async function runShortestPath() {
+  const srcVal = document.getElementById('pathSourceSelect').value;
+  const tgtVal = document.getElementById('pathTargetSelect').value;
+  const resultBox = document.getElementById('pathResultBox');
+
+  if (!srcVal || !tgtVal) {
+    alert('Please select both a source entity and a target entity.');
+    return;
+  }
+  if (srcVal === tgtVal) {
+    alert('Source and target cannot be the same entity.');
+    return;
+  }
+
+  showLoading('Computing shortest investigative path...');
+  resultBox.style.display = 'block';
+  resultBox.innerHTML = '<div style="color:var(--muted); font-size:11px;">Tracing paths...</div>';
+
+  try {
+    const res = await fetch(getApiEndpoint(`/api/graph/shortest-path?source_id=${srcVal}&target_id=${tgtVal}`));
+    if (res.ok) {
+      const data = await res.json();
+      if (data.found && Array.isArray(data.path) && data.path.length > 0) {
+        renderPathResult(data);
+      } else {
+        resultBox.innerHTML = `
+          <div class="path-trail" style="border-color:var(--neon-amber); color:var(--neon-amber);">
+            <b>No path found:</b> ${data.message || 'No direct or multi-hop path connects these entities.'}
+          </div>
+        `;
+        clearAllHighlights();
+      }
+    } else {
+      resultBox.innerHTML = '<div class="path-trail" style="color:var(--neon-red);">Failed to compute shortest path.</div>';
+    }
+  } catch (err) {
+    // Client-side fallback path check using Cytoscape dijkstra / aStar
+    console.warn('Backend path fetch failed, attempting client-side topology search:', err);
+    runClientSideShortestPath(srcVal, tgtVal, resultBox);
+  } finally {
+    hideLoading();
+  }
+}
+
+function renderPathResult(data) {
+  const resultBox = document.getElementById('pathResultBox');
+  const steps = data.path;
+
+  resultBox.innerHTML = `
+    <div class="path-trail">
+      <div style="font-weight:700; color:var(--neon-cyan); margin-bottom:6px;">
+        PATH IDENTIFIED (${data.hops} HOPS):
+      </div>
+      ${steps.map((st, i) => `
+        <div class="trail-step">
+          <span style="color:var(--muted); font-size:10px;">${i + 1}.</span>
+          <span class="type-badge type-${st.entity_type}">${st.entity_type}</span>
+          <b style="color:#fff;">${st.label}</b>
+          ${i < steps.length - 1 ? '<span class="trail-arrow">→</span>' : ''}
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  // Highlight on canvas
+  clearAllHighlights();
+  document.getElementById('btnPresetPath').classList.add('active');
+
+  const pathNodeIds = steps.map(s => s.id);
+  const pathNodes = cy.nodes().filter(n => pathNodeIds.includes(n.id()));
+
+  cy.elements().addClass('dimmed');
+  pathNodes.removeClass('dimmed').addClass('path-highlight');
+
+  // Highlight connecting edges along path
+  for (let i = 0; i < pathNodes.length - 1; i++) {
+    const u = pathNodes[i];
+    const v = pathNodes[i + 1];
+    u.edgesWith(v).removeClass('dimmed').addClass('path-highlight');
+  }
+
+  cy.animate({
+    center: { eles: pathNodes },
+    zoom: 1.3,
+    duration: 500
+  });
+
+  setHudStatus(`Path Trace: ${data.hops} hops between origin and destination`);
+}
+
+function runClientSideShortestPath(srcNumericId, tgtNumericId, resultBox) {
+  if (!cy) return;
+  const srcNode = cy.nodes().filter(n => n.data('numeric_id') == srcNumericId || n.data('id') == srcNumericId);
+  const tgtNode = cy.nodes().filter(n => n.data('numeric_id') == tgtNumericId || n.data('id') == tgtNumericId);
+
+  if (srcNode.length === 0 || tgtNode.length === 0) {
+    resultBox.innerHTML = '<div class="path-trail">One of the entities is not loaded in current graph view.</div>';
+    return;
+  }
+
+  const aStar = cy.elements().aStar({ root: srcNode[0], goal: tgtNode[0], directed: false });
+  if (aStar.found) {
+    const steps = aStar.path.nodes().map(n => ({
+      id: n.id(),
+      label: n.data('label'),
+      entity_type: n.data('entity_type')
+    }));
+    renderPathResult({ found: true, path: steps, hops: steps.length - 1 });
+  } else {
+    resultBox.innerHTML = '<div class="path-trail" style="color:var(--neon-amber);">No topological path found between entities.</div>';
+  }
+}
+
+function activateShortestPathTab() {
+  switchIntelTab('path');
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btnPresetPath').classList.add('active');
+}
+
+function switchIntelTab(tabName) {
+  document.querySelectorAll('.intel-tab').forEach(t => {
+    t.classList.toggle('active', t.getAttribute('data-tab') === tabName);
+  });
+  document.querySelectorAll('.intel-panel').forEach(p => p.classList.remove('active'));
+  const targetPanel = document.getElementById(
+    tabName === 'shared' ? 'panelShared' : (tabName === 'cycles' ? 'panelCycles' : 'panelPath')
+  );
+  if (targetPanel) targetPanel.classList.add('active');
+}
+
+/* =========================================================
+   CASE SUBGRAPH & FULL GRAPH LOADING
+   ========================================================= */
+async function loadCasesDropdown() {
+  try {
+    const res = await fetch(getApiEndpoint('/api/cases'));
+    if (res.ok) {
+      casesRegistry = await res.json();
+      const select = document.getElementById('caseSelector');
+      if (select && Array.isArray(casesRegistry)) {
+        // Keep option 0 (Full network)
+        select.innerHTML = '<option value="all">⚡ Full Network Overview (All Cases)</option>';
+        casesRegistry.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = `${c.case_number || ('CS-' + c.id)}: ${c.title || 'Incident'} (${c.severity || 'MED'})`;
+          select.appendChild(opt);
+        });
+      }
+    }
+  } catch (err) {
+    console.warn('Cases registry fetch fallback:', err);
+  }
+}
+
+async function handleCaseChange(caseVal) {
+  currentScope = caseVal;
+  const selector = document.getElementById('caseSelector');
+  if (selector) selector.value = caseVal;
+
+  if (caseVal === 'all') {
+    document.getElementById('hudScope').textContent = 'Full Network Overview';
+    await loadFullGraph();
+  } else {
+    const foundCase = casesRegistry.find(c => c.id == caseVal);
+    const caseTitle = foundCase ? `${foundCase.case_number}: ${foundCase.title}` : `Case #${caseVal}`;
+    document.getElementById('hudScope').textContent = caseTitle;
+    await loadCaseGraph(caseVal, caseTitle);
+  }
+}
+
+function handleHopChange(hops) {
+  currentHops = parseInt(hops, 10) || 2;
+  if (currentScope !== 'all') {
+    handleCaseChange(currentScope);
+  } else {
+    setHudStatus(`Hop depth set to ${currentHops}`);
+  }
+}
+
+async function loadFullGraph() {
+  showLoading('Loading CyberScope Fraud Graph...');
+  try {
+    const res = await fetch(getApiEndpoint('/api/graph?limit=150'));
+    if (res.ok) {
+      const data = await res.json();
+      fullGraphData = data;
+      renderGraphElements(data);
+      setHudStatus('Full Network Overview Loaded');
+    } else {
+      throw new Error(`HTTP ${res.status}`);
+    }
+  } catch (err) {
+    console.warn('Backend graph unavailable, falling back to Operation Phantom KYC demo data:', err);
+    fullGraphData = FALLBACK_GRAPH;
+    renderGraphElements(FALLBACK_GRAPH);
+    setHudStatus('Loaded Demo Dataset: Operation Phantom KYC');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function loadCaseGraph(caseId, caseLabel) {
+  showLoading(`Loading Subgraph for ${caseLabel || ('Case #' + caseId)}...`);
+  try {
+    const res = await fetch(getApiEndpoint(`/api/graph/case/${caseId}?hops=${currentHops}`));
+    if (res.ok) {
+      const data = await res.json();
+      renderGraphElements(data);
+      setHudStatus(`Loaded ${caseLabel || ('Case #' + caseId)} (${currentHops} Hops)`);
+    } else {
+      throw new Error(`HTTP ${res.status}`);
+    }
+  } catch (err) {
+    console.warn('Case subgraph fetch fallback:', err);
+    // Fallback: filter fallback graph
+    renderGraphElements(FALLBACK_GRAPH);
+    setHudStatus(`Showing Demo Subgraph for Case #${caseId}`);
+  } finally {
+    hideLoading();
+  }
+}
+
+/* =========================================================
+   HIGH RISK PULSE ANIMATION
+   ========================================================= */
+let pulseTick = false;
+function startHighRiskPulse() {
+  setInterval(() => {
+    if (!cy) return;
+    pulseTick = !pulseTick;
+    const highRiskNodes = cy.nodes('.high-risk');
+    if (highRiskNodes.length === 0) return;
+
+    highRiskNodes.forEach(n => {
+      if (n.hasClass('dimmed') || n.hasClass('cycle-highlight') || n.hasClass('path-highlight')) return;
+      n.style({
+        'shadow-blur': pulseTick ? 24 : 12,
+        'border-width': pulseTick ? 4.2 : 3
+      });
+    });
+  }, 1100);
+}
+
+/* =========================================================
+   URL PARAMETER AUTO-LOADING
+   ========================================================= */
+async function processUrlParameters() {
+  const params = new URLSearchParams(window.location.search);
+  const caseIdParam = params.get('case_id');
+  const caseNumParam = params.get('case_number');
+  const entityIdParam = params.get('entity_id');
+  const entityParam = params.get('entity') || params.get('ip') || entityIdParam;
+  const searchParam = params.get('search');
+
+  // Load cases dropdown first
+  await loadCasesDropdown();
+
+  // 1. Case ID or Case Number
+  if (caseIdParam) {
+    currentScope = caseIdParam;
+    await handleCaseChange(caseIdParam);
+  } else if (caseNumParam) {
+    const match = casesRegistry.find(c => c.case_number === caseNumParam);
+    if (match) {
+      await handleCaseChange(match.id);
+    } else {
+      await loadFullGraph();
+    }
+  } else if (entityParam) {
+    // 2. Entity ID / IP -> expand entity neighborhood
+    showLoading(`Loading Neighborhood for ${entityParam}...`);
+    try {
+      const res = await fetch(getApiEndpoint(`/api/graph/entity/${encodeURIComponent(entityParam)}?hops=2`));
+      if (res.ok) {
+        const data = await res.json();
+        renderGraphElements(data);
+        document.getElementById('hudScope').textContent = `${entityParam} Neighborhood`;
+        setTimeout(() => {
+          const target = cy.nodes().filter(n => 
+            n.data('label') === entityParam || 
+            n.data('normalized_value') === entityParam || 
+            n.data('numeric_id') == entityParam || 
+            n.data('id') === entityParam
+          );
+          if (target.length) {
+            target[0].select();
+            inspectNode(target[0]);
+            highlightNeighborhood(target[0]);
+            cy.animate({ center: { eles: target[0] }, zoom: 1.35, duration: 400 });
+          }
+        }, 350);
+      } else {
+        await loadFullGraph();
+      }
+    } catch (e) {
+      await loadFullGraph();
+    } finally {
+      hideLoading();
+    }
+  } else {
+    // 3. Default to full network
+    await loadFullGraph();
+  }
+
+  // 4. Run Search if specified in URL
+  if (searchParam) {
+    document.getElementById('graphSearchInput').value = searchParam;
+    setTimeout(() => {
+      executeSearch();
+    }, 450);
+  } else if (entityIdParam && cy) {
+    setTimeout(() => {
+      const target = cy.nodes().filter(n => n.data('numeric_id') == entityIdParam || n.data('id') == entityIdParam);
+      if (target.length) {
+        target[0].select();
+        inspectNode(target[0]);
+        highlightNeighborhood(target[0]);
+        cy.animate({ center: { eles: target[0] }, zoom: 1.35, duration: 400 });
+      }
+    }, 450);
+  }
+
+  // Load Presets in background
+  fetchSharedInfrastructure();
+  fetchCircularFlows();
+}
+
+/* =========================================================
+   BOOTSTRAP
+   ========================================================= */
+document.addEventListener('DOMContentLoaded', () => {
+  initCytoscape();
+  processUrlParameters();
+});
+</script>
+</body>
+</html>

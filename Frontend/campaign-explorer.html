@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel=icon type=image/png href=assets/logo.png>
+<link rel=apple-touch-icon href=assets/logo.png>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CyberScope | Campaign Explorer</title>
+<link rel="stylesheet" href="assets/cyberscope.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="index.html"><div class="mark"><img src="assets/logo.png" alt="CyberScope"></div><div><b>CYBERSCOPE</b><small>A PROJECT OF TETRABYTE</small></div></a>
+  <div class="nav-inline">
+    <nav class="nav" id="siteNav">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="cases.html">Cases</a>
+      <a href="fraud-graph.html">Fraud Graph</a>
+      <a href="threat-map.html">Threat Map</a>
+      <a href="entity-explorer.html">Entities</a>
+      <a href="transaction-explorer.html">Transactions</a>
+      <a href="campaign-explorer.html">Campaigns</a>
+      <a href="investigation-workspace.html">Workspace</a>
+    </nav>
+    <div class="profile">
+      <div class="avatar" id="avatar">CS</div>
+      <div><div class="pname" id="profileName">User</div><div class="prole">Investigator</div></div>
+      <button class="signout" onclick="signOut()">Sign out</button>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="siteNav"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<div class="nav-backdrop" id="navBackdrop"></div>
+
+<main>
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">CYBERSCOPE MODULE</div>
+      <h1>Group incidents into possible campaigns.</h1>
+      <p>Correlate cases through shared infrastructure, repeated entities and recurring fraud signals.</p>
+    </div>
+    <div class="status"><span class="dot-pulse">●</span> SYSTEM OPERATIONAL</div>
+  </section>
+
+  <div class="grid3" id="campaignGrid">
+    <div class="card panel">
+      <div class="eyebrow">CAMPAIGN 01</div>
+      <h2>Utility-Bill Cluster</h2>
+      <div class="sub">12 linked cases</div>
+      <div class="metric"><label>SHARED ENTITIES</label><strong>19</strong><small>5 domains · 8 phones</small></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
+        <span class="tag high">HIGH CORRELATION</span>
+        <a href="fraud-graph.html?search=Utility-Bill%20Cluster" class="btn" style="padding:4px 10px; font-size:11px; text-decoration:none;">◎ Explore in Graph →</a>
+      </div>
+    </div>
+    <div class="card panel">
+      <div class="eyebrow">CAMPAIGN 02</div>
+      <h2>KYC Phishing Network</h2>
+      <div class="sub">8 linked cases</div>
+      <div class="metric"><label>SHARED ENTITIES</label><strong>14</strong><small>4 domains · 6 phones</small></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
+        <span class="tag high">HIGH CORRELATION</span>
+        <a href="fraud-graph.html?search=KYC%20Phishing%20Network" class="btn" style="padding:4px 10px; font-size:11px; text-decoration:none;">◎ Explore in Graph →</a>
+      </div>
+    </div>
+    <div class="card panel">
+      <div class="eyebrow">CAMPAIGN 03</div>
+      <h2>Impersonation Cluster</h2>
+      <div class="sub">7 linked cases</div>
+      <div class="metric"><label>SHARED ENTITIES</label><strong>10</strong><small>3 phones · 2 UPI IDs</small></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
+        <span class="tag medium">REVIEW</span>
+        <a href="fraud-graph.html?search=Impersonation%20Cluster" class="btn" style="padding:4px 10px; font-size:11px; text-decoration:none;">◎ Explore in Graph →</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="card panel" style="margin-top:17px">
+    <h2>Campaign Signals</h2>
+    <div class="sub">Explainable indicators used to group incidents</div>
+    <div class="grid3">
+      <div class="item"><b>Shared infrastructure</b><p>Same domains, phone numbers or payment destinations across cases.</p></div>
+      <div class="item"><b>Repeated patterns</b><p>Similar scam wording or recurring incident characteristics.</p></div>
+      <div class="item"><b>Entity overlap</b><p>Multiple incidents converge on the same investigation objects.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer>CYBERSCOPE · TETRABYTE · INVESTIGATION INTELLIGENCE CONSOLE</footer>
+
+<button class="chat-button" id="chatButton" aria-label="Open CyberScope assistant">✦</button>
+<div class="chat-window" id="chatWindow">
+  <div class="chat-head">
+    <div class="chat-head-title"><div class="chat-logo"><img src="assets/logo.png" alt="CyberScope"></div><div><strong>CYBERSCOPE ASSISTANT</strong><small>Investigation workspace assistant</small></div></div>
+    <button class="chat-close" id="chatClose" aria-label="Close chat">×</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-message bot-message">Hello. I can explain cases, the fraud graph, entities, transactions, campaigns and the investigation workspace.</div>
+  </div>
+  <div class="chat-quick">
+    <button data-q="What is the Fraud Graph?">Fraud Graph</button>
+    <button data-q="What is a case?">Cases</button>
+    <button data-q="What are entities?">Entities</button>
+    <button data-q="Tell me about transactions">Transactions</button>
+    <button data-q="What is Campaign Explorer?">Campaigns</button>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chatInput" placeholder="Ask CyberScope...">
+    <button class="chat-send" id="chatSend">→</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-client.js"></script>
+<script src="assets/cyberscope.js"></script>
+<script>
+cyberscopeProtect();
+
+async function loadLiveCampaigns(){
+  try {
+    var authHeaders = (window.CyberScopeAuth && typeof window.CyberScopeAuth.getAuthHeaders === 'function')
+      ? window.CyberScopeAuth.getAuthHeaders()
+      : {};
+    var res = await fetch('/api/campaigns', { headers: authHeaders });
+    if(res.ok){
+      var camps = await res.json();
+      if(Array.isArray(camps) && camps.length > 0){
+        var container = document.getElementById('campaignGrid');
+        if(container){
+          container.innerHTML = '';
+          camps.forEach(function(camp, idx){
+            var div = document.createElement('div');
+            div.className = 'card panel';
+            var num = String(idx + 1).padStart(2, '0');
+            var name = camp.name || ('Campaign ' + num);
+            var cases = camp.case_count || (camp.cases ? camp.cases.length : 1);
+            var entCount = camp.entity_count || camp.shared_entity_count || (camp.key_entities ? camp.key_entities.length : 0);
+            var tagClass = (camp.severity || '').toLowerCase() === 'high' || (camp.risk_score && camp.risk_score >= 70) ? 'high' : 'medium';
+            var tagText = tagClass === 'high' ? 'HIGH CORRELATION' : 'REVIEW';
+            var graphHref = 'fraud-graph.html?search=' + encodeURIComponent(name);
+
+            div.innerHTML = '<div class="eyebrow">CAMPAIGN ' + num + '</div>' +
+                            '<h2>' + name + '</h2>' +
+                            '<div class="sub">' + cases + ' linked cases</div>' +
+                            '<div class="metric"><label>SHARED ENTITIES</label><strong>' + entCount + '</strong><small>cross-incident signals</small></div>' +
+                            '<div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">' +
+                              '<span class="tag ' + tagClass + '">' + tagText + '</span>' +
+                              '<a href="' + graphHref + '" class="btn" style="padding:4px 10px; font-size:11px; text-decoration:none;">◎ Explore in Graph →</a>' +
+                            '</div>';
+            container.appendChild(div);
+          });
+        }
+      }
+    }
+  } catch(e) {}
+}
+loadLiveCampaigns();
+</script>
+</body>
+</html>

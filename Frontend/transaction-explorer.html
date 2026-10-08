@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel=icon type=image/png href=assets/logo.png>
+<link rel=apple-touch-icon href=assets/logo.png>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CyberScope | Transaction Explorer</title>
+<link rel="stylesheet" href="assets/cyberscope.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="index.html"><div class="mark"><img src="assets/logo.png" alt="CyberScope"></div><div><b>CYBERSCOPE</b><small>A PROJECT OF TETRABYTE</small></div></a>
+  <div class="nav-inline">
+    <nav class="nav" id="siteNav">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="cases.html">Cases</a>
+      <a href="fraud-graph.html">Fraud Graph</a>
+      <a href="threat-map.html">Threat Map</a>
+      <a href="entity-explorer.html">Entities</a>
+      <a href="transaction-explorer.html">Transactions</a>
+      <a href="campaign-explorer.html">Campaigns</a>
+      <a href="investigation-workspace.html">Workspace</a>
+    </nav>
+    <div class="profile">
+      <div class="avatar" id="avatar">CS</div>
+      <div><div class="pname" id="profileName">User</div><div class="prole">Investigator</div></div>
+      <button class="signout" onclick="signOut()">Sign out</button>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="siteNav"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<div class="nav-backdrop" id="navBackdrop"></div>
+
+<main>
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">CYBERSCOPE MODULE</div>
+      <h1>Follow the flow of suspicious value.</h1>
+      <p>Inspect synthetic transaction paths and connect payment activity back to cases and entities.</p>
+    </div>
+    <div class="status"><span class="dot-pulse">●</span> SYSTEM OPERATIONAL</div>
+  </section>
+
+  <div class="grid">
+    <section class="card panel">
+      <h2>Transaction Activity</h2>
+      <div class="sub">Synthetic transaction records for demonstration</div>
+      <div class="toolbar">
+        <input class="search" id="txSearch" placeholder="Search transaction ID, account or case...">
+        <button class="btn" onclick="filterTransactions()">Search</button>
+      </div>
+      <div class="table-scroll">
+        <table class="table" id="txTable">
+          <thead><tr><th>TX ID</th><th>FROM</th><th>TO</th><th>AMOUNT</th><th>CASE</th><th>FLAG</th><th>ACTIONS</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>TX-8841</td><td>AC-1091</td><td>UPI-4482</td><td>₹48,500</td><td>CS-1027</td><td><span class="tag high">FLAGGED</span></td>
+              <td><a href="fraud-graph.html?search=AC-1091" class="btn" style="padding:4px 9px; font-size:11px; white-space:nowrap; text-decoration:none;">◎ Graph</a></td>
+            </tr>
+            <tr>
+              <td>TX-8837</td><td>AC-2014</td><td>UPI-4482</td><td>₹31,200</td><td>CS-1024</td><td><span class="tag high">FLAGGED</span></td>
+              <td><a href="fraud-graph.html?search=AC-2014" class="btn" style="padding:4px 9px; font-size:11px; white-space:nowrap; text-decoration:none;">◎ Graph</a></td>
+            </tr>
+            <tr>
+              <td>TX-8819</td><td>AC-7712</td><td>AC-4482</td><td>₹19,800</td><td>CS-1019</td><td><span class="tag medium">REVIEW</span></td>
+              <td><a href="fraud-graph.html?search=AC-7712" class="btn" style="padding:4px 9px; font-size:11px; white-space:nowrap; text-decoration:none;">◎ Graph</a></td>
+            </tr>
+            <tr>
+              <td>TX-8803</td><td>AC-3118</td><td>UPI-1901</td><td>₹8,400</td><td>CS-1013</td><td><span class="tag low">NORMAL</span></td>
+              <td><a href="fraud-graph.html?search=AC-3118" class="btn" style="padding:4px 9px; font-size:11px; white-space:nowrap; text-decoration:none;">◎ Graph</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <aside class="card panel">
+      <h2>Flow Summary</h2>
+      <div class="sub">Cross-case transaction signals</div>
+      <div class="grid3">
+        <div class="card metric"><label>FLAGGED</label><strong>23</strong><small>transactions</small></div>
+        <div class="card metric"><label>VALUE</label><strong>₹12.8L</strong><small>synthetic total</small></div>
+        <div class="card metric"><label>LINKED</label><strong>18</strong><small>cases</small></div>
+      </div>
+      <div class="list" style="margin-top:15px">
+        <div class="item"><b>Repeated destination</b><p>UPI-4482 appears across multiple incident paths.</p></div>
+        <div class="item"><b>Graph relation</b><p>TRANSFERRED_TO connects source and destination accounts.</p></div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer>CYBERSCOPE · TETRABYTE · INVESTIGATION INTELLIGENCE CONSOLE</footer>
+
+<button class="chat-button" id="chatButton" aria-label="Open CyberScope assistant">✦</button>
+<div class="chat-window" id="chatWindow">
+  <div class="chat-head">
+    <div class="chat-head-title"><div class="chat-logo"><img src="assets/logo.png" alt="CyberScope"></div><div><strong>CYBERSCOPE ASSISTANT</strong><small>Investigation workspace assistant</small></div></div>
+    <button class="chat-close" id="chatClose" aria-label="Close chat">×</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-message bot-message">Hello. I can explain cases, the fraud graph, entities, transactions, campaigns and the investigation workspace.</div>
+  </div>
+  <div class="chat-quick">
+    <button data-q="What is the Fraud Graph?">Fraud Graph</button>
+    <button data-q="What is a case?">Cases</button>
+    <button data-q="What are entities?">Entities</button>
+    <button data-q="Tell me about transactions">Transactions</button>
+    <button data-q="What is Campaign Explorer?">Campaigns</button>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chatInput" placeholder="Ask CyberScope...">
+    <button class="chat-send" id="chatSend">→</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-client.js"></script>
+<script src="assets/cyberscope.js"></script>
+<script>
+cyberscopeProtect();
+function filterTransactions(){
+  var q = (document.getElementById('txSearch').value || '').toLowerCase().trim();
+  document.querySelectorAll('#txTable tbody tr').forEach(function(r){
+    r.style.display = (!q || r.innerText.toLowerCase().includes(q)) ? '' : 'none';
+  });
+}
+
+function checkUrlSearch(){
+  var params = new URLSearchParams(window.location.search);
+  var s = params.get('search');
+  if(s){
+    var input = document.getElementById('txSearch');
+    if(input){
+      input.value = s;
+      filterTransactions();
+    }
+  }
+}
+
+async function loadLiveTransactions(){
+  try {
+    var authHeaders = (window.CyberScopeAuth && typeof window.CyberScopeAuth.getAuthHeaders === 'function')
+      ? window.CyberScopeAuth.getAuthHeaders()
+      : {};
+    var res = await fetch('/api/transactions', { headers: authHeaders });
+    if(res.ok){
+      var txs = await res.json();
+      if(Array.isArray(txs) && txs.length > 0){
+        var tbody = document.querySelector('#txTable tbody');
+        if(tbody){
+          tbody.innerHTML = '';
+          txs.forEach(function(t){
+            var tr = document.createElement('tr');
+            var isFlagged = t.is_suspicious || (t.amount && t.amount > 25000);
+            var badgeClass = isFlagged ? 'high' : 'low';
+            var badgeText = isFlagged ? 'FLAGGED' : 'NORMAL';
+            var amt = typeof t.amount === 'number' ? ('₹' + t.amount.toLocaleString()) : (t.amount || '₹0');
+            var targetEntity = t.from_account || t.to_account || t.transaction_ref || '';
+            var graphHref = 'fraud-graph.html?search=' + encodeURIComponent(targetEntity);
+            tr.innerHTML = '<td>' + (t.transaction_ref || t.tx_hash || 'TX-001') + '</td>' +
+                           '<td>' + (t.from_account || '') + '</td>' +
+                           '<td>' + (t.to_account || '') + '</td>' +
+                           '<td>' + amt + '</td>' +
+                           '<td>' + (t.case_number || 'CS-1027') + '</td>' +
+                           '<td><span class="tag ' + badgeClass + '">' + badgeText + '</span></td>' +
+                           '<td><a href="' + graphHref + '" class="btn" style="padding:4px 9px; font-size:11px; white-space:nowrap; text-decoration:none;">◎ Graph</a></td>';
+            tbody.appendChild(tr);
+          });
+          checkUrlSearch();
+        }
+      }
+    }
+  } catch(e) {}
+}
+checkUrlSearch();
+loadLiveTransactions();
+</script>
+</body>
+</html>
+
