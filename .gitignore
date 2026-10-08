@@ -20,7 +20,9 @@ yarn-error.log*
 
 # Environment & IDE
 .env
-.env.local
+.env.*
+.env*
+env
 .vscode/
 .idea/
 *.swp

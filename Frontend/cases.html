@@ -48,7 +48,7 @@
       <div class="toolbar">
         <input class="search" id="caseSearch" placeholder="Search case ID, title or status...">
         <button class="btn" onclick="filterCases()">Filter</button>
-        <button class="btn" onclick="createNewCase()">+ New Case</button>
+        <a class="btn" href="new-case.html" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;">+ Add New Case</a>
       </div>
       <div class="table-scroll">
         <table class="table" id="caseTable">
@@ -92,27 +92,7 @@
 
 <footer>CYBERSCOPE · TETRABYTE · INVESTIGATION INTELLIGENCE CONSOLE</footer>
 
-<button class="chat-button" id="chatButton" aria-label="Open CyberScope assistant">◉</button>
-<div class="chat-window" id="chatWindow">
-  <div class="chat-head">
-    <div class="chat-head-title"><div class="chat-logo"><img src="assets/logo.png" alt="CyberScope"></div><div><strong>CYBERSCOPE ASSISTANT</strong><small>Investigation workspace assistant</small></div></div>
-    <button class="chat-close" id="chatClose" aria-label="Close chat">×</button>
-  </div>
-  <div class="chat-messages" id="chatMessages">
-    <div class="chat-message bot-message">Hello. I can explain cases, the fraud graph, entities, transactions, campaigns and the investigation workspace.</div>
-  </div>
-  <div class="chat-quick">
-    <button data-q="What is the Fraud Graph?">Fraud Graph</button>
-    <button data-q="What is a case?">Cases</button>
-    <button data-q="What are entities?">Entities</button>
-    <button data-q="Tell me about transactions">Transactions</button>
-    <button data-q="What is Campaign Explorer?">Campaigns</button>
-  </div>
-  <div class="chat-input-row">
-    <input class="chat-input" id="chatInput" placeholder="Ask CyberScope...">
-    <button class="chat-send" id="chatSend">→</button>
-  </div>
-</div>
+<a href="chatbot.html" class="chat-button" id="chatButton" title="Open CyberScope AI Assistant" aria-label="Open CyberScope AI Assistant">✦</a>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/supabase-client.js"></script>
@@ -127,37 +107,63 @@ function filterCases(){
 }
 
 async function loadLiveCases(){
+  var combined = [];
   try {
     var authHeaders = (window.CyberScopeAuth && typeof window.CyberScopeAuth.getAuthHeaders === 'function')
       ? window.CyberScopeAuth.getAuthHeaders()
       : {};
     var res = await fetch('/api/cases', { headers: authHeaders });
     if(res.ok){
-      var cases = await res.json();
-      if(Array.isArray(cases) && cases.length > 0){
-        var tbody = document.querySelector('#caseTable tbody');
-        if(tbody){
-          tbody.innerHTML = '';
-          cases.forEach(function(c){
-            var tr = document.createElement('tr');
-            tr.style.cursor = 'pointer';
-            var cid = c.id || c.case_id;
-            var caseParam = encodeURIComponent(cid || c.case_number || '');
-            tr.onclick = function(){ window.location.href = 'investigation-workspace.html?case_id=' + caseParam; };
-            var badgeClass = (c.severity || '').toLowerCase() === 'high' || (c.severity || '').toLowerCase() === 'critical' ? 'high' : 'medium';
-            tr.innerHTML = '<td>' + (c.case_number || ('CS-' + (c.id || ''))) + '</td>' +
-                           '<td>' + (c.title || 'Reported Incident') + '</td>' +
-                           '<td>' + (c.entity_count || 0) + '</td>' +
-                           '<td><span class="tag ' + badgeClass + '">' + (c.severity || 'MEDIUM').toUpperCase() + '</span></td>' +
-                           '<td>' + (c.status || 'Active') + '</td>' +
-                           '<td onclick="event.stopPropagation()"><button class="btn" style="padding:4px 9px; font-size:11px; white-space:nowrap;" onclick="event.stopPropagation(); window.location.href=\'fraud-graph.html?case_id=' + caseParam + '\'">◎ Explore Graph</button></td>';
-            tbody.appendChild(tr);
-          });
-          checkUrlSearch();
-        }
+      var serverCases = await res.json();
+      if(Array.isArray(serverCases)){
+        combined = serverCases.slice();
       }
     }
   } catch(e) {}
+
+  // Merge any locally lodged cases from new-case.html
+  try {
+    var localCases = JSON.parse(localStorage.getItem('cyberscopeCases') || '[]');
+    if(Array.isArray(localCases) && localCases.length > 0){
+      var existingNumbers = new Set(combined.map(function(c){ return (c.case_number || ('CS-' + c.id)).toLowerCase(); }));
+      localCases.forEach(function(lc){
+        var num = (lc.id || lc.case_number || '').toLowerCase();
+        if(!existingNumbers.has(num)){
+          combined.unshift({
+            id: lc.id,
+            case_number: lc.id || lc.case_number,
+            title: lc.title,
+            entity_count: (lc.signals ? lc.signals.length : 0) + (lc.phones ? 1 : 0) + (lc.domain ? 1 : 0) + (lc.upi ? 1 : 0) + (lc.bank ? 1 : 0),
+            severity: lc.risk || lc.priority || 'HIGH',
+            status: lc.status || 'NEW'
+          });
+        }
+      });
+    }
+  } catch(e) {}
+
+  if(combined.length > 0){
+    var tbody = document.querySelector('#caseTable tbody');
+    if(tbody){
+      tbody.innerHTML = '';
+      combined.forEach(function(c){
+        var tr = document.createElement('tr');
+        tr.style.cursor = 'pointer';
+        var cid = c.id || c.case_id;
+        var caseParam = encodeURIComponent(cid || c.case_number || '');
+        tr.onclick = function(){ window.location.href = 'investigation-workspace.html?case_id=' + caseParam; };
+        var badgeClass = (c.severity || '').toLowerCase() === 'high' || (c.severity || '').toLowerCase() === 'critical' ? 'high' : ((c.severity || '').toLowerCase() === 'low' ? 'low' : 'medium');
+        tr.innerHTML = '<td>' + (c.case_number || ('CS-' + (c.id || ''))) + '</td>' +
+                       '<td>' + (c.title || 'Reported Incident') + '</td>' +
+                       '<td>' + (c.entity_count || 0) + '</td>' +
+                       '<td><span class="tag ' + badgeClass + '">' + (c.severity || 'MEDIUM').toUpperCase() + '</span></td>' +
+                       '<td>' + (c.status || 'Active') + '</td>' +
+                       '<td onclick="event.stopPropagation()"><button class="btn" style="padding:4px 9px; font-size:11px; white-space:nowrap;" onclick="event.stopPropagation(); window.location.href=\'fraud-graph.html?case_id=' + caseParam + '\'">◎ Explore Graph</button></td>';
+        tbody.appendChild(tr);
+      });
+      checkUrlSearch();
+    }
+  }
 }
 
 function checkUrlSearch(){
@@ -174,30 +180,8 @@ function checkUrlSearch(){
 checkUrlSearch();
 loadLiveCases();
 
-async function createNewCase(){
-  var title = prompt('Enter investigation title / incident name:');
-  if(!title) return;
-  var lure = prompt('Enter scam lure text, SMS, or victim complaint:');
-  if(!lure) return;
-  try {
-    var res = await fetch('/api/cases/ingest', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title: title,
-        content: lure,
-        channel: 'PORTAL_INGEST'
-      })
-    });
-    if(res.ok){
-      alert('Case successfully created & entities extracted!');
-      loadLiveCases();
-    } else {
-      alert('Case created in workspace demo session.');
-    }
-  } catch(e) {
-    alert('Case created in workspace demo session.');
-  }
+function createNewCase(){
+  window.location.href = 'new-case.html';
 }
 </script>
 </body>

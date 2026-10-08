@@ -106,105 +106,18 @@ function cyberscopeInitNav(){
   });
 }
 
-/* ---------- chat widget (one canonical version, textContent-only) ---------- */
-var CYBERSCOPE_RESPONSES = [
-  { test:/fraud graph|graph/, text:'The Fraud Graph visualizes relationships between phones, UPI IDs, bank accounts, domains and cases, so investigators can see links that are not obvious when incidents are viewed separately.' },
-  { test:/entit/,             text:'Entities are investigation objects such as phone numbers, domains, UPI IDs and bank accounts that can be connected across fraud incidents.' },
-  { test:/case/,              text:'Cases represent individual fraud incidents or investigation records. CyberScope connects cases through shared entities and infrastructure.' },
-  { test:/transaction/,       text:'Transaction Explorer helps investigators examine financial flows and identify potentially connected transaction activity across cases.' },
-  { test:/campaign/,          text:'Campaign Explorer groups related incidents into possible coordinated campaigns using shared infrastructure and entity signals.' },
-  { test:/workspace|investigation/, text:'The Investigation Workspace brings case information, evidence, linked entities and notes together in one working area.' },
-  { test:/dashboard|overview/, text:'The dashboard gives a high-level view of active cases, linked entities, risk signals, campaigns and recent activity.' },
-  { test:/cyberscope|what is/, text:'CyberScope is a cyber-fraud intelligence platform for connecting fragmented incidents, entities, transactions and campaigns into one investigation environment.' },
-  { test:/help/,              text:'I can explain the Dashboard, Cases, Fraud Graph, Entities, Transactions, Campaigns and Investigation Workspace.' }
-];
-function cyberscopeAnswer(question){
-  var q = question.toLowerCase();
-  for(var i=0;i<CYBERSCOPE_RESPONSES.length;i++){
-    if(CYBERSCOPE_RESPONSES[i].test.test(q)) return CYBERSCOPE_RESPONSES[i].text;
-  }
-  return 'Try asking about the Fraud Graph, Cases, Entities, Transactions, Campaigns or the Investigation Workspace.';
-}
-
+/* ---------- chat assistant launcher ---------- */
 function cyberscopeInitChat(){
   var button = document.getElementById('chatButton');
-  var win = document.getElementById('chatWindow');
-  var messages = document.getElementById('chatMessages');
-  var input = document.getElementById('chatInput');
-  var sendBtn = document.getElementById('chatSend');
-  var closeBtn = document.getElementById('chatClose');
-  if(!button || !win || !messages || !input) return;
-
-  function toggle(){
-    win.classList.toggle('active');
-    if(win.classList.contains('active')) setTimeout(function(){ input.focus(); }, 150);
-  }
-  function addMessage(text, cls){
-    var div = document.createElement('div');
-    div.className = 'chat-message ' + cls;
-    div.textContent = text; // textContent only — no innerHTML, no injected markup
-    messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight;
-  }
-  async function send(){
-    var q = input.value.trim();
-    if(!q) return;
-    addMessage(q, 'user-message');
-    input.value = '';
-
-    var typing = document.createElement('div');
-    typing.className = 'chat-message bot-message';
-    typing.id = 'typingIndicator';
-    var wrap = document.createElement('div');
-    wrap.className = 'typing';
-    wrap.innerHTML = '<span></span><span></span><span></span>'; // static markup, no user data
-    typing.appendChild(wrap);
-    messages.appendChild(typing);
-    messages.scrollTop = messages.scrollHeight;
-
-    try {
-      var authHeaders = (window.CyberScopeAuth && typeof window.CyberScopeAuth.getAuthHeaders === 'function')
-        ? window.CyberScopeAuth.getAuthHeaders()
-        : {};
-      var res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders),
-        body: JSON.stringify({
-          model: 'meta/llama-3.2-11b-vision-instruct',
-          messages: [{ role: 'user', content: q }]
-        })
-      });
-      if (res.ok) {
-        var data = await res.json();
-        var reply = data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : null;
-        if (reply) {
-          var indicator = document.getElementById('typingIndicator');
-          if (indicator) indicator.remove();
-          addMessage(reply, 'bot-message');
-          return;
-        }
-      }
-    } catch(e) {
-      // Backend / proxy offline, fall back to local responses
-    }
-
-    setTimeout(function(){
-      var indicator = document.getElementById('typingIndicator');
-      if(indicator) indicator.remove();
-      addMessage(cyberscopeAnswer(q), 'bot-message');
-    }, 450);
-  }
-
-  button.addEventListener('click', toggle);
-  if(closeBtn) closeBtn.addEventListener('click', toggle);
-  if(sendBtn) sendBtn.addEventListener('click', send);
-  input.addEventListener('keydown', function(e){ if(e.key === 'Enter') send(); });
-  document.querySelectorAll('.chat-quick button[data-q]').forEach(function(b){
-    b.addEventListener('click', function(){
-      input.value = b.getAttribute('data-q');
-      send();
+  if(!button) return;
+  button.setAttribute('title', 'Open CyberScope AI Assistant');
+  button.setAttribute('aria-label', 'Open CyberScope AI Assistant');
+  if(button.tagName.toLowerCase() !== 'a'){
+    button.addEventListener('click', function(e){
+      e.preventDefault();
+      window.location.href = 'chatbot.html';
     });
-  });
+  }
 }
 
 /* cyberscopeProtect() is called explicitly by each page (like the
