@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cyberscope-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=CYBERSCOPE
+      - APP_ENV=production
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-cyberscope_app}:${POSTGRES_PASSWORD:-cs_sec_db_2026_x89f}@postgres:5432/${POSTGRES_DB:-cyberscope_prod}
+      - GRAPH_BACKEND=networkx
+      - AI_PROVIDER=fallback
+      - CORS_ORIGINS=["http://localhost:5173","http://localhost:3000","http://localhost"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cyberscope-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: cyberscope-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cyberscope_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cs_sec_db_2026_x89f}
+      POSTGRES_DB: ${POSTGRES_DB:-cyberscope_prod}
+    # Security: Database port 5432 is restricted to internal Docker network and NOT published to host
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cyberscope_app} -d ${POSTGRES_DB:-cyberscope_prod}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

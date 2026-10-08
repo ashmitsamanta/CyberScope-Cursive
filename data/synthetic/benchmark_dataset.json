@@ -1,0 +1,2329 @@
+{
+  "metadata": {
+    "benchmark_version": "1.0.0",
+    "seed": 42,
+    "generated_at": "2026-09-24T21:23:46.482249+00:00",
+    "profile": "demo",
+    "planted_scenario": "Operation Phantom KYC",
+    "total_cases": 42,
+    "total_entities": 78,
+    "total_relationships": 52,
+    "total_transactions": 54,
+    "total_campaigns": 3
+  },
+  "cases": [
+    {
+      "id": 1,
+      "case_number": "CS-1024",
+      "title": "Simulated KYC Suspension Alert - Victim Rajiv",
+      "description": "Urgent: Your SBI account will be suspended within 2 hours. Update KYC at https://secure-kyc-update.com immediately or pay \u20b9500 fee to centralmule99@okaxis.",
+      "status": "INVESTIGATING",
+      "severity": "HIGH",
+      "source": "VICTIM_COMPLAINT_PORTAL",
+      "risk_score": 84.0,
+      "campaign_id": 1,
+      "created_at": "2026-09-04T09:00:00+00:00",
+      "updated_at": "2026-09-04T09:00:00+00:00",
+      "metadata": {
+        "victim_name": "Rajiv Sharma",
+        "stolen_amount": 48500.0
+      }
+    },
+    {
+      "id": 2,
+      "case_number": "CS-1025",
+      "title": "Simulated KYC Suspension Alert - Victim Meera",
+      "description": "Official Bank Alert: Mandatory Aadhaar-PAN link failed. Verify immediately at https://secure-kyc-update.com to prevent debit freeze.",
+      "status": "NEW",
+      "severity": "CRITICAL",
+      "source": "VICTIM_COMPLAINT_PORTAL",
+      "risk_score": 91.0,
+      "campaign_id": 1,
+      "created_at": "2026-09-05T11:00:00+00:00",
+      "updated_at": "2026-09-05T11:00:00+00:00",
+      "metadata": {
+        "victim_name": "Meera Sen",
+        "stolen_amount": 52000.0
+      }
+    },
+    {
+      "id": 3,
+      "case_number": "CS-1026",
+      "title": "Simulated KYC Suspension Alert - Victim Anand",
+      "description": "Notice: Electricity supply scheduled for disconnection due to unpaid invoice. Verify payment via https://verify-portal-in.net or contact 9000000001.",
+      "status": "NEW",
+      "severity": "HIGH",
+      "source": "VICTIM_COMPLAINT_PORTAL",
+      "risk_score": 76.0,
+      "campaign_id": 1,
+      "created_at": "2026-09-06T13:00:00+00:00",
+      "updated_at": "2026-09-06T13:00:00+00:00",
+      "metadata": {
+        "victim_name": "Anand Verma",
+        "stolen_amount": 35000.0
+      }
+    },
+    {
+      "id": 4,
+      "case_number": "CS-1027",
+      "title": "Simulated KYC Suspension Alert - Victim Sunita",
+      "description": "Dear customer, your credit card loyalty reward points expire today. Claim refund of \u20b95,000 at https://quick-kyc-auth.org now.",
+      "status": "NEW",
+      "severity": "HIGH",
+      "source": "VICTIM_COMPLAINT_PORTAL",
+      "risk_score": 76.0,
+      "campaign_id": 1,
+      "created_at": "2026-09-07T15:00:00+00:00",
+      "updated_at": "2026-09-07T15:00:00+00:00",
+      "metadata": {
+        "victim_name": "Sunita Patil",
+        "stolen_amount": 49500.0
+      }
+    },
+    {
+      "id": 5,
+      "case_number": "CS-1028",
+      "title": "Simulated KYC Suspension Alert - Victim Kavita",
+      "description": "SBI Security Warning: Suspicious transaction detected. Re-verify identity at https://secure-kyc-update.com.",
+      "status": "NEW",
+      "severity": "HIGH",
+      "source": "VICTIM_COMPLAINT_PORTAL",
+      "risk_score": 76.0,
+      "campaign_id": 1,
+      "created_at": "2026-09-08T17:00:00+00:00",
+      "updated_at": "2026-09-08T17:00:00+00:00",
+      "metadata": {
+        "victim_name": "Kavita Rao",
+        "stolen_amount": 41000.0
+      }
+    },
+    {
+      "id": 6,
+      "case_number": "CS-1029",
+      "title": "Corporate Executive ATO & Rapid Wire Siphon",
+      "description": "Simulated multi-channel Account Takeover targeting treasury executive with simultaneous SIM swap and \u20b92,50,000 transfer.",
+      "status": "ESCALATED",
+      "severity": "CRITICAL",
+      "source": "TRANSACTION_MONITORING_SIEM",
+      "risk_score": 94.0,
+      "campaign_id": null,
+      "created_at": "2026-09-09T09:00:00+00:00",
+      "updated_at": "2026-09-09T09:00:00+00:00"
+    },
+    {
+      "id": 7,
+      "case_number": "CS-1030",
+      "title": "Electricity Disconnection Phishing - Cluster Case A",
+      "description": "Simulated report: Electricity Disconnection Phishing - Cluster Case A.",
+      "status": "INVESTIGATING",
+      "severity": "HIGH",
+      "source": "AUTOMATED_CORRELATION",
+      "risk_score": 82.0,
+      "campaign_id": 2,
+      "created_at": "2026-09-11T09:00:00+00:00",
+      "updated_at": "2026-09-11T09:00:00+00:00"
+    },
+    {
+      "id": 8,
+      "case_number": "CS-1031",
+      "title": "Electricity Disconnection Phishing - Cluster Case B",
+      "description": "Simulated report: Electricity Disconnection Phishing - Cluster Case B.",
+      "status": "INVESTIGATING",
+      "severity": "HIGH",
+      "source": "AUTOMATED_CORRELATION",
+      "risk_score": 78.0,
+      "campaign_id": 2,
+      "created_at": "2026-09-12T09:00:00+00:00",
+      "updated_at": "2026-09-12T09:00:00+00:00"
+    },
+    {
+      "id": 9,
+      "case_number": "CS-1032",
+      "title": "Detained Consignment Duty Scam - Case Alpha",
+      "description": "Simulated report: Detained Consignment Duty Scam - Case Alpha.",
+      "status": "INVESTIGATING",
+      "severity": "HIGH",
+      "source": "AUTOMATED_CORRELATION",
+      "risk_score": 75.0,
+      "campaign_id": 3,
+      "created_at": "2026-09-13T09:00:00+00:00",
+      "updated_at": "2026-09-13T09:00:00+00:00"
+    },
+    {
+      "id": 10,
+      "case_number": "CS-1033",
+      "title": "Incident Report CS-1033 - Suspicious Velocity",
+      "description": "Synthetic incident telemetry for case CS-1033.",
+      "status": "NEW",
+      "severity": "MEDIUM",
+      "source": "CUSTOMER_PORTAL",
+      "risk_score": 48.4,
+      "campaign_id": null,
+      "created_at": "2026-09-08T08:00:00+00:00",
+      "updated_at": "2026-09-08T08:00:00+00:00"
+    },
+    {
+      "id": 11,
+      "case_number": "CS-1034",
+      "title": "Incident Report CS-1034 - Suspicious Velocity",
+      "description": "Synthetic incident telemetry for case CS-1034.",
+      "status": "RESOLVED",
+      "severity": "MEDIUM",
+      "source": "FRAUD_INBOX",
+      "risk_score": 49.8,
+      "campaign_id": null,
+      "created_at": "2026-09-08T20:00:00+00:00",
+      "updated_at": "2026-09-08T20:00:00+00:00"
+    },
+    {
+      "id": 12,
+      "case_number": "CS-1035",
+      "title": "Incident Report CS-1035 - Suspicious Velocity",
+      "description": "Synthetic incident telemetry for case CS-1035.",
+      "status": "NEW",
+      "severity": "MEDIUM",
+      "source": "GATEWAY_ALERT",
+      "risk_score": 44.1,
+      "campaign_id": 2,
+      "created_at": "2026-09-13T21:00:00+00:00",
+      "updated_at": "2026-09-13T21:00:00+00:00"
+    },
+    {
+      "id": 13,
+      "case_number": "CS-1036",
+      "title": "Incident Report CS-1036 - Suspicious Velocity",
+      "description": "Synthetic incident telemetry for case CS-1036.",
+      "status": "NEW",
+      "severity": "MEDIUM",
+      "source": "FRAUD_INBOX",
+      "risk_score": 48.1,
+      "campaign_id": 2,
+      "created_at": "2026-09-17T03:00:00+00:00",
+      "updated_at": "2026-09-17T03:00:00+00:00"
+    },
+    {
+      "id": 14,
+      "case_number": "CS-1037",
+      "title": "Incident Report CS-1037 - Suspicious Velocity",
+      "description": "Synthetic incident telemetry for case CS-1037.",
+      "status": "INVESTIGATING",
+      "severity": "MEDIUM",
+      "source": "CUSTOMER_PORTAL",
+      "risk_score": 64.4,
+      "campaign_id": 2,
+      "created_at": "2026-09-05T03:00:00+00:00",
+      "updated_at": "2026-09-05T03:00:00+00:00"
+    },
+    {
+      "id": 15,
+      "case_number": "CS-1038",
+      "title": "Incident Report CS-1038 - Suspicious Velocity",
+      "description": "Synthetic incident telemetry for case CS-1038.",
+      "status": "FALSE_POSITIVE",
+      "severity": "MEDIUM",
+      "source": "GATEWAY_ALERT",
+      "risk_score": 61.1,
+      "campaign_id": 3,
+      "created_at": "2026-09-20T16:00:00+00:00",
+      "updated_at": "2026-09-20T16:00:00+00:00"
+    },
+    {
+      "id": 16,
+      "case_number": "CS-1039",
+      "title": "Incident Report CS-1039 - Suspicious Velocity",
+      "description": "Synthetic incident telemetry for case CS-1039.",
+      "status": "RESOLVED",
+      "severity": "MEDIUM",
+      "source": "FRAUD_INBOX",
+      "risk_score": 43.6,
+      "campaign_id": 3,
+      "created_at": "2026-09-11T12:00:00+00:00",
+      "updated_at": "2026-09-11T12:00:00+00:00"
+    },
+    {
+      "id": 17,
+      "case_number": "CS-1040",
+      "title": "Incident Report CS-1040 - Suspicious Velocity",
+      "description": "Synthetic incident telemetry for case CS-1040.",
+      "status": "INVESTIGATING",
+      "severity": "MEDIUM",
+      "source": "GATEWAY_ALERT",
+      "risk_score": 61.9,
+      "campaign_id": null,
+      "created_at": "2026-09-11T00:00:00+00:00",
+      "updated_at": "2026-09-11T00:00:00+00:00"
+    },
+    {
+      "id": 18,
+      "case_number": "CS-1041",
+      "title": "Incident Report CS-1041 - Suspicious Velocity",
+      "description": "Synthetic incident telemetry for case CS-1041.",
+      "status": "RESOLVED",
+      "severity": "MEDIUM",
+      "source": "FRAUD_INBOX",
+      "risk_score": 61.2,
+      "campaign_id": null,
+      "created_at": "2026-09-13T21:00:00+00:00",
+      "updated_at": "2026-09-13T21:00:00+00:00"
+    },
+    {
+      "id": 19,
+      "case_number": "CS-1042",
+      "title": "Incident Report CS-1042 - Suspicious Velocity",
+      "description": "Synthetic incident telemetry for case CS-1042.",
+      "status": "NEW",
+      "severity": "MEDIUM",
+      "source": "FRAUD_INBOX",
+      "risk_score": 57.4,
+      "campaign_id": null,
+      "created_at": "2026-09-22T06:00:00+00:00",
+      "updated_at": "2026-09-22T06:00:00+00:00"
+    },
+    {
+      "id": 20,
+      "case_number": "CS-1043",
+      "title": "Incident Report CS-1043 - Suspicious Velocity",
+      "description": "Synthetic incident telemetry for case CS-1043.",
+      "status": "RESOLVED",
+      "severity": "MEDIUM",
+      "source": "CUSTOMER_PORTAL",
+      "risk_score": 54.3,
+      "campaign_id": null,
+      "created_at": "2026-09-08T00:00:00+00:00",
+      "updated_at": "2026-09-08T00:00:00+00:00"
+    },
+    {
+      "id": 21,
+      "case_number": "CS-1044",
+      "title": "Incident Report CS-1044 - Suspicious Velocity",
+      "description": "Synthetic incident telemetry for case CS-1044.",
+      "status": "RESOLVED",
+      "severity": "MEDIUM",
+      "source": "FRAUD_INBOX",
+      "risk_score": 48.2,
+      "campaign_id": null,
+      "created_at": "2026-09-23T20:00:00+00:00",
+      "updated_at": "2026-09-23T20:00:00+00:00"
+    },
+    {
+      "id": 22,
+      "case_number": "CS-1045",
+      "title": "Incident Report CS-1045 - Suspicious Velocity",
+      "description": "Synthetic incident telemetry for case CS-1045.",
+      "status": "NEW",
+      "severity": "MEDIUM",
+      "source": "CUSTOMER_PORTAL",
+      "risk_score": 47.3,
+      "campaign_id": null,
+      "created_at": "2026-09-12T22:00:00+00:00",
+      "updated_at": "2026-09-12T22:00:00+00:00"
+    },
+    {
+      "id": 23,
+      "case_number": "CS-1046",
+      "title": "Incident Report CS-1046 - Suspicious Velocity",
+      "description": "Synthetic incident telemetry for case CS-1046.",
+      "status": "FALSE_POSITIVE",
+      "severity": "MEDIUM",
+      "source": "CUSTOMER_PORTAL",
+      "risk_score": 43.5,
+      "campaign_id": null,
+      "created_at": "2026-09-09T06:00:00+00:00",
+      "updated_at": "2026-09-09T06:00:00+00:00"
+    },
+    {
+      "id": 24,
+      "case_number": "CS-1047",
+      "title": "Incident Report CS-1047 - Suspicious Velocity",
+      "description": "Synthetic incident telemetry for case CS-1047.",
+      "status": "INVESTIGATING",
+      "severity": "MEDIUM",
+      "source": "FRAUD_INBOX",
+      "risk_score": 51.1,
+      "campaign_id": null,
+      "created_at": "2026-09-06T18:00:00+00:00",
+      "updated_at": "2026-09-06T18:00:00+00:00"
+    },
+    {
+      "id": 25,
+      "case_number": "CS-1048",
+      "title": "Incident Report CS-1048 - Suspicious Velocity",
+      "description": "Synthetic incident telemetry for case CS-1048.",
+      "status": "FALSE_POSITIVE",
+      "severity": "MEDIUM",
+      "source": "GATEWAY_ALERT",
+      "risk_score": 47.7,
+      "campaign_id": null,
+      "created_at": "2026-09-20T23:00:00+00:00",
+      "updated_at": "2026-09-20T23:00:00+00:00"
+    },
+    {
+      "id": 26,
+      "case_number": "CS-1049",
+      "title": "Incident Report CS-1049 - Suspicious Velocity",
+      "description": "Synthetic incident telemetry for case CS-1049.",
+      "status": "RESOLVED",
+      "severity": "MEDIUM",
+      "source": "CUSTOMER_PORTAL",
+      "risk_score": 51.2,
+      "campaign_id": null,
+      "created_at": "2026-09-07T02:00:00+00:00",
+      "updated_at": "2026-09-07T02:00:00+00:00"
+    },
+    {
+      "id": 27,
+      "case_number": "CS-1050",
+      "title": "Incident Report CS-1050 - Suspicious Velocity",
+      "description": "Synthetic incident telemetry for case CS-1050.",
+      "status": "NEW",
+      "severity": "MEDIUM",
+      "source": "GATEWAY_ALERT",
+      "risk_score": 44.1,
+      "campaign_id": null,
+      "created_at": "2026-09-05T14:00:00+00:00",
+      "updated_at": "2026-09-05T14:00:00+00:00"
+    },
+    {
+      "id": 28,
+      "case_number": "CS-1051",
+      "title": "Incident Report CS-1051 - Unrecognized Verification SMS",
+      "description": "Synthetic incident telemetry for case CS-1051.",
+      "status": "INVESTIGATING",
+      "severity": "LOW",
+      "source": "CUSTOMER_PORTAL",
+      "risk_score": 15.8,
+      "campaign_id": null,
+      "created_at": "2026-09-21T12:00:00+00:00",
+      "updated_at": "2026-09-21T12:00:00+00:00"
+    },
+    {
+      "id": 29,
+      "case_number": "CS-1052",
+      "title": "Incident Report CS-1052 - Unrecognized Verification SMS",
+      "description": "Synthetic incident telemetry for case CS-1052.",
+      "status": "INVESTIGATING",
+      "severity": "LOW",
+      "source": "GATEWAY_ALERT",
+      "risk_score": 21.2,
+      "campaign_id": null,
+      "created_at": "2026-09-18T18:00:00+00:00",
+      "updated_at": "2026-09-18T18:00:00+00:00"
+    },
+    {
+      "id": 30,
+      "case_number": "CS-1053",
+      "title": "Incident Report CS-1053 - Unrecognized Verification SMS",
+      "description": "Synthetic incident telemetry for case CS-1053.",
+      "status": "NEW",
+      "severity": "LOW",
+      "source": "GATEWAY_ALERT",
+      "risk_score": 32.7,
+      "campaign_id": null,
+      "created_at": "2026-09-23T13:00:00+00:00",
+      "updated_at": "2026-09-23T13:00:00+00:00"
+    },
+    {
+      "id": 31,
+      "case_number": "CS-1054",
+      "title": "Incident Report CS-1054 - Unrecognized Verification SMS",
+      "description": "Synthetic incident telemetry for case CS-1054.",
+      "status": "FALSE_POSITIVE",
+      "severity": "LOW",
+      "source": "FRAUD_INBOX",
+      "risk_score": 33.2,
+      "campaign_id": null,
+      "created_at": "2026-09-22T20:00:00+00:00",
+      "updated_at": "2026-09-22T20:00:00+00:00"
+    },
+    {
+      "id": 32,
+      "case_number": "CS-1055",
+      "title": "Incident Report CS-1055 - Unrecognized Verification SMS",
+      "description": "Synthetic incident telemetry for case CS-1055.",
+      "status": "RESOLVED",
+      "severity": "LOW",
+      "source": "GATEWAY_ALERT",
+      "risk_score": 19.0,
+      "campaign_id": null,
+      "created_at": "2026-09-16T10:00:00+00:00",
+      "updated_at": "2026-09-16T10:00:00+00:00"
+    },
+    {
+      "id": 33,
+      "case_number": "CS-1056",
+      "title": "Incident Report CS-1056 - Unrecognized Verification SMS",
+      "description": "Synthetic incident telemetry for case CS-1056.",
+      "status": "FALSE_POSITIVE",
+      "severity": "LOW",
+      "source": "GATEWAY_ALERT",
+      "risk_score": 33.0,
+      "campaign_id": null,
+      "created_at": "2026-09-18T15:00:00+00:00",
+      "updated_at": "2026-09-18T15:00:00+00:00"
+    },
+    {
+      "id": 34,
+      "case_number": "CS-1057",
+      "title": "Incident Report CS-1057 - Unrecognized Verification SMS",
+      "description": "Synthetic incident telemetry for case CS-1057.",
+      "status": "FALSE_POSITIVE",
+      "severity": "LOW",
+      "source": "GATEWAY_ALERT",
+      "risk_score": 33.9,
+      "campaign_id": null,
+      "created_at": "2026-09-23T02:00:00+00:00",
+      "updated_at": "2026-09-23T02:00:00+00:00"
+    },
+    {
+      "id": 35,
+      "case_number": "CS-1058",
+      "title": "Incident Report CS-1058 - Unrecognized Verification SMS",
+      "description": "Synthetic incident telemetry for case CS-1058.",
+      "status": "FALSE_POSITIVE",
+      "severity": "LOW",
+      "source": "GATEWAY_ALERT",
+      "risk_score": 16.8,
+      "campaign_id": null,
+      "created_at": "2026-09-08T03:00:00+00:00",
+      "updated_at": "2026-09-08T03:00:00+00:00"
+    },
+    {
+      "id": 36,
+      "case_number": "CS-1059",
+      "title": "Incident Report CS-1059 - Unrecognized Verification SMS",
+      "description": "Synthetic incident telemetry for case CS-1059.",
+      "status": "FALSE_POSITIVE",
+      "severity": "LOW",
+      "source": "FRAUD_INBOX",
+      "risk_score": 34.0,
+      "campaign_id": null,
+      "created_at": "2026-09-17T10:00:00+00:00",
+      "updated_at": "2026-09-17T10:00:00+00:00"
+    },
+    {
+      "id": 37,
+      "case_number": "CS-1060",
+      "title": "Incident Report CS-1060 - Unrecognized Verification SMS",
+      "description": "Synthetic incident telemetry for case CS-1060.",
+      "status": "FALSE_POSITIVE",
+      "severity": "LOW",
+      "source": "FRAUD_INBOX",
+      "risk_score": 34.3,
+      "campaign_id": null,
+      "created_at": "2026-09-09T11:00:00+00:00",
+      "updated_at": "2026-09-09T11:00:00+00:00"
+    },
+    {
+      "id": 38,
+      "case_number": "CS-1061",
+      "title": "Incident Report CS-1061 - Unrecognized Verification SMS",
+      "description": "Synthetic incident telemetry for case CS-1061.",
+      "status": "NEW",
+      "severity": "LOW",
+      "source": "FRAUD_INBOX",
+      "risk_score": 33.1,
+      "campaign_id": null,
+      "created_at": "2026-09-05T01:00:00+00:00",
+      "updated_at": "2026-09-05T01:00:00+00:00"
+    },
+    {
+      "id": 39,
+      "case_number": "CS-1062",
+      "title": "Incident Report CS-1062 - Unrecognized Verification SMS",
+      "description": "Synthetic incident telemetry for case CS-1062.",
+      "status": "RESOLVED",
+      "severity": "LOW",
+      "source": "CUSTOMER_PORTAL",
+      "risk_score": 35.5,
+      "campaign_id": null,
+      "created_at": "2026-09-07T07:00:00+00:00",
+      "updated_at": "2026-09-07T07:00:00+00:00"
+    },
+    {
+      "id": 40,
+      "case_number": "CS-1063",
+      "title": "Incident Report CS-1063 - Unrecognized Verification SMS",
+      "description": "Synthetic incident telemetry for case CS-1063.",
+      "status": "RESOLVED",
+      "severity": "LOW",
+      "source": "GATEWAY_ALERT",
+      "risk_score": 34.7,
+      "campaign_id": null,
+      "created_at": "2026-09-11T02:00:00+00:00",
+      "updated_at": "2026-09-11T02:00:00+00:00"
+    },
+    {
+      "id": 41,
+      "case_number": "CS-1064",
+      "title": "Incident Report CS-1064 - Unrecognized Verification SMS",
+      "description": "Synthetic incident telemetry for case CS-1064.",
+      "status": "RESOLVED",
+      "severity": "LOW",
+      "source": "FRAUD_INBOX",
+      "risk_score": 22.2,
+      "campaign_id": null,
+      "created_at": "2026-09-20T08:00:00+00:00",
+      "updated_at": "2026-09-20T08:00:00+00:00"
+    },
+    {
+      "id": 42,
+      "case_number": "CS-1065",
+      "title": "Incident Report CS-1065 - Unrecognized Verification SMS",
+      "description": "Synthetic incident telemetry for case CS-1065.",
+      "status": "INVESTIGATING",
+      "severity": "LOW",
+      "source": "CUSTOMER_PORTAL",
+      "risk_score": 29.1,
+      "campaign_id": null,
+      "created_at": "2026-09-24T06:00:00+00:00",
+      "updated_at": "2026-09-24T06:00:00+00:00"
+    }
+  ],
+  "entities": [
+    {
+      "id": 1,
+      "entity_type": "DOMAIN",
+      "value": "secure-kyc-update.com",
+      "normalized_value": "secure-kyc-update.com",
+      "risk_score": 88.0,
+      "metadata": {
+        "tld": ".com",
+        "registrar": "Simulated Registrar"
+      }
+    },
+    {
+      "id": 2,
+      "entity_type": "DOMAIN",
+      "value": "verify-portal-in.net",
+      "normalized_value": "verify-portal-in.net",
+      "risk_score": 85.0,
+      "metadata": {}
+    },
+    {
+      "id": 3,
+      "entity_type": "DOMAIN",
+      "value": "quick-kyc-auth.org",
+      "normalized_value": "quick-kyc-auth.org",
+      "risk_score": 80.0,
+      "metadata": {}
+    },
+    {
+      "id": 4,
+      "entity_type": "PHONE",
+      "value": "+919686579303",
+      "normalized_value": "+919686579303",
+      "risk_score": 85.0,
+      "metadata": {
+        "carrier": "Synthetic Telecom A"
+      }
+    },
+    {
+      "id": 5,
+      "entity_type": "PHONE",
+      "value": "+919119540831",
+      "normalized_value": "+919119540831",
+      "risk_score": 80.0,
+      "metadata": {}
+    },
+    {
+      "id": 6,
+      "entity_type": "PHONE",
+      "value": "+919026855092",
+      "normalized_value": "+919026855092",
+      "risk_score": 75.0,
+      "metadata": {}
+    },
+    {
+      "id": 7,
+      "entity_type": "UPI_ID",
+      "value": "centralmule99@okaxis",
+      "normalized_value": "centralmule99@okaxis",
+      "risk_score": 90.0,
+      "metadata": {
+        "bank": "Axis Simulation"
+      }
+    },
+    {
+      "id": 8,
+      "entity_type": "UPI_ID",
+      "value": "kycpaydesk@paytm",
+      "normalized_value": "kycpaydesk@paytm",
+      "risk_score": 82.0,
+      "metadata": {}
+    },
+    {
+      "id": 9,
+      "entity_type": "DEVICE",
+      "value": "DEV-SIM-1000",
+      "normalized_value": "dev-sim-1000",
+      "risk_score": 75.0,
+      "metadata": {
+        "os": "Android 13"
+      }
+    },
+    {
+      "id": 10,
+      "entity_type": "IP_ADDRESS",
+      "value": "198.51.100.10",
+      "normalized_value": "198.51.100.10",
+      "risk_score": 70.0,
+      "metadata": {}
+    },
+    {
+      "id": 11,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-MULE-HUB-891",
+      "normalized_value": "sim-acc-mule-hub-891",
+      "risk_score": 88.0,
+      "metadata": {
+        "branch": "Metro Cyber Hub"
+      }
+    },
+    {
+      "id": 12,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-LAYER1-A-101",
+      "normalized_value": "sim-acc-layer1-a-101",
+      "risk_score": 72.0,
+      "metadata": {}
+    },
+    {
+      "id": 13,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-LAYER1-B-102",
+      "normalized_value": "sim-acc-layer1-b-102",
+      "risk_score": 72.0,
+      "metadata": {}
+    },
+    {
+      "id": 14,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-LAYER1-C-103",
+      "normalized_value": "sim-acc-layer1-c-103",
+      "risk_score": 70.0,
+      "metadata": {}
+    },
+    {
+      "id": 15,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-CASH-OUT-999",
+      "normalized_value": "sim-acc-cash-out-999",
+      "risk_score": 85.0,
+      "metadata": {}
+    },
+    {
+      "id": 16,
+      "entity_type": "PERSON",
+      "value": "Rajiv Sharma",
+      "normalized_value": "rajiv sharma",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 17,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-VICTIM-200",
+      "normalized_value": "sim-acc-victim-200",
+      "risk_score": 15.0,
+      "metadata": {}
+    },
+    {
+      "id": 18,
+      "entity_type": "PHONE",
+      "value": "+919726600539",
+      "normalized_value": "+919726600539",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 19,
+      "entity_type": "CASE",
+      "value": "CS-1024",
+      "normalized_value": "cs-1024",
+      "risk_score": 84.0,
+      "metadata": {
+        "title": "Simulated KYC Suspension Alert - Victim Rajiv"
+      }
+    },
+    {
+      "id": 20,
+      "entity_type": "PERSON",
+      "value": "Meera Sen",
+      "normalized_value": "meera sen",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 21,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-VICTIM-201",
+      "normalized_value": "sim-acc-victim-201",
+      "risk_score": 15.0,
+      "metadata": {}
+    },
+    {
+      "id": 22,
+      "entity_type": "PHONE",
+      "value": "+919795285932",
+      "normalized_value": "+919795285932",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 23,
+      "entity_type": "CASE",
+      "value": "CS-1025",
+      "normalized_value": "cs-1025",
+      "risk_score": 91.0,
+      "metadata": {
+        "title": "Simulated KYC Suspension Alert - Victim Meera"
+      }
+    },
+    {
+      "id": 24,
+      "entity_type": "PERSON",
+      "value": "Anand Verma",
+      "normalized_value": "anand verma",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 25,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-VICTIM-202",
+      "normalized_value": "sim-acc-victim-202",
+      "risk_score": 15.0,
+      "metadata": {}
+    },
+    {
+      "id": 26,
+      "entity_type": "PHONE",
+      "value": "+919957970516",
+      "normalized_value": "+919957970516",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 27,
+      "entity_type": "CASE",
+      "value": "CS-1026",
+      "normalized_value": "cs-1026",
+      "risk_score": 76.0,
+      "metadata": {
+        "title": "Simulated KYC Suspension Alert - Victim Anand"
+      }
+    },
+    {
+      "id": 28,
+      "entity_type": "PERSON",
+      "value": "Sunita Patil",
+      "normalized_value": "sunita patil",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 29,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-VICTIM-203",
+      "normalized_value": "sim-acc-victim-203",
+      "risk_score": 15.0,
+      "metadata": {}
+    },
+    {
+      "id": 30,
+      "entity_type": "PHONE",
+      "value": "+919585582861",
+      "normalized_value": "+919585582861",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 31,
+      "entity_type": "CASE",
+      "value": "CS-1027",
+      "normalized_value": "cs-1027",
+      "risk_score": 76.0,
+      "metadata": {
+        "title": "Simulated KYC Suspension Alert - Victim Sunita"
+      }
+    },
+    {
+      "id": 32,
+      "entity_type": "PERSON",
+      "value": "Kavita Rao",
+      "normalized_value": "kavita rao",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 33,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-VICTIM-204",
+      "normalized_value": "sim-acc-victim-204",
+      "risk_score": 15.0,
+      "metadata": {}
+    },
+    {
+      "id": 34,
+      "entity_type": "PHONE",
+      "value": "+919093349856",
+      "normalized_value": "+919093349856",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 35,
+      "entity_type": "CASE",
+      "value": "CS-1028",
+      "normalized_value": "cs-1028",
+      "risk_score": 76.0,
+      "metadata": {
+        "title": "Simulated KYC Suspension Alert - Victim Kavita"
+      }
+    },
+    {
+      "id": 36,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-CIRCULAR-A",
+      "normalized_value": "sim-acc-circular-a",
+      "risk_score": 65.0,
+      "metadata": {}
+    },
+    {
+      "id": 37,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-CIRCULAR-B",
+      "normalized_value": "sim-acc-circular-b",
+      "risk_score": 65.0,
+      "metadata": {}
+    },
+    {
+      "id": 38,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-CIRCULAR-C",
+      "normalized_value": "sim-acc-circular-c",
+      "risk_score": 65.0,
+      "metadata": {}
+    },
+    {
+      "id": 39,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-500",
+      "normalized_value": "sim-acc-norm-500",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 40,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-501",
+      "normalized_value": "sim-acc-norm-501",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 41,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-502",
+      "normalized_value": "sim-acc-norm-502",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 42,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-503",
+      "normalized_value": "sim-acc-norm-503",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 43,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-504",
+      "normalized_value": "sim-acc-norm-504",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 44,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-505",
+      "normalized_value": "sim-acc-norm-505",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 45,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-506",
+      "normalized_value": "sim-acc-norm-506",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 46,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-507",
+      "normalized_value": "sim-acc-norm-507",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 47,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-508",
+      "normalized_value": "sim-acc-norm-508",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 48,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-509",
+      "normalized_value": "sim-acc-norm-509",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 49,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-510",
+      "normalized_value": "sim-acc-norm-510",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 50,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-511",
+      "normalized_value": "sim-acc-norm-511",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 51,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-512",
+      "normalized_value": "sim-acc-norm-512",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 52,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-513",
+      "normalized_value": "sim-acc-norm-513",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 53,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-514",
+      "normalized_value": "sim-acc-norm-514",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 54,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-515",
+      "normalized_value": "sim-acc-norm-515",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 55,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-516",
+      "normalized_value": "sim-acc-norm-516",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 56,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-517",
+      "normalized_value": "sim-acc-norm-517",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 57,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-518",
+      "normalized_value": "sim-acc-norm-518",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 58,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-519",
+      "normalized_value": "sim-acc-norm-519",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 59,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-520",
+      "normalized_value": "sim-acc-norm-520",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 60,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-521",
+      "normalized_value": "sim-acc-norm-521",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 61,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-522",
+      "normalized_value": "sim-acc-norm-522",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 62,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-523",
+      "normalized_value": "sim-acc-norm-523",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 63,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-524",
+      "normalized_value": "sim-acc-norm-524",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 64,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-525",
+      "normalized_value": "sim-acc-norm-525",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 65,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-526",
+      "normalized_value": "sim-acc-norm-526",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 66,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-527",
+      "normalized_value": "sim-acc-norm-527",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 67,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-528",
+      "normalized_value": "sim-acc-norm-528",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 68,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-529",
+      "normalized_value": "sim-acc-norm-529",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 69,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-530",
+      "normalized_value": "sim-acc-norm-530",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 70,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-531",
+      "normalized_value": "sim-acc-norm-531",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 71,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-532",
+      "normalized_value": "sim-acc-norm-532",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 72,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-533",
+      "normalized_value": "sim-acc-norm-533",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 73,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-534",
+      "normalized_value": "sim-acc-norm-534",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 74,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-535",
+      "normalized_value": "sim-acc-norm-535",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 75,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-536",
+      "normalized_value": "sim-acc-norm-536",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 76,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-537",
+      "normalized_value": "sim-acc-norm-537",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 77,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-538",
+      "normalized_value": "sim-acc-norm-538",
+      "risk_score": 10.0,
+      "metadata": {}
+    },
+    {
+      "id": 78,
+      "entity_type": "BANK_ACCOUNT",
+      "value": "SIM-ACC-NORM-539",
+      "normalized_value": "sim-acc-norm-539",
+      "risk_score": 10.0,
+      "metadata": {}
+    }
+  ],
+  "relationships": [
+    {
+      "source_entity_id": 4,
+      "target_entity_id": 1,
+      "relationship_type": "RESOLVES_TO",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 1,
+      "target_entity_id": 7,
+      "relationship_type": "ASSOCIATED_WITH",
+      "confidence": 0.9
+    },
+    {
+      "source_entity_id": 4,
+      "target_entity_id": 2,
+      "relationship_type": "RESOLVES_TO",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 2,
+      "target_entity_id": 7,
+      "relationship_type": "ASSOCIATED_WITH",
+      "confidence": 0.9
+    },
+    {
+      "source_entity_id": 4,
+      "target_entity_id": 3,
+      "relationship_type": "RESOLVES_TO",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 3,
+      "target_entity_id": 7,
+      "relationship_type": "ASSOCIATED_WITH",
+      "confidence": 0.9
+    },
+    {
+      "source_entity_id": 7,
+      "target_entity_id": 11,
+      "relationship_type": "LINKED_TO",
+      "confidence": 0.98
+    },
+    {
+      "source_entity_id": 9,
+      "target_entity_id": 11,
+      "relationship_type": "USED_BY",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 16,
+      "target_entity_id": 17,
+      "relationship_type": "OWNS",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 16,
+      "target_entity_id": 18,
+      "relationship_type": "USED_BY",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 16,
+      "target_entity_id": 19,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 4,
+      "target_entity_id": 19,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 1,
+      "target_entity_id": 19,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 7,
+      "target_entity_id": 19,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 17,
+      "target_entity_id": 11,
+      "relationship_type": "TRANSFERRED_TO",
+      "confidence": 1.0,
+      "metadata": {
+        "amount": 48500.0
+      }
+    },
+    {
+      "source_entity_id": 20,
+      "target_entity_id": 21,
+      "relationship_type": "OWNS",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 20,
+      "target_entity_id": 22,
+      "relationship_type": "USED_BY",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 20,
+      "target_entity_id": 23,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 4,
+      "target_entity_id": 23,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 1,
+      "target_entity_id": 23,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 7,
+      "target_entity_id": 23,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 21,
+      "target_entity_id": 11,
+      "relationship_type": "TRANSFERRED_TO",
+      "confidence": 1.0,
+      "metadata": {
+        "amount": 52000.0
+      }
+    },
+    {
+      "source_entity_id": 24,
+      "target_entity_id": 25,
+      "relationship_type": "OWNS",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 24,
+      "target_entity_id": 26,
+      "relationship_type": "USED_BY",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 24,
+      "target_entity_id": 27,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 4,
+      "target_entity_id": 27,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 1,
+      "target_entity_id": 27,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 7,
+      "target_entity_id": 27,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 25,
+      "target_entity_id": 11,
+      "relationship_type": "TRANSFERRED_TO",
+      "confidence": 1.0,
+      "metadata": {
+        "amount": 35000.0
+      }
+    },
+    {
+      "source_entity_id": 28,
+      "target_entity_id": 29,
+      "relationship_type": "OWNS",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 28,
+      "target_entity_id": 30,
+      "relationship_type": "USED_BY",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 28,
+      "target_entity_id": 31,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 4,
+      "target_entity_id": 31,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 1,
+      "target_entity_id": 31,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 7,
+      "target_entity_id": 31,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 29,
+      "target_entity_id": 11,
+      "relationship_type": "TRANSFERRED_TO",
+      "confidence": 1.0,
+      "metadata": {
+        "amount": 49500.0
+      }
+    },
+    {
+      "source_entity_id": 32,
+      "target_entity_id": 33,
+      "relationship_type": "OWNS",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 32,
+      "target_entity_id": 34,
+      "relationship_type": "USED_BY",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 32,
+      "target_entity_id": 35,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 4,
+      "target_entity_id": 35,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 1,
+      "target_entity_id": 35,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 7,
+      "target_entity_id": 35,
+      "relationship_type": "REPORTED_IN",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 33,
+      "target_entity_id": 11,
+      "relationship_type": "TRANSFERRED_TO",
+      "confidence": 1.0,
+      "metadata": {
+        "amount": 41000.0
+      }
+    },
+    {
+      "source_entity_id": 11,
+      "target_entity_id": 12,
+      "relationship_type": "TRANSFERRED_TO",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 12,
+      "target_entity_id": 15,
+      "relationship_type": "TRANSFERRED_TO",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 11,
+      "target_entity_id": 13,
+      "relationship_type": "TRANSFERRED_TO",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 13,
+      "target_entity_id": 15,
+      "relationship_type": "TRANSFERRED_TO",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 11,
+      "target_entity_id": 14,
+      "relationship_type": "TRANSFERRED_TO",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 14,
+      "target_entity_id": 15,
+      "relationship_type": "TRANSFERRED_TO",
+      "confidence": 0.95
+    },
+    {
+      "source_entity_id": 36,
+      "target_entity_id": 37,
+      "relationship_type": "TRANSFERRED_TO",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 37,
+      "target_entity_id": 38,
+      "relationship_type": "TRANSFERRED_TO",
+      "confidence": 1.0
+    },
+    {
+      "source_entity_id": 38,
+      "target_entity_id": 36,
+      "relationship_type": "TRANSFERRED_TO",
+      "confidence": 1.0
+    }
+  ],
+  "transactions": [
+    {
+      "id": 1,
+      "transaction_ref": "TX-SIM-9000",
+      "timestamp": "2026-09-04T09:12:00+00:00",
+      "sender_entity_id": 17,
+      "receiver_entity_id": 11,
+      "amount": 48500.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "case_id": 1,
+      "status": "FLAGGED",
+      "metadata": {
+        "channel_desc": "Immediate Payment Service"
+      }
+    },
+    {
+      "id": 2,
+      "transaction_ref": "TX-SIM-9001",
+      "timestamp": "2026-09-05T11:12:00+00:00",
+      "sender_entity_id": 21,
+      "receiver_entity_id": 11,
+      "amount": 52000.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "case_id": 2,
+      "status": "FLAGGED",
+      "metadata": {
+        "channel_desc": "Immediate Payment Service"
+      }
+    },
+    {
+      "id": 3,
+      "transaction_ref": "TX-SIM-9002",
+      "timestamp": "2026-09-06T13:12:00+00:00",
+      "sender_entity_id": 25,
+      "receiver_entity_id": 11,
+      "amount": 35000.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "case_id": 3,
+      "status": "FLAGGED",
+      "metadata": {
+        "channel_desc": "Immediate Payment Service"
+      }
+    },
+    {
+      "id": 4,
+      "transaction_ref": "TX-SIM-9003",
+      "timestamp": "2026-09-07T15:12:00+00:00",
+      "sender_entity_id": 29,
+      "receiver_entity_id": 11,
+      "amount": 49500.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "case_id": 4,
+      "status": "FLAGGED",
+      "metadata": {
+        "channel_desc": "Immediate Payment Service"
+      }
+    },
+    {
+      "id": 5,
+      "transaction_ref": "TX-SIM-9004",
+      "timestamp": "2026-09-08T17:12:00+00:00",
+      "sender_entity_id": 33,
+      "receiver_entity_id": 11,
+      "amount": 41000.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "case_id": 5,
+      "status": "FLAGGED",
+      "metadata": {
+        "channel_desc": "Immediate Payment Service"
+      }
+    },
+    {
+      "id": 6,
+      "transaction_ref": "TX-SIM-9005",
+      "timestamp": "2026-09-04T10:04:00+00:00",
+      "sender_entity_id": 11,
+      "receiver_entity_id": 12,
+      "amount": 18500.0,
+      "currency": "INR",
+      "channel": "IMPS",
+      "case_id": 1,
+      "status": "FLAGGED",
+      "metadata": {
+        "layering_hop": 2
+      }
+    },
+    {
+      "id": 7,
+      "transaction_ref": "TX-SIM-9006",
+      "timestamp": "2026-09-04T10:12:00+00:00",
+      "sender_entity_id": 12,
+      "receiver_entity_id": 15,
+      "amount": 18000.0,
+      "currency": "INR",
+      "channel": "NEFT",
+      "case_id": 1,
+      "status": "FLAGGED",
+      "metadata": {
+        "layering_hop": 3
+      }
+    },
+    {
+      "id": 8,
+      "transaction_ref": "TX-SIM-9007",
+      "timestamp": "2026-09-04T10:08:00+00:00",
+      "sender_entity_id": 11,
+      "receiver_entity_id": 13,
+      "amount": 15000.0,
+      "currency": "INR",
+      "channel": "IMPS",
+      "case_id": 1,
+      "status": "FLAGGED",
+      "metadata": {
+        "layering_hop": 2
+      }
+    },
+    {
+      "id": 9,
+      "transaction_ref": "TX-SIM-9008",
+      "timestamp": "2026-09-04T10:16:00+00:00",
+      "sender_entity_id": 13,
+      "receiver_entity_id": 15,
+      "amount": 14500.0,
+      "currency": "INR",
+      "channel": "NEFT",
+      "case_id": 1,
+      "status": "FLAGGED",
+      "metadata": {
+        "layering_hop": 3
+      }
+    },
+    {
+      "id": 10,
+      "transaction_ref": "TX-SIM-9009",
+      "timestamp": "2026-09-04T10:12:00+00:00",
+      "sender_entity_id": 11,
+      "receiver_entity_id": 14,
+      "amount": 15000.0,
+      "currency": "INR",
+      "channel": "IMPS",
+      "case_id": 1,
+      "status": "FLAGGED",
+      "metadata": {
+        "layering_hop": 2
+      }
+    },
+    {
+      "id": 11,
+      "transaction_ref": "TX-SIM-9010",
+      "timestamp": "2026-09-04T10:20:00+00:00",
+      "sender_entity_id": 14,
+      "receiver_entity_id": 15,
+      "amount": 14500.0,
+      "currency": "INR",
+      "channel": "NEFT",
+      "case_id": 1,
+      "status": "FLAGGED",
+      "metadata": {
+        "layering_hop": 3
+      }
+    },
+    {
+      "id": 12,
+      "transaction_ref": "TX-SIM-9011",
+      "timestamp": "2026-09-07T09:00:00+00:00",
+      "sender_entity_id": 36,
+      "receiver_entity_id": 37,
+      "amount": 25000.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "FLAGGED"
+    },
+    {
+      "id": 13,
+      "transaction_ref": "TX-SIM-9012",
+      "timestamp": "2026-09-07T09:10:00+00:00",
+      "sender_entity_id": 37,
+      "receiver_entity_id": 38,
+      "amount": 24800.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "FLAGGED"
+    },
+    {
+      "id": 14,
+      "transaction_ref": "TX-SIM-9013",
+      "timestamp": "2026-09-07T09:22:00+00:00",
+      "sender_entity_id": 38,
+      "receiver_entity_id": 36,
+      "amount": 24500.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "FLAGGED"
+    },
+    {
+      "id": 15,
+      "transaction_ref": "TX-SIM-9014",
+      "timestamp": "2026-09-16T09:00:00+00:00",
+      "sender_entity_id": 39,
+      "receiver_entity_id": 11,
+      "amount": 8979.0,
+      "currency": "INR",
+      "channel": "IMPS",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 16,
+      "transaction_ref": "TX-SIM-9015",
+      "timestamp": "2026-09-05T09:00:00+00:00",
+      "sender_entity_id": 40,
+      "receiver_entity_id": 41,
+      "amount": 4561.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 17,
+      "transaction_ref": "TX-SIM-9016",
+      "timestamp": "2026-09-04T09:00:00+00:00",
+      "sender_entity_id": 41,
+      "receiver_entity_id": 42,
+      "amount": 6039.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 18,
+      "transaction_ref": "TX-SIM-9017",
+      "timestamp": "2026-09-20T09:00:00+00:00",
+      "sender_entity_id": 42,
+      "receiver_entity_id": 43,
+      "amount": 9575.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 19,
+      "transaction_ref": "TX-SIM-9018",
+      "timestamp": "2026-09-20T09:00:00+00:00",
+      "sender_entity_id": 43,
+      "receiver_entity_id": 44,
+      "amount": 4108.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 20,
+      "transaction_ref": "TX-SIM-9019",
+      "timestamp": "2026-09-04T09:00:00+00:00",
+      "sender_entity_id": 44,
+      "receiver_entity_id": 45,
+      "amount": 10839.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 21,
+      "transaction_ref": "TX-SIM-9020",
+      "timestamp": "2026-09-09T09:00:00+00:00",
+      "sender_entity_id": 45,
+      "receiver_entity_id": 46,
+      "amount": 1604.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 22,
+      "transaction_ref": "TX-SIM-9021",
+      "timestamp": "2026-09-12T09:00:00+00:00",
+      "sender_entity_id": 46,
+      "receiver_entity_id": 47,
+      "amount": 1660.0,
+      "currency": "INR",
+      "channel": "NEFT",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 23,
+      "transaction_ref": "TX-SIM-9022",
+      "timestamp": "2026-09-09T09:00:00+00:00",
+      "sender_entity_id": 47,
+      "receiver_entity_id": 48,
+      "amount": 5062.0,
+      "currency": "INR",
+      "channel": "NEFT",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 24,
+      "transaction_ref": "TX-SIM-9023",
+      "timestamp": "2026-09-17T09:00:00+00:00",
+      "sender_entity_id": 48,
+      "receiver_entity_id": 49,
+      "amount": 4010.0,
+      "currency": "INR",
+      "channel": "NEFT",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 25,
+      "transaction_ref": "TX-SIM-9024",
+      "timestamp": "2026-09-06T09:00:00+00:00",
+      "sender_entity_id": 49,
+      "receiver_entity_id": 11,
+      "amount": 9855.0,
+      "currency": "INR",
+      "channel": "NEFT",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 26,
+      "transaction_ref": "TX-SIM-9025",
+      "timestamp": "2026-09-17T09:00:00+00:00",
+      "sender_entity_id": 50,
+      "receiver_entity_id": 51,
+      "amount": 4481.0,
+      "currency": "INR",
+      "channel": "IMPS",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 27,
+      "transaction_ref": "TX-SIM-9026",
+      "timestamp": "2026-09-15T09:00:00+00:00",
+      "sender_entity_id": 51,
+      "receiver_entity_id": 52,
+      "amount": 3619.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 28,
+      "transaction_ref": "TX-SIM-9027",
+      "timestamp": "2026-09-05T09:00:00+00:00",
+      "sender_entity_id": 52,
+      "receiver_entity_id": 53,
+      "amount": 11296.0,
+      "currency": "INR",
+      "channel": "IMPS",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 29,
+      "transaction_ref": "TX-SIM-9028",
+      "timestamp": "2026-09-13T09:00:00+00:00",
+      "sender_entity_id": 53,
+      "receiver_entity_id": 54,
+      "amount": 7439.0,
+      "currency": "INR",
+      "channel": "IMPS",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 30,
+      "transaction_ref": "TX-SIM-9029",
+      "timestamp": "2026-09-16T09:00:00+00:00",
+      "sender_entity_id": 54,
+      "receiver_entity_id": 55,
+      "amount": 1387.0,
+      "currency": "INR",
+      "channel": "NEFT",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 31,
+      "transaction_ref": "TX-SIM-9030",
+      "timestamp": "2026-09-05T09:00:00+00:00",
+      "sender_entity_id": 55,
+      "receiver_entity_id": 56,
+      "amount": 1493.0,
+      "currency": "INR",
+      "channel": "IMPS",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 32,
+      "transaction_ref": "TX-SIM-9031",
+      "timestamp": "2026-09-12T09:00:00+00:00",
+      "sender_entity_id": 56,
+      "receiver_entity_id": 57,
+      "amount": 2290.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 33,
+      "transaction_ref": "TX-SIM-9032",
+      "timestamp": "2026-09-08T09:00:00+00:00",
+      "sender_entity_id": 57,
+      "receiver_entity_id": 58,
+      "amount": 3616.0,
+      "currency": "INR",
+      "channel": "NEFT",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 34,
+      "transaction_ref": "TX-SIM-9033",
+      "timestamp": "2026-09-16T09:00:00+00:00",
+      "sender_entity_id": 58,
+      "receiver_entity_id": 59,
+      "amount": 2796.0,
+      "currency": "INR",
+      "channel": "IMPS",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 35,
+      "transaction_ref": "TX-SIM-9034",
+      "timestamp": "2026-09-07T09:00:00+00:00",
+      "sender_entity_id": 59,
+      "receiver_entity_id": 11,
+      "amount": 5063.0,
+      "currency": "INR",
+      "channel": "IMPS",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 36,
+      "transaction_ref": "TX-SIM-9035",
+      "timestamp": "2026-09-09T09:00:00+00:00",
+      "sender_entity_id": 60,
+      "receiver_entity_id": 61,
+      "amount": 1735.0,
+      "currency": "INR",
+      "channel": "IMPS",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 37,
+      "transaction_ref": "TX-SIM-9036",
+      "timestamp": "2026-09-19T09:00:00+00:00",
+      "sender_entity_id": 61,
+      "receiver_entity_id": 62,
+      "amount": 2104.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 38,
+      "transaction_ref": "TX-SIM-9037",
+      "timestamp": "2026-09-19T09:00:00+00:00",
+      "sender_entity_id": 62,
+      "receiver_entity_id": 63,
+      "amount": 741.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 39,
+      "transaction_ref": "TX-SIM-9038",
+      "timestamp": "2026-09-09T09:00:00+00:00",
+      "sender_entity_id": 63,
+      "receiver_entity_id": 64,
+      "amount": 3224.0,
+      "currency": "INR",
+      "channel": "IMPS",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 40,
+      "transaction_ref": "TX-SIM-9039",
+      "timestamp": "2026-09-17T09:00:00+00:00",
+      "sender_entity_id": 64,
+      "receiver_entity_id": 65,
+      "amount": 8386.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 41,
+      "transaction_ref": "TX-SIM-9040",
+      "timestamp": "2026-09-14T09:00:00+00:00",
+      "sender_entity_id": 65,
+      "receiver_entity_id": 66,
+      "amount": 1460.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 42,
+      "transaction_ref": "TX-SIM-9041",
+      "timestamp": "2026-09-14T09:00:00+00:00",
+      "sender_entity_id": 66,
+      "receiver_entity_id": 67,
+      "amount": 535.0,
+      "currency": "INR",
+      "channel": "IMPS",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 43,
+      "transaction_ref": "TX-SIM-9042",
+      "timestamp": "2026-09-10T09:00:00+00:00",
+      "sender_entity_id": 67,
+      "receiver_entity_id": 68,
+      "amount": 7954.0,
+      "currency": "INR",
+      "channel": "IMPS",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 44,
+      "transaction_ref": "TX-SIM-9043",
+      "timestamp": "2026-09-15T09:00:00+00:00",
+      "sender_entity_id": 68,
+      "receiver_entity_id": 69,
+      "amount": 11912.0,
+      "currency": "INR",
+      "channel": "NEFT",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 45,
+      "transaction_ref": "TX-SIM-9044",
+      "timestamp": "2026-09-19T09:00:00+00:00",
+      "sender_entity_id": 69,
+      "receiver_entity_id": 11,
+      "amount": 11344.0,
+      "currency": "INR",
+      "channel": "NEFT",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 46,
+      "transaction_ref": "TX-SIM-9045",
+      "timestamp": "2026-09-17T09:00:00+00:00",
+      "sender_entity_id": 70,
+      "receiver_entity_id": 71,
+      "amount": 3036.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 47,
+      "transaction_ref": "TX-SIM-9046",
+      "timestamp": "2026-09-11T09:00:00+00:00",
+      "sender_entity_id": 71,
+      "receiver_entity_id": 72,
+      "amount": 4066.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 48,
+      "transaction_ref": "TX-SIM-9047",
+      "timestamp": "2026-09-20T09:00:00+00:00",
+      "sender_entity_id": 72,
+      "receiver_entity_id": 73,
+      "amount": 9383.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 49,
+      "transaction_ref": "TX-SIM-9048",
+      "timestamp": "2026-09-12T09:00:00+00:00",
+      "sender_entity_id": 73,
+      "receiver_entity_id": 74,
+      "amount": 1436.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 50,
+      "transaction_ref": "TX-SIM-9049",
+      "timestamp": "2026-09-20T09:00:00+00:00",
+      "sender_entity_id": 74,
+      "receiver_entity_id": 75,
+      "amount": 8311.0,
+      "currency": "INR",
+      "channel": "NEFT",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 51,
+      "transaction_ref": "TX-SIM-9050",
+      "timestamp": "2026-09-18T09:00:00+00:00",
+      "sender_entity_id": 75,
+      "receiver_entity_id": 76,
+      "amount": 3079.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 52,
+      "transaction_ref": "TX-SIM-9051",
+      "timestamp": "2026-09-18T09:00:00+00:00",
+      "sender_entity_id": 76,
+      "receiver_entity_id": 77,
+      "amount": 1812.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 53,
+      "transaction_ref": "TX-SIM-9052",
+      "timestamp": "2026-09-04T09:00:00+00:00",
+      "sender_entity_id": 77,
+      "receiver_entity_id": 78,
+      "amount": 10249.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 54,
+      "transaction_ref": "TX-SIM-9053",
+      "timestamp": "2026-09-09T09:00:00+00:00",
+      "sender_entity_id": 78,
+      "receiver_entity_id": 77,
+      "amount": 7115.0,
+      "currency": "INR",
+      "channel": "UPI",
+      "status": "SUCCESS"
+    }
+  ],
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": "2026-09-04T09:00:00+00:00",
+      "sender_phone": "+919686579303",
+      "receiver_phone": "+919726600539",
+      "channel": "SMS",
+      "subject": "Urgent Bank Notice",
+      "content": "Urgent: Your SBI account will be suspended within 2 hours. Update KYC at https://secure-kyc-update.com immediately or pay \u20b9500 fee to centralmule99@okaxis.",
+      "url": "https://secure-kyc-update.com",
+      "case_id": 1
+    },
+    {
+      "id": 2,
+      "timestamp": "2026-09-05T11:00:00+00:00",
+      "sender_phone": "+919686579303",
+      "receiver_phone": "+919795285932",
+      "channel": "SMS",
+      "subject": "Urgent Bank Notice",
+      "content": "Official Bank Alert: Mandatory Aadhaar-PAN link failed. Verify immediately at https://secure-kyc-update.com to prevent debit freeze.",
+      "url": "https://secure-kyc-update.com",
+      "case_id": 2
+    },
+    {
+      "id": 3,
+      "timestamp": "2026-09-06T13:00:00+00:00",
+      "sender_phone": "+919686579303",
+      "receiver_phone": "+919957970516",
+      "channel": "SMS",
+      "subject": "Urgent Bank Notice",
+      "content": "Notice: Electricity supply scheduled for disconnection due to unpaid invoice. Verify payment via https://verify-portal-in.net or contact 9000000001.",
+      "url": "https://secure-kyc-update.com",
+      "case_id": 3
+    },
+    {
+      "id": 4,
+      "timestamp": "2026-09-07T15:00:00+00:00",
+      "sender_phone": "+919686579303",
+      "receiver_phone": "+919585582861",
+      "channel": "SMS",
+      "subject": "Urgent Bank Notice",
+      "content": "Dear customer, your credit card loyalty reward points expire today. Claim refund of \u20b95,000 at https://quick-kyc-auth.org now.",
+      "url": "https://secure-kyc-update.com",
+      "case_id": 4
+    },
+    {
+      "id": 5,
+      "timestamp": "2026-09-08T17:00:00+00:00",
+      "sender_phone": "+919686579303",
+      "receiver_phone": "+919093349856",
+      "channel": "SMS",
+      "subject": "Urgent Bank Notice",
+      "content": "SBI Security Warning: Suspicious transaction detected. Re-verify identity at https://secure-kyc-update.com.",
+      "url": "https://secure-kyc-update.com",
+      "case_id": 5
+    }
+  ],
+  "campaigns": [
+    {
+      "id": 1,
+      "campaign_id": "CAMP-PHANTOM-KYC",
+      "name": "Operation Phantom KYC",
+      "description": "Coordinated cyber-fraud ring impersonating major public banks with urgent KYC deactivation threats.",
+      "risk_score": 92.0,
+      "case_count": 5,
+      "entity_count": 22,
+      "status": "ACTIVE",
+      "first_seen": "2026-09-03T09:00:00+00:00",
+      "last_seen": "2026-09-16T09:00:00+00:00",
+      "shared_indicators": {
+        "domains": [
+          "secure-kyc-update.com",
+          "verify-portal-in.net",
+          "quick-kyc-auth.org"
+        ],
+        "phones": [
+          "+919686579303",
+          "+919119540831",
+          "+919026855092"
+        ],
+        "upi_ids": [
+          "centralmule99@okaxis",
+          "kycpaydesk@paytm"
+        ],
+        "devices": [
+          "DEV-SIM-1000",
+          "DEV-SIM-1001"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "campaign_id": "CAMP-ELECTRICITY-SPOOF",
+      "name": "State Electricity Billing Lure",
+      "description": "SMS phishing network threatening immediate power cut at midnight for unpaid fake arrears.",
+      "risk_score": 78.0,
+      "case_count": 8,
+      "entity_count": 18,
+      "status": "MONITORED",
+      "first_seen": "2026-09-06T09:00:00+00:00",
+      "last_seen": "2026-09-19T09:00:00+00:00",
+      "shared_indicators": {
+        "domains": [
+          "urgent-ebill-pay.co"
+        ],
+        "upi_ids": [
+          "quickflow88@ybl"
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "campaign_id": "CAMP-PARCEL-CUSTOMS",
+      "name": "International Parcel Customs Fee Trap",
+      "description": "Victims notified of detained overseas consignment requiring urgent clearance fee payment.",
+      "risk_score": 74.0,
+      "case_count": 6,
+      "entity_count": 14,
+      "status": "MONITORED",
+      "first_seen": "2026-09-08T09:00:00+00:00",
+      "last_seen": "2026-09-20T09:00:00+00:00",
+      "shared_indicators": {
+        "domains": [
+          "parcel-customs-clear.net"
+        ],
+        "upi_ids": [
+          "clearancefast@ibl"
+        ]
+      }
+    }
+  ]
+}
