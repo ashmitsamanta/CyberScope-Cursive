@@ -70,7 +70,12 @@ class Settings(BaseSettings):
     SUPABASE_ANON_KEY: str = ""
     SUPABASE_SERVICE_ROLE_KEY: str = ""
     SUPABASE_JWT_SECRET: str = ""
-    REQUIRE_AUTH: bool = False
+    JWT_SECRET: str = "cyberscope-secret-jwt-key-for-auth-token-verification-32b"
+
+    def __init__(self, **values):
+        super().__init__(**values)
+        if not self.JWT_SECRET or len(self.JWT_SECRET) < 32:
+            raise ValueError("JWT_SECRET must be at least 32 characters long")
 
     # Email / SMTP Configuration
     SMTP_HOST: str = ""

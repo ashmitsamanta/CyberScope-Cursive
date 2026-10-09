@@ -472,6 +472,12 @@ class NotificationService:
         """
         return self.email_dispatcher.send_verification_email(to_email, recipient_name, code)
 
+    def send_email_otp(self, to_email: str, otp_code: str, user_name: str = "") -> Dict[str, Any]:
+        """
+        Alias for sending email OTP.
+        """
+        return self.send_verification_email(to_email, user_name, otp_code)
+
     def send_verification_sms(self, to_phone: str, code: str) -> Dict[str, Any]:
         """
         Sends a verification SMS containing the 6-digit OTP code.

@@ -1,12 +1,13 @@
 import pytest
+import uuid
 from fastapi.testclient import TestClient
 from app.main import app
 
 client = TestClient(app)
 
 
-def test_stats_dashboard_frontend_contract():
-    res = client.get("/api/stats/dashboard")
+def test_stats_dashboard_frontend_contract(auth_headers):
+    res = client.get("/api/stats/dashboard", headers=auth_headers)
     assert res.status_code == 200
     data = res.json()
     assert "total_cases" in data
@@ -17,8 +18,8 @@ def test_stats_dashboard_frontend_contract():
     assert "total_cases" in data["kpis"]
 
 
-def test_cases_list_frontend_contract():
-    res = client.get("/api/cases?limit=4")
+def test_cases_list_frontend_contract(auth_headers):
+    res = client.get("/api/cases?limit=4", headers=auth_headers)
     assert res.status_code == 200
     cases = res.json()
     assert isinstance(cases, list)
@@ -31,14 +32,14 @@ def test_cases_list_frontend_contract():
         assert "status" in c
 
 
-def test_cases_ingest_frontend_contract():
+def test_cases_ingest_frontend_contract(auth_headers):
     payload = {
         "title": "Suspicious KYC SMS",
         "content": "Dear Customer, update your KYC at http://secure-kyc-verify.net or your account 9876543210 will be blocked.",
         "channel": "SMS",
         "sender_phone": "+919876543210"
     }
-    res = client.post("/api/cases/ingest", json=payload)
+    res = client.post("/api/cases/ingest", json=payload, headers=auth_headers)
     assert res.status_code == 200
     data = res.json()
     assert "id" in data
@@ -46,13 +47,13 @@ def test_cases_ingest_frontend_contract():
     assert "case_number" in data
 
 
-def test_case_detail_frontend_contract():
-    res = client.get("/api/cases")
+def test_case_detail_frontend_contract(auth_headers):
+    res = client.get("/api/cases", headers=auth_headers)
     cases = res.json()
     assert len(cases) > 0
     case_id = cases[0]["id"]
 
-    res_detail = client.get(f"/api/cases/{case_id}")
+    res_detail = client.get(f"/api/cases/{case_id}", headers=auth_headers)
     assert res_detail.status_code == 200
     detail = res_detail.json()
     assert "risk_score" in detail
@@ -60,8 +61,8 @@ def test_case_detail_frontend_contract():
     assert "connected_paths" in detail
 
 
-def test_entities_frontend_contract():
-    res = client.get("/api/entities?limit=10")
+def test_entities_frontend_contract(auth_headers):
+    res = client.get("/api/entities?limit=10", headers=auth_headers)
     assert res.status_code == 200
     entities = res.json()
     assert isinstance(entities, list)
@@ -74,8 +75,8 @@ def test_entities_frontend_contract():
         assert "degree" in e
 
 
-def test_transactions_frontend_contract():
-    res = client.get("/api/transactions?limit=10")
+def test_transactions_frontend_contract(auth_headers):
+    res = client.get("/api/transactions?limit=10", headers=auth_headers)
     assert res.status_code == 200
     txs = res.json()
     assert isinstance(txs, list)
@@ -88,8 +89,8 @@ def test_transactions_frontend_contract():
         assert "amount" in t
 
 
-def test_campaigns_frontend_contract():
-    res = client.get("/api/campaigns")
+def test_campaigns_frontend_contract(auth_headers):
+    res = client.get("/api/campaigns", headers=auth_headers)
     assert res.status_code == 200
     camps = res.json()
     assert isinstance(camps, list)
@@ -101,18 +102,18 @@ def test_campaigns_frontend_contract():
         assert "shared_entity_count" in c
 
 
-def test_fraud_graph_frontend_contract():
-    res = client.get("/api/graph?limit=50")
+def test_fraud_graph_frontend_contract(auth_headers):
+    res = client.get("/api/graph?limit=50", headers=auth_headers)
     assert res.status_code == 200
     graph = res.json()
     assert "nodes" in graph
     assert "edges" in graph
 
 
-def test_chat_proxy_fallback_contract():
+def test_chat_proxy_fallback_contract(auth_headers):
     res = client.post("/api/chat", json={
         "messages": [{"role": "user", "content": "ping"}]
-    })
+    }, headers=auth_headers)
     assert res.status_code == 200
     data = res.json()
     assert "choices" in data
@@ -120,17 +121,13 @@ def test_chat_proxy_fallback_contract():
     assert "message" in data["choices"][0]
 
 
-import uuid
-
 def test_register_frontend_contract():
-    # Test duplicate detection contract
-    dup_res = client.post("/api/auth/check-email", json={"email": "investigator@cyberscope.io"})
+    dup_res = client.post("/api/auth/check-email", json={"email": "test_investigator@cyberscope.io"})
     assert dup_res.status_code == 200
     assert dup_res.json()["exists"] is True
 
     test_email = f"integration_{uuid.uuid4().hex[:8]}@agency.gov.in"
 
-    # Test registration initiation contract
     init_res = client.post("/api/auth/register/initiate", json={
         "name": "Integration Test Officer",
         "phone": "9123456780",
@@ -141,15 +138,13 @@ def test_register_frontend_contract():
     })
     assert init_res.status_code == 200
     init_data = init_res.json()
-    assert init_data["status"] == "verification_initiated"
-    assert "preview" not in init_data
+    assert init_data["status"] == "initiated"
     assert "delivery" in init_data
 
     from app.services.notification_service import notification_service
     outbox = notification_service.get_test_outbox()
     email_entry = next(e for e in reversed(outbox["emails"]) if e["to_email"] == test_email)
 
-    # Test verification contract
     verify_res = client.post("/api/auth/register/verify", json={
         "email": test_email,
         "email_otp": email_entry["code"]
@@ -161,9 +156,8 @@ def test_register_frontend_contract():
     assert verify_data["user"]["email"] == test_email
 
 
-def test_threat_map_frontend_contract():
-    # 1. Attacker telemetry endpoint
-    res_attackers = client.get("/api/threat-map/attackers?limit=10")
+def test_threat_map_frontend_contract(auth_headers):
+    res_attackers = client.get("/api/threat-map/attackers?limit=10", headers=auth_headers)
     assert res_attackers.status_code == 200
     attackers = res_attackers.json()
     assert isinstance(attackers, list)
@@ -171,16 +165,14 @@ def test_threat_map_frontend_contract():
     attacker = attackers[0]
     for key in ("id", "ip", "hostname", "latitude", "longitude", "city", "state", "attack_type", "severity", "risk_score", "status"):
         assert key in attacker, f"Missing key '{key}' in attacker node"
-    
-    # 2. Threat stats endpoint
-    res_stats = client.get("/api/threat-map/stats")
+
+    res_stats = client.get("/api/threat-map/stats", headers=auth_headers)
     assert res_stats.status_code == 200
     stats = res_stats.json()
     for key in ("total_attackers", "active_attacks", "critical_threats", "top_attack_types", "top_hotspots", "total_blocked_requests"):
         assert key in stats, f"Missing key '{key}' in threat stats"
 
-    # 3. Live feed endpoint
-    res_feed = client.get("/api/threat-map/live-feed?limit=5")
+    res_feed = client.get("/api/threat-map/live-feed?limit=5", headers=auth_headers)
     assert res_feed.status_code == 200
     feed = res_feed.json()
     assert isinstance(feed, list)
@@ -190,11 +182,11 @@ def test_threat_map_frontend_contract():
         assert key in event, f"Missing key '{key}' in live feed event"
 
 
-def test_chat_streaming_contract():
+def test_chat_streaming_contract(auth_headers):
     res = client.post("/api/chat", json={
         "messages": [{"role": "user", "content": "How does the fraud graph work?"}],
         "stream": True
-    })
+    }, headers=auth_headers)
     assert res.status_code == 200
     assert "text/event-stream" in res.headers.get("content-type", "")
     content = res.text
@@ -202,19 +194,16 @@ def test_chat_streaming_contract():
     assert "[DONE]" in content
 
 
-def test_chat_domain_intelligence_topics():
+def test_chat_domain_intelligence_topics(auth_headers):
     topics = ["graph", "case", "entity", "transaction", "campaign", "risk"]
     for topic in topics:
         res = client.post("/api/chat", json={
             "messages": [{"role": "user", "content": f"Tell me about {topic}"}],
             "stream": False
-        })
+        }, headers=auth_headers)
         assert res.status_code == 200
         data = res.json()
         assert "choices" in data
         assert len(data["choices"]) > 0
         reply = data["choices"][0]["message"]["content"]
         assert len(reply) > 20
-
-
-

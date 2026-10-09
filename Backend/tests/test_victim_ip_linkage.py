@@ -6,6 +6,7 @@ through forensic edges (ACCESSED_FROM sessions, TARGETED_BY lures, CONTACTED
 handsets) and that transaction telemetry is bound to attacker IPs while
 normal traffic stays unbound.
 """
+import pytest
 from fastapi.testclient import TestClient
 from app.main import app
 
@@ -23,15 +24,14 @@ VICTIM_NAMES = [
 ]
 
 
-def _full_graph():
-    res = client.get("/api/graph?limit=500")
+def _full_graph(auth_headers):
+    res = client.get("/api/graph?limit=500", headers=auth_headers)
     assert res.status_code == 200
     return res.json()
 
 
-def test_every_attacker_ip_is_connected():
-    """No floating IP entities: every attacker IP participates in the graph."""
-    graph = _full_graph()
+def test_every_attacker_ip_is_connected(auth_headers):
+    graph = _full_graph(auth_headers)
     ip_nodes = {n["id"] for n in graph["nodes"] if n["entity_type"] == "IP_ADDRESS"}
     assert len(ip_nodes) >= 25
 
@@ -42,9 +42,8 @@ def test_every_attacker_ip_is_connected():
     assert ip_nodes <= connected, f"Orphan IP nodes: {ip_nodes - connected}"
 
 
-def test_victim_accounts_accessed_from_attacker_ips():
-    """Every case victim's account carries an attacker-side session edge."""
-    graph = _full_graph()
+def test_victim_accounts_accessed_from_attacker_ips(auth_headers):
+    graph = _full_graph(auth_headers)
     nodes = {n["id"]: n for n in graph["nodes"]}
 
     victim_sessions = []
@@ -63,9 +62,8 @@ def test_victim_accounts_accessed_from_attacker_ips():
     assert len(victim_sessions) >= len(VICTIM_CASES)
 
 
-def test_victims_targeted_by_lure_infrastructure():
-    """Victims are linked to the lure domain (or SIM-swap device) that targeted them."""
-    graph = _full_graph()
+def test_victims_targeted_by_lure_infrastructure(auth_headers):
+    graph = _full_graph(auth_headers)
     nodes = {n["id"]: n for n in graph["nodes"]}
 
     targeted = []
@@ -80,9 +78,8 @@ def test_victims_targeted_by_lure_infrastructure():
     assert all(t in ("DOMAIN", "DEVICE") for _, t in targeted)
 
 
-def test_lure_handsets_contact_victim_handsets():
-    """SMS lure delivery is represented as CONTACTED edges from attacker handsets."""
-    graph = _full_graph()
+def test_lure_handsets_contact_victim_handsets(auth_headers):
+    graph = _full_graph(auth_headers)
     nodes = {n["id"]: n for n in graph["nodes"]}
 
     contacts = []
@@ -97,9 +94,8 @@ def test_lure_handsets_contact_victim_handsets():
     assert len(contacts) >= len(VICTIM_CASES)
 
 
-def test_fraud_transactions_bound_to_attacker_ips():
-    """FLAGGED transactions carry attacker IP telemetry; normal traffic stays unbound."""
-    res = client.get("/api/transactions?limit=200")
+def test_fraud_transactions_bound_to_attacker_ips(auth_headers):
+    res = client.get("/api/transactions?limit=200", headers=auth_headers)
     assert res.status_code == 200
     txs = res.json()
 
@@ -110,14 +106,12 @@ def test_fraud_transactions_bound_to_attacker_ips():
     assert all(t.get("ip_id") for t in flagged)
     assert not any(t.get("ip_id") for t in normal)
 
-    # C2-driven sessions (Phantom KYC / executive ATO) also expose the trojan device
     c2_device_txs = [t for t in flagged if t.get("device_id")]
     assert len(c2_device_txs) >= 5
 
 
-def test_case_graph_shows_victim_to_ip_chain():
-    """The CS-1024 case subgraph reaches both the victim and the attacking C2 IP."""
-    res = client.get("/api/graph/case/CS-1024?hops=3")
+def test_case_graph_shows_victim_to_ip_chain(auth_headers):
+    res = client.get("/api/graph/case/CS-1024?hops=3", headers=auth_headers)
     assert res.status_code == 200
     graph = res.json()
 
@@ -137,10 +131,9 @@ def test_case_graph_shows_victim_to_ip_chain():
     assert session_edges, "Expected victim-account ACCESSED_FROM C2 edge in case subgraph"
 
 
-def test_threat_map_privacy_after_victim_linkage():
-    """Victim identities stay out of the public threat-map surface."""
-    attackers = client.get("/api/threat-map/attackers?limit=100").json()
-    feed = client.get("/api/threat-map/live-feed?limit=15").json()
+def test_threat_map_privacy_after_victim_linkage(auth_headers):
+    attackers = client.get("/api/threat-map/attackers?limit=100", headers=auth_headers).json()
+    feed = client.get("/api/threat-map/live-feed?limit=15", headers=auth_headers).json()
     combined = str(attackers) + str(feed)
 
     for name in VICTIM_NAMES:

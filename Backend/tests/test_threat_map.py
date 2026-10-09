@@ -5,8 +5,8 @@ from app.main import app
 client = TestClient(app)
 
 
-def test_get_attackers_list():
-    response = client.get("/api/threat-map/attackers")
+def test_get_attackers_list(auth_headers):
+    response = client.get("/api/threat-map/attackers", headers=auth_headers)
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
@@ -24,14 +24,13 @@ def test_get_attackers_list():
         assert field in first, f"Missing {field} in response"
 
 
-def test_case_linkage_and_redirection():
-    response = client.get("/api/threat-map/attackers")
+def test_case_linkage_and_redirection(auth_headers):
+    response = client.get("/api/threat-map/attackers", headers=auth_headers)
     assert response.status_code == 200
     attackers = response.json()
     assert len(attackers) >= 25
 
     for node in attackers:
-        # Check coordinates compatibility
         assert "lat" in node and isinstance(node["lat"], (int, float))
         assert "lng" in node and isinstance(node["lng"], (int, float))
         assert "latitude" in node and isinstance(node["latitude"], (int, float))
@@ -39,7 +38,6 @@ def test_case_linkage_and_redirection():
         assert node["lat"] == node["latitude"]
         assert node["lng"] == node["longitude"]
 
-        # Check case linkages
         assert "primary_case_id" in node and isinstance(node["primary_case_id"], int)
         assert "primary_case_number" in node and isinstance(node["primary_case_number"], str)
         assert "linked_case_ids" in node and isinstance(node["linked_case_ids"], list)
@@ -48,22 +46,17 @@ def test_case_linkage_and_redirection():
         assert "linked_case_numbers" in node and isinstance(node["linked_case_numbers"], list)
         assert len(node["linked_case_numbers"]) > 0
 
-    # Verify primary case exists for first node and can be retrieved by ID and number
     first_node = attackers[0]
     cid = first_node["primary_case_id"]
     cnum = first_node["primary_case_number"]
-    case_resp_id = client.get(f"/api/cases/{cid}")
+    case_resp_id = client.get(f"/api/cases/{cid}", headers=auth_headers)
     assert case_resp_id.status_code == 200, f"Case ID {cid} not found"
-    case_resp_num = client.get(f"/api/cases/{cnum}")
+    case_resp_num = client.get(f"/api/cases/{cnum}", headers=auth_headers)
     assert case_resp_num.status_code == 200, f"Case number {cnum} not found"
 
 
-def test_preexisting_db_ip_198_51_100_10_jamtara():
-    """
-    Verifies that preexisting DB IP 198.51.100.10 (Entity ID 10 in Operation Phantom KYC)
-    is populated as a prominent threat node with Jamtara, Jharkhand origin and PIN 815351.
-    """
-    response = client.get("/api/threat-map/attackers?search=198.51.100.10")
+def test_preexisting_db_ip_198_51_100_10_jamtara(auth_headers):
+    response = client.get("/api/threat-map/attackers?search=198.51.100.10", headers=auth_headers)
     assert response.status_code == 200
     nodes = response.json()
     assert len(nodes) >= 1
@@ -77,11 +70,8 @@ def test_preexisting_db_ip_198_51_100_10_jamtara():
     assert target["risk_score"] >= 90.0
 
 
-def test_verified_authentic_indian_pincodes():
-    """
-    Verifies all threat nodes have authentic 6-digit India Post PIN codes matching specified hotspots.
-    """
-    response = client.get("/api/threat-map/attackers?limit=100")
+def test_verified_authentic_indian_pincodes(auth_headers):
+    response = client.get("/api/threat-map/attackers?limit=100", headers=auth_headers)
     assert response.status_code == 200
     nodes = response.json()
     assert len(nodes) >= 25
@@ -123,35 +113,31 @@ def test_verified_authentic_indian_pincodes():
             assert pin == verified_hotspot_pins[city], f"Expected {verified_hotspot_pins[city]} for {city}, got {pin}"
 
 
-def test_get_attackers_filtering():
-    # Filter by severity
-    resp_crit = client.get("/api/threat-map/attackers?severity=CRITICAL")
+def test_get_attackers_filtering(auth_headers):
+    resp_crit = client.get("/api/threat-map/attackers?severity=CRITICAL", headers=auth_headers)
     assert resp_crit.status_code == 200
     for node in resp_crit.json():
         assert node["severity"] == "CRITICAL"
 
-    # Filter by attack_type
-    resp_phish = client.get("/api/threat-map/attackers?attack_type=PHISHING_HOST")
+    resp_phish = client.get("/api/threat-map/attackers?attack_type=PHISHING_HOST", headers=auth_headers)
     assert resp_phish.status_code == 200
     for node in resp_phish.json():
         assert node["attack_type"] == "PHISHING_HOST"
 
-    # Filter by min_risk
-    resp_risk = client.get("/api/threat-map/attackers?min_risk=85.0")
+    resp_risk = client.get("/api/threat-map/attackers?min_risk=85.0", headers=auth_headers)
     assert resp_risk.status_code == 200
     for node in resp_risk.json():
         assert node["risk_score"] >= 85.0
 
-    # Filter by pincode
-    resp_pin = client.get("/api/threat-map/attackers?pincode=815351")
+    resp_pin = client.get("/api/threat-map/attackers?pincode=815351", headers=auth_headers)
     assert resp_pin.status_code == 200
     pins_data = resp_pin.json()
     assert len(pins_data) >= 1
     assert all(n["pincode"] == "815351" for n in pins_data)
 
 
-def test_threat_stats():
-    response = client.get("/api/threat-map/stats")
+def test_threat_stats(auth_headers):
+    response = client.get("/api/threat-map/stats", headers=auth_headers)
     assert response.status_code == 200
     stats = response.json()
     assert "total_attackers" in stats
@@ -162,14 +148,13 @@ def test_threat_stats():
     assert "total_blocked_requests" in stats
     assert "avg_risk_score" in stats
     assert stats["total_attackers"] >= 25
-    # Verify hotspot contains pincode
     for h in stats["top_hotspots"]:
         assert "city" in h
         assert "pincode" in h
 
 
-def test_live_feed():
-    response = client.get("/api/threat-map/live-feed?limit=15")
+def test_live_feed(auth_headers):
+    response = client.get("/api/threat-map/live-feed?limit=15", headers=auth_headers)
     assert response.status_code == 200
     feed = response.json()
     assert len(feed) == 15
@@ -178,9 +163,8 @@ def test_live_feed():
         assert key in first_evt
 
 
-def test_block_attacker():
-    # Block by IP
-    response = client.post("/api/threat-map/block", json={"ip": "115.110.201.78", "reason": "Sim Box automated suppression"})
+def test_block_attacker(auth_headers):
+    response = client.post("/api/threat-map/block", json={"ip": "115.110.201.78", "reason": "Sim Box automated suppression"}, headers=auth_headers)
     assert response.status_code == 200
     body = response.json()
     assert body["success"] is True
@@ -188,13 +172,9 @@ def test_block_attacker():
     assert "firewall_rule_id" in body
 
 
-def test_strict_privacy_no_victim_data():
-    """
-    STRICT PRIVACY GUARANTEE: Never expose victim IPs, victim accounts, or victim personal data.
-    Only show attacker/scammer infrastructure.
-    """
-    resp_attackers = client.get("/api/threat-map/attackers").json()
-    resp_feed = client.get("/api/threat-map/live-feed").json()
+def test_strict_privacy_no_victim_data(auth_headers):
+    resp_attackers = client.get("/api/threat-map/attackers", headers=auth_headers).json()
+    resp_feed = client.get("/api/threat-map/live-feed", headers=auth_headers).json()
     combined = str(resp_attackers) + str(resp_feed)
 
     victim_identifiers = [

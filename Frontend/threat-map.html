@@ -12,7 +12,40 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <!-- Core Theme Styles -->
 <link rel="stylesheet" href="assets/cyberscope.css">
-<!-- Leaflet 1.9.4 CSS -->
+<script>document.documentElement.classList.add('cs-pending');</script>
+<style>
+  html.cs-pending body { visibility: hidden !important; }
+  #cs-auth-loader {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 99999;
+    background: #050a12;
+    color: #38bdf8;
+    font-family: system-ui, -apple-system, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+  }
+  html:not(.cs-pending) #cs-auth-loader { display: none !important; }
+  html.cs-pending #cs-auth-loader { display: flex !important; }
+  .cs-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(56, 189, 248, 0.2);
+    border-top-color: #38bdf8;
+    border-radius: 50%;
+    animation: cs-spin 0.8s linear infinite;
+    margin-bottom: 14px;
+  }
+  @keyframes cs-spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div id="cs-auth-loader"><div class="cs-spinner"></div><div>Verifying session…</div></div>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <!-- Leaflet 1.9.4 JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -3776,5 +3809,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <a href="chatbot.html" class="chat-button" id="chatButton" title="Open CyberScope AI Assistant" aria-label="Open CyberScope AI Assistant">✦</a>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-client.js"></script>
+<script src="assets/cyberscope.js"></script>
+<script>cyberscopeProtect();</script>
 </body>
 </html>

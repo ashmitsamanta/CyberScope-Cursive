@@ -36,7 +36,7 @@ _last_resend_timestamps: Dict[str, float] = {}
 # ---------------------------------------------------------
 
 class TokenVerifyRequest(BaseModel):
-    access_token: str = Field(..., description="Supabase or local JWT access token to verify")
+    access_token: str = Field(..., description="Access token to verify")
 
 
 class AuthConfigResponse(BaseModel):
@@ -44,7 +44,6 @@ class AuthConfigResponse(BaseModel):
     supabase_anon_key: str
     configured: bool
     auth_required: bool
-    demo_account: Dict[str, str]
 
 
 class CheckEmailRequest(BaseModel):
@@ -94,8 +93,7 @@ class PasswordStrengthResponse(BaseModel):
 @router.post("/check-password", response_model=PasswordStrengthResponse)
 def check_password(payload: CheckPasswordRequest):
     """
-    Evaluates password strength and returns score, grade (out of 10), rating, and improvement tips.
-    Used by the frontend for real-time feedback while the user types.
+    Evaluates password strength and returns score, grade, rating, and improvement tips.
     """
     score, max_score, grade, rating, reasons = check_password_strength(payload.password)
     return {
@@ -162,7 +160,6 @@ def register_initiate(payload: RegisterInitiateRequest, db: Session = Depends(ge
             content={"detail": "Name is required.", "code": "INVALID_NAME"}
         )
 
-    # Check if email exists in users table (409 Conflict check)
     existing_user = db.query(User).filter(User.email == normalized_email).first()
     if existing_user:
         return JSONResponse(
@@ -173,7 +170,6 @@ def register_initiate(payload: RegisterInitiateRequest, db: Session = Depends(ge
             }
         )
 
-    # --- Password strength gate (reject TOO WEAK passwords) ---
     pw_score, pw_max, pw_grade, pw_rating, pw_reasons = check_password_strength(payload.password)
     if pw_rating == "TOO WEAK":
         return JSONResponse(
@@ -191,7 +187,6 @@ def register_initiate(payload: RegisterInitiateRequest, db: Session = Depends(ge
             }
         )
 
-    # Clean up previous pending verifications for this email
     db.query(UserVerification).filter(UserVerification.email == normalized_email).delete()
 
     normalized_phone = normalize_phone(payload.phone)
@@ -203,28 +198,30 @@ def register_initiate(payload: RegisterInitiateRequest, db: Session = Depends(ge
         phone=normalized_phone,
         name=payload.name.strip(),
         password_hash=hash_password(payload.password),
-        role=payload.role.strip() if payload.role else "Investigator",
+        role=payload.role or "Investigator",
         organization=payload.organization.strip() if payload.organization else "",
         email_otp=email_otp,
         expires_at=expires_at,
-        created_at=datetime.now(timezone.utc),
         attempts=0
     )
     db.add(verification)
     db.commit()
 
-    email_result = notification_service.send_verification_email(
+    import time
+    _last_resend_timestamps[normalized_email] = time.time()
+
+    email_sent = notification_service.send_email_otp(
         to_email=normalized_email,
-        recipient_name=payload.name,
-        code=email_otp
+        otp_code=email_otp,
+        user_name=payload.name.strip()
     )
 
     return {
-        "status": "verification_initiated",
-        "message": "Verification code has been dispatched to your email.",
+        "status": "initiated",
+        "message": f"Verification code sent to {normalized_email}.",
         "email": normalized_email,
         "delivery": {
-            "email": email_result
+            "email": email_sent
         }
     }
 
@@ -232,80 +229,60 @@ def register_initiate(payload: RegisterInitiateRequest, db: Session = Depends(ge
 @router.post("/register/verify")
 def register_verify(payload: RegisterVerifyRequest, db: Session = Depends(get_db)):
     """
-    Validates email OTP code, creates verified user record,
-    removes pending verification, and issues an access token.
-    Enforces brute-force lockout after 5 failed verification attempts.
+    Verifies the email OTP. On success, creates user account and returns access token.
     """
     normalized_email = payload.email.strip().lower()
+
     verification = db.query(UserVerification).filter(UserVerification.email == normalized_email).first()
 
     if not verification:
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             content={
-                "detail": "No pending verification found for this email. Please initiate registration first.",
-                "code": "VERIFICATION_NOT_FOUND"
+                "detail": "No pending registration found for this email. Please initiate registration first.",
+                "code": "NO_PENDING_REGISTRATION"
             }
         )
 
-    # Brute force lockout check if already exceeded
-    if verification.attempts >= 5:
-        db.delete(verification)
-        db.commit()
-        return JSONResponse(
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            content={
-                "detail": "Too many failed attempts. Verification codes invalidated. Please request new codes.",
-                "code": "MAX_ATTEMPTS_EXCEEDED"
-            }
-        )
-
-    # Check expiry
     now = datetime.now(timezone.utc)
-    is_expired = False
-    if verification.expires_at:
-        if verification.expires_at.tzinfo is None:
-            is_expired = verification.expires_at < now.replace(tzinfo=None)
-        else:
-            is_expired = verification.expires_at < now
+    exp = verification.expires_at
+    if exp.tzinfo is None:
+        exp = exp.replace(tzinfo=timezone.utc)
 
-    if is_expired:
-        db.delete(verification)
+    if now > exp:
+        db.query(UserVerification).filter(UserVerification.email == normalized_email).delete()
         db.commit()
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_410_GONE,
             content={
-                "detail": "Verification codes have expired. Please request new codes.",
+                "detail": "Verification code has expired. Please request a new code.",
                 "code": "OTP_EXPIRED"
             }
         )
 
-    # Validate OTP using constant-time comparison to prevent timing attacks
-    email_match = hmac.compare_digest(payload.email_otp.strip(), verification.email_otp)
-
-    if not email_match:
-        verification.attempts += 1
+    if verification.attempts >= 5:
+        db.query(UserVerification).filter(UserVerification.email == normalized_email).delete()
         db.commit()
-        if verification.attempts >= 5:
-            db.delete(verification)
-            db.commit()
-            return JSONResponse(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                content={
-                    "detail": "Too many failed attempts. Verification codes invalidated. Please request new codes.",
-                    "code": "MAX_ATTEMPTS_EXCEEDED"
-                }
-            )
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             content={
-                "detail": "Invalid email verification code.",
-                "code": "INVALID_OTP",
-                "remaining_attempts": 5 - verification.attempts
+                "detail": "Too many failed attempts. Registration reset. Please register again.",
+                "code": "TOO_MANY_ATTEMPTS"
             }
         )
 
-    # Create new User in database
+    if not hmac.compare_digest(payload.email_otp.strip(), verification.email_otp):
+        verification.attempts += 1
+        db.commit()
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "detail": f"Invalid verification code. {5 - verification.attempts} attempts remaining.",
+                "code": "INVALID_OTP",
+                "attempts_remaining": 5 - verification.attempts
+            }
+        )
+
     new_user = User(
         email=verification.email,
         phone=verification.phone,
@@ -318,16 +295,17 @@ def register_verify(payload: RegisterVerifyRequest, db: Session = Depends(get_db
         is_active=True
     )
     db.add(new_user)
-    db.delete(verification)
+    db.query(UserVerification).filter(UserVerification.email == normalized_email).delete()
     db.commit()
     db.refresh(new_user)
 
-    token = create_access_token(new_user.to_dict())
+    user_dict = new_user.to_dict()
+    token = create_access_token(user_dict)
 
     return {
         "status": "verified",
-        "message": "Account successfully verified and created in database.",
-        "user": new_user.to_dict(),
+        "message": "Account created successfully.",
+        "user": user_dict,
         "access_token": token,
         "token_type": "bearer"
     }
@@ -336,53 +314,52 @@ def register_verify(payload: RegisterVerifyRequest, db: Session = Depends(get_db
 @router.post("/register/resend")
 def register_resend(payload: ResendOTPRequest, db: Session = Depends(get_db)):
     """
-    Generates fresh OTPs with a 60s rate-limit cooldown and dispatches them
-    via notification service without returning plaintext codes in response.
+    Resends verification code if pending registration exists and 30s cooldown passed.
     """
     normalized_email = payload.email.strip().lower()
+
+    import time
+    last_time = _last_resend_timestamps.get(normalized_email, 0)
+    elapsed = time.time() - last_time
+    if elapsed < 30:
+        remaining = int(30 - elapsed)
+        return JSONResponse(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            content={
+                "detail": f"Please wait {remaining} seconds before requesting another code.",
+                "code": "COOLDOWN_ACTIVE",
+                "retry_after_seconds": remaining
+            }
+        )
+
     verification = db.query(UserVerification).filter(UserVerification.email == normalized_email).first()
 
     if not verification:
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             content={
-                "detail": "No pending verification found for this email. Please initiate registration first.",
-                "code": "VERIFICATION_NOT_FOUND"
+                "detail": "No pending registration found for this email.",
+                "code": "NO_PENDING_REGISTRATION"
             }
         )
-
-    now_ts = datetime.now(timezone.utc).timestamp()
-    last_ts = _last_resend_timestamps.get(normalized_email)
-    if last_ts is not None and (now_ts - last_ts) < 60:
-        remaining = int(60 - (now_ts - last_ts))
-        return JSONResponse(
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            content={
-                "detail": f"Please wait {remaining} seconds before requesting new verification codes.",
-                "cooldown_remaining": remaining,
-                "code": "COOLDOWN_ACTIVE"
-            }
-        )
-
-    _last_resend_timestamps[normalized_email] = now_ts
 
     new_email_otp = f"{secrets.randbelow(900000) + 100000:06d}"
-
     verification.email_otp = new_email_otp
     verification.expires_at = datetime.now(timezone.utc) + timedelta(minutes=10)
-    verification.created_at = datetime.now(timezone.utc)
     verification.attempts = 0
     db.commit()
 
-    email_result = notification_service.send_verification_email(
+    _last_resend_timestamps[normalized_email] = time.time()
+
+    email_result = notification_service.send_email_otp(
         to_email=verification.email,
-        recipient_name=verification.name,
-        code=new_email_otp
+        otp_code=new_email_otp,
+        user_name=verification.name
     )
 
     return {
         "status": "resent",
-        "message": "Fresh verification codes have been generated and sent.",
+        "message": "Fresh verification code generated and sent.",
         "email": verification.email,
         "delivery": {
             "email": email_result
@@ -394,57 +371,27 @@ def register_resend(payload: ResendOTPRequest, db: Session = Depends(get_db)):
 def login(payload: LoginRequest, db: Session = Depends(get_db)):
     """
     Authenticates an investigator via email and password.
-    Falls back to recognizing the demo account if not yet created in the database.
+    Returns identical 401 response for non-existent email and wrong password.
     """
     normalized_email = payload.email.strip().lower()
     user = db.query(User).filter(User.email == normalized_email).first()
 
-    if not user:
-        if normalized_email == "investigator@cyberscope.io":
-            if payload.password != "password123":
-                return JSONResponse(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    content={
-                        "detail": "Invalid password. Please check your credentials.",
-                        "code": "INVALID_PASSWORD"
-                    }
-                )
-            # Auto-seed demo investigator
-            user = User(
-                email="investigator@cyberscope.io",
-                password_hash=hash_password("password123"),
-                name="Investigator Demo",
-                phone="+919876543210",
-                role="Investigator",
-                organization="TetraByte Cyber Defense",
-                is_verified_email=True,
-                is_verified_phone=True,
-                is_active=True
-            )
-            db.add(user)
-            db.commit()
-            db.refresh(user)
-        else:
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={
-                    "detail": "No account found with this email address. Please register a new account.",
-                    "code": "USER_NOT_FOUND"
-                }
-            )
-    else:
-        is_valid = verify_password(payload.password, user.password_hash)
-        if not is_valid and user.email == "investigator@cyberscope.io" and payload.password == "password123":
-            is_valid = True
+    auth_failed_response = JSONResponse(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        content={
+            "detail": "Invalid email or password.",
+            "code": "INVALID_CREDENTIALS"
+        }
+    )
 
-        if not is_valid:
-            return JSONResponse(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                content={
-                    "detail": "Invalid password. Please check your credentials.",
-                    "code": "INVALID_PASSWORD"
-                }
-            )
+    if not user:
+        return auth_failed_response
+
+    if not verify_password(payload.password, user.password_hash):
+        return auth_failed_response
+
+    if not getattr(user, "is_active", True):
+        return auth_failed_response
 
     token = create_access_token(user.to_dict())
 
@@ -463,21 +410,13 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
 @router.get("/config", response_model=AuthConfigResponse)
 def get_auth_config():
     """
-    Returns public Supabase client configuration parameters.
-    Allows frontend clients to dynamically initialize Supabase without
-    baking credentials directly into static builds.
+    Returns public configuration parameters.
     """
     return {
         "supabase_url": settings.SUPABASE_URL,
         "supabase_anon_key": settings.SUPABASE_ANON_KEY,
         "configured": auth_service.is_configured(),
-        "auth_required": settings.REQUIRE_AUTH,
-        "demo_account": {
-            "email": "investigator@cyberscope.io",
-            "password": "password123",
-            "name": "Investigator Demo",
-            "role": "Investigator"
-        }
+        "auth_required": True,
     }
 
 
@@ -485,7 +424,6 @@ def get_auth_config():
 def get_authenticated_user(current_user: Dict[str, Any] = Depends(get_current_user)):
     """
     Returns the current authenticated investigator's profile.
-    Extracts identity from Supabase or local JWT access token.
     """
     return {
         "status": "authenticated",
@@ -494,20 +432,19 @@ def get_authenticated_user(current_user: Dict[str, Any] = Depends(get_current_us
 
 
 @router.post("/verify")
-def verify_access_token(payload: TokenVerifyRequest):
+def verify_access_token(payload: TokenVerifyRequest, db: Session = Depends(get_db)):
     """
     Verifies an access token and returns decoded investigator claims.
+    Returns {"valid": False} with 401 status for any bad, expired, or forged token.
     """
     try:
-        user_info = auth_service.verify_token(payload.access_token)
+        user_info = auth_service.verify_token(payload.access_token, db=db)
         return {
             "valid": True,
             "user": user_info
         }
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Token verification failed: {str(e)}"
+    except Exception:
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={"valid": False, "detail": "Invalid, expired, or untrusted authentication token"}
         )

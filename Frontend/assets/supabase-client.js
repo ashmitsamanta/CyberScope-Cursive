@@ -1,7 +1,7 @@
 /**
  * CYBERSCOPE — Supabase & Backend Authentication Client
  * Provides unified authentication, database token verification, session persistence,
- * live duplicate email detection, and seamless fallback for local demonstration/evaluation.
+ * live duplicate email detection, and server-first authentication security.
  */
 (function(window) {
   'use strict';
@@ -12,17 +12,6 @@
   var STORAGE_TOKEN_KEY = 'cyberscopeAccessToken';
   var STORAGE_CUSTOM_URL = 'cyberscope_supabase_url';
   var STORAGE_CUSTOM_KEY = 'cyberscope_supabase_anon_key';
-
-  var DEMO_ACCOUNT = {
-    id: 'demo-investigator-001',
-    email: 'investigator@cyberscope.io',
-    password: 'password123',
-    name: 'Investigator Demo',
-    role: 'Investigator',
-    phone: '+919876543210',
-    organization: 'TetraByte Cyber Defense',
-    is_demo: true
-  };
 
   var state = {
     client: null,
@@ -58,7 +47,6 @@
     });
   }
 
-  // Clear any legacy custom config stored in localStorage from earlier in-page settings
   try {
     localStorage.removeItem(STORAGE_CUSTOM_URL);
     localStorage.removeItem(STORAGE_CUSTOM_KEY);
@@ -88,7 +76,6 @@
     if (state.initPromise) return state.initPromise;
 
     state.initPromise = (async function() {
-      // 1. Determine Supabase config: window override -> server endpoint (/api/auth/config) -> project .env credentials
       var config = null;
 
       if (window.CYBERSCOPE_SUPABASE_CONFIG) {
@@ -111,7 +98,6 @@
         state.configured = false;
       }
 
-      // 2. Load Supabase library if configured
       if (state.configured) {
         try {
           await loadScript(SUPABASE_CDN);
@@ -124,30 +110,13 @@
               }
             });
 
-            // Listen to auth state changes
             state.client.auth.onAuthStateChange(function(event, session) {
-              if (session && session.user) {
-                var meta = session.user.user_metadata || {};
-                var u = {
-                  id: session.user.id,
-                  email: session.user.email,
-                  name: meta.name || meta.full_name || (session.user.email ? session.user.email.split('@')[0] : 'Investigator'),
-                  role: meta.role || 'Investigator',
-                  phone: meta.phone || '',
-                  organization: meta.organization || '',
-                  is_demo: false
-                };
-                localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(u));
-                localStorage.setItem(STORAGE_SESSION_KEY, 'active');
+              if (session && session.user && session.access_token) {
                 localStorage.setItem(STORAGE_TOKEN_KEY, session.access_token);
               } else if (event === 'SIGNED_OUT') {
-                var activeUser = getUser();
-                // Only clear if not an active database investigator
-                if (!activeUser || activeUser.is_demo) {
-                  localStorage.removeItem(STORAGE_USER_KEY);
-                  localStorage.removeItem(STORAGE_SESSION_KEY);
-                  localStorage.removeItem(STORAGE_TOKEN_KEY);
-                }
+                localStorage.removeItem(STORAGE_USER_KEY);
+                localStorage.removeItem(STORAGE_SESSION_KEY);
+                localStorage.removeItem(STORAGE_TOKEN_KEY);
               }
             });
           }
@@ -155,11 +124,6 @@
           console.warn('Supabase initialization warning:', err);
           state.configured = false;
         }
-      }
-
-      // Fallback demo account setup if no local user is stored
-      if (!localStorage.getItem(STORAGE_USER_KEY)) {
-        localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(DEMO_ACCOUNT));
       }
 
       state.initialized = true;
@@ -171,39 +135,14 @@
 
   function getUser() {
     try {
-      var cached = JSON.parse(localStorage.getItem(STORAGE_USER_KEY) || 'null');
-      if (cached) {
-        return cached;
-      }
-      // Reconstruct user identity from database access token claims if present
-      var token = localStorage.getItem(STORAGE_TOKEN_KEY);
-      if (token && token.indexOf('.') !== -1) {
-        var parts = token.split('.');
-        if (parts.length === 3) {
-          var payloadStr = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'));
-          var payload = JSON.parse(payloadStr);
-          var meta = payload.user_metadata || {};
-          var userObj = {
-            id: payload.sub || payload.id || 'usr-jwt',
-            email: payload.email || '',
-            name: meta.name || meta.full_name || (payload.email ? payload.email.split('@')[0] : 'Investigator'),
-            role: meta.role || payload.role || 'Investigator',
-            phone: meta.phone || '',
-            organization: meta.organization || '',
-            is_demo: false
-          };
-          localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(userObj));
-          return userObj;
-        }
-      }
-      return null;
+      return JSON.parse(localStorage.getItem(STORAGE_USER_KEY) || 'null');
     } catch(e) {
       return null;
     }
   }
 
   function isAuthenticated() {
-    return localStorage.getItem(STORAGE_SESSION_KEY) === 'active' && Boolean(getUser());
+    return localStorage.getItem(STORAGE_SESSION_KEY) === 'active' && Boolean(getUser()) && Boolean(localStorage.getItem(STORAGE_TOKEN_KEY));
   }
 
   function getAuthHeaders() {
@@ -231,22 +170,13 @@
         var data = await res.json();
         return {
           exists: Boolean(data.exists),
-          email: cleanedEmail,
-          message: data.message || '',
-          data: data
+          message: data.message || (data.exists ? 'Account exists' : 'Email available')
         };
       }
-    } catch (err) {
-      // Backend offline or unreachable
-    }
+    } catch (e) {}
 
-    // Fallback offline / demo check
-    var savedUser = getUser();
-    var demoMatch = (cleanedEmail === String(DEMO_ACCOUNT.email).toLowerCase());
-    var savedMatch = (savedUser && cleanedEmail === String(savedUser.email).toLowerCase());
     return {
-      exists: Boolean(demoMatch || savedMatch),
-      email: cleanedEmail,
+      exists: false,
       is_offline: true
     };
   }
@@ -260,7 +190,6 @@
       return { success: false, error: { message: 'Please enter both email and password.' } };
     }
 
-    // A. Coordinate with backend /api/auth/login endpoint first when available
     try {
       var loginRes = await fetch(getApiEndpoint('/api/auth/login'), {
         method: 'POST',
@@ -271,7 +200,7 @@
       if (loginRes.status === 200) {
         var data = await loginRes.json();
         var userObj = data.user || {
-          id: data.id || 'db-user',
+          id: data.id,
           email: email,
           name: data.name || email.split('@')[0],
           role: data.role || 'Investigator',
@@ -292,103 +221,22 @@
           session: { access_token: data.access_token },
           access_token: data.access_token
         };
-      } else if (loginRes.status === 404) {
-        return {
-          success: false,
-          status: 404,
-          error: {
-            code: 'USER_NOT_FOUND',
-            message: 'No account found with this email. Please register a new account.'
-          }
-        };
-      } else if (loginRes.status === 401) {
-        return {
-          success: false,
-          status: 401,
-          error: {
-            code: 'INVALID_PASSWORD',
-            message: 'Incorrect password. Please verify your credentials or use "Forgot password?".'
-          }
-        };
-      } else if (loginRes.status >= 400 && loginRes.status < 500) {
-        var errJson = await loginRes.json().catch(function() { return {}; });
+      } else {
+        var errData = await loginRes.json().catch(function() { return {}; });
         return {
           success: false,
           status: loginRes.status,
           error: {
-            message: errJson.detail || errJson.message || 'Authentication failed.'
+            message: errData.detail || errData.message || 'Invalid email or password.'
           }
         };
       }
-      // If 5xx, proceed to Supabase / Demo fallback
     } catch (netErr) {
-      // Backend offline or unreachable, fall back gracefully
-    }
-
-    // B. Use real Supabase client if configured
-    if (state.configured && state.client) {
-      try {
-        var res = await state.client.auth.signInWithPassword({
-          email: email,
-          password: password
-        });
-
-        if (res.error) {
-          return { success: false, error: res.error };
-        }
-
-        var session = res.data.session;
-        var user = res.data.user;
-        var meta = (user && user.user_metadata) || {};
-        var userObj = {
-          id: user.id,
-          email: user.email,
-          name: meta.name || meta.full_name || email.split('@')[0],
-          role: meta.role || 'Investigator',
-          phone: meta.phone || '',
-          organization: meta.organization || '',
-          is_demo: false
-        };
-
-        localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(userObj));
-        localStorage.setItem(STORAGE_SESSION_KEY, 'active');
-        if (session) {
-          localStorage.setItem(STORAGE_TOKEN_KEY, session.access_token);
-        }
-
-        return {
-          success: true,
-          user: userObj,
-          session: session,
-          access_token: session ? session.access_token : null
-        };
-      } catch (err) {
-        return { success: false, error: { message: err.message || 'Supabase authentication failed.' } };
-      }
-    }
-
-    // C. Demo mode authentication fallback
-    var savedUser = getUser() || DEMO_ACCOUNT;
-    var demoMatch = (email === String(DEMO_ACCOUNT.email).toLowerCase() && password === DEMO_ACCOUNT.password);
-    var savedMatch = (savedUser && email === String(savedUser.email).toLowerCase() && (password === savedUser.password || password === 'password123'));
-
-    if (demoMatch || savedMatch) {
-      var activeUser = demoMatch ? DEMO_ACCOUNT : savedUser;
-      localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(activeUser));
-      localStorage.setItem(STORAGE_SESSION_KEY, 'active');
-      localStorage.setItem(STORAGE_TOKEN_KEY, 'demo-token');
       return {
-        success: true,
-        user: activeUser,
-        session: { access_token: 'demo-token' },
-        access_token: 'demo-token'
+        success: false,
+        error: { message: 'Unable to connect to the authentication server. Please try again.' }
       };
     }
-
-    return {
-      success: false,
-      error: { message: 'Invalid email or password. (For demo login, use investigator@cyberscope.io / password123)' }
-    };
   }
 
   async function signUp(data) {
@@ -404,7 +252,6 @@
       return { success: false, error: { message: 'Please provide name, email, and password.' } };
     }
 
-    // A. Coordinate with backend /api/auth/register/initiate endpoint first when available
     try {
       var regRes = await fetch(getApiEndpoint('/api/auth/register/initiate'), {
         method: 'POST',
@@ -430,17 +277,7 @@
           email_otp: (regData.preview && regData.preview.email_otp) || null,
           message: regData.message || 'Verification code sent to your official email.'
         };
-      } else if (regRes.status === 409) {
-        var conflictData = await regRes.json().catch(function() { return {}; });
-        return {
-          success: false,
-          status: 409,
-          error: {
-            code: 'EMAIL_ALREADY_EXISTS',
-            message: conflictData.detail || 'An account with this email address already exists. Please sign in instead.'
-          }
-        };
-      } else if (regRes.status >= 400 && regRes.status < 500) {
+      } else {
         var errData = await regRes.json().catch(function() { return {}; });
         return {
           success: false,
@@ -449,78 +286,11 @@
         };
       }
     } catch (netErr) {
-      // Backend unreachable or offline, proceed to Supabase / demo fallback
+      return {
+        success: false,
+        error: { message: 'Unable to connect to the registration server. Please try again.' }
+      };
     }
-
-    // B. Use real Supabase client if configured
-    if (state.configured && state.client) {
-      try {
-        var res = await state.client.auth.signUp({
-          email: email,
-          password: password,
-          options: {
-            data: {
-              name: name,
-              phone: phone,
-              role: role,
-              organization: organization
-            }
-          }
-        });
-
-        if (res.error) {
-          return { success: false, error: res.error };
-        }
-
-        var sbUser = res.data.user;
-        var session = res.data.session;
-        var sbUserObj = {
-          id: sbUser ? sbUser.id : 'sb-user',
-          email: email,
-          name: name,
-          phone: phone,
-          role: role,
-          organization: organization,
-          is_demo: false
-        };
-
-        // Cache details
-        localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(sbUserObj));
-        if (session) {
-          localStorage.setItem(STORAGE_SESSION_KEY, 'active');
-          localStorage.setItem(STORAGE_TOKEN_KEY, session.access_token);
-        }
-
-        return {
-          success: true,
-          user: sbUserObj,
-          session: session,
-          needsEmailConfirmation: sbUser && !session
-        };
-      } catch (err) {
-        return { success: false, error: { message: err.message || 'Supabase signup failed.' } };
-      }
-    }
-
-    // C. Demo mode signup fallback
-    var newUser = {
-      id: 'demo-' + Date.now(),
-      email: email,
-      password: password,
-      name: name,
-      phone: phone,
-      role: role,
-      organization: organization,
-      is_demo: true
-    };
-    localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(newUser));
-    localStorage.removeItem(STORAGE_SESSION_KEY);
-    return {
-      success: true,
-      user: newUser,
-      session: null,
-      needsEmailConfirmation: false
-    };
   }
 
   async function verifyRegistration(email, emailOtp) {
@@ -587,6 +357,7 @@
         await state.client.auth.signOut();
       }
     } catch(e) {}
+    localStorage.removeItem(STORAGE_USER_KEY);
     localStorage.removeItem(STORAGE_SESSION_KEY);
     localStorage.removeItem(STORAGE_TOKEN_KEY);
     return true;
@@ -609,66 +380,51 @@
     }
 
     return {
-      success: true,
-      message: 'Demo mode: In live mode, Supabase will dispatch an email recovery link. For demo testing, use password123.'
+      success: false,
+      error: { message: 'Password reset service unavailable.' }
     };
   }
 
   async function verifySession() {
-    await init();
     var token = localStorage.getItem(STORAGE_TOKEN_KEY);
-    var session = localStorage.getItem(STORAGE_SESSION_KEY);
-
-    if (session !== 'active') {
+    if (!token) {
+      localStorage.removeItem(STORAGE_SESSION_KEY);
+      localStorage.removeItem(STORAGE_TOKEN_KEY);
+      localStorage.removeItem(STORAGE_USER_KEY);
       return false;
     }
 
-    // 1. Validate database token via /api/auth/verify
-    if (token) {
-      try {
-        var res = await fetch(getApiEndpoint('/api/auth/verify'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ access_token: token })
-        });
+    try {
+      var controller = new AbortController();
+      var timeoutId = setTimeout(function() { controller.abort(); }, 60000);
 
-        if (res.status === 200) {
-          var data = await res.json();
-          if (data && data.valid) {
-            if (data.user) {
-              localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(data.user));
-            }
-            return true;
-          }
-        } else if (res.status === 401 || res.status === 403) {
-          // Token expired or invalid
-          localStorage.removeItem(STORAGE_SESSION_KEY);
-          localStorage.removeItem(STORAGE_TOKEN_KEY);
-          localStorage.removeItem(STORAGE_USER_KEY);
-          return false;
-        }
-      } catch (err) {
-        // Backend offline, proceed to fallback checks
-      }
-    }
+      var res = await fetch(getApiEndpoint('/api/auth/verify'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ access_token: token }),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
 
-    // 2. Real Supabase client check if configured
-    if (state.configured && state.client) {
-      try {
-        var sbRes = await state.client.auth.getSession();
-        if (sbRes && sbRes.data && sbRes.data.session) {
+      if (res.status === 200) {
+        var data = await res.json();
+        if (data && data.valid && data.user) {
+          localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(data.user));
+          localStorage.setItem(STORAGE_SESSION_KEY, 'active');
           return true;
         }
-      } catch (e) {}
+      }
+    } catch (err) {
+      console.warn("Server verification error:", err);
     }
 
-    // 3. Honor valid local database investigator sessions
-    // Do NOT let null Supabase cloud session destroy authenticated database investigators
-    if (session === 'active' && user && (user.email || user.id)) {
-      return true;
-    }
-
-    return isAuthenticated();
+    localStorage.removeItem(STORAGE_SESSION_KEY);
+    localStorage.removeItem(STORAGE_TOKEN_KEY);
+    localStorage.removeItem(STORAGE_USER_KEY);
+    return false;
   }
 
   function setCustomConfig(url, key) {
@@ -689,7 +445,6 @@
     state.initPromise = null;
   }
 
-  // Auto-initialize in background on page load
   if (typeof document !== 'undefined') {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', function() { init(); });
@@ -698,7 +453,6 @@
     }
   }
 
-  // Export public API
   window.CyberScopeAuth = {
     init: init,
     getUser: getUser,
@@ -715,8 +469,7 @@
     setCustomConfig: setCustomConfig,
     clearCustomConfig: clearCustomConfig,
     isConfigured: function() { return state.configured; },
-    getConfig: function() { return { url: state.url, configured: state.configured }; },
-    DEMO_ACCOUNT: DEMO_ACCOUNT
+    getConfig: function() { return { url: state.url, configured: state.configured }; }
   };
 
 })(typeof window !== 'undefined' ? window : this);

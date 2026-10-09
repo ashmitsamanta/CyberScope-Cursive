@@ -51,26 +51,27 @@ def seed_database(db_session=None, drop_existing=True):
     # 2. Generate dataset
     data = generate_synthetic_dataset(profile="demo")
 
-    # 3. Seed Demo Investigator User
     print("Checking / Seeding Demo Investigator User...")
-    demo_user = db.query(User).filter(User.email == "investigator@cyberscope.io").first()
-    if not demo_user:
-        demo_user = User(
-            email="investigator@cyberscope.io",
-            password_hash=hash_password("password123"),
-            name="Investigator Demo",
-            phone="+919876543210",
-            role="Investigator",
-            organization="TetraByte Cyber Defense",
-            is_verified_email=True,
-            is_verified_phone=True,
-            is_active=True
-        )
-        db.add(demo_user)
-        db.commit()
-        print(" - Demo Investigator User seeded: investigator@cyberscope.io (password: password123)")
+    demo_user_password = os.environ.get("DEMO_USER_PASSWORD")
+    if os.environ.get("APP_ENV") == "development" and demo_user_password:
+        demo_user = db.query(User).filter(User.email == "investigator@cyberscope.io").first()
+        if not demo_user:
+            demo_user = User(
+                email="investigator@cyberscope.io",
+                password_hash=hash_password(demo_user_password),
+                name="Investigator Demo",
+                phone="+919876543210",
+                role="Investigator",
+                organization="TetraByte Cyber Defense",
+                is_verified_email=True,
+                is_verified_phone=True,
+                is_active=True
+            )
+            db.add(demo_user)
+            db.commit()
+            print(" - Demo Investigator User seeded.")
     else:
-        print(" - Demo Investigator User already exists in database.")
+        print(" - Demo Investigator User seeding skipped.")
 
     # 4. Seed Campaigns
     print("Inserting Campaigns...")

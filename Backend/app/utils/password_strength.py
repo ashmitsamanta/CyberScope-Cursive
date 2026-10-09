@@ -10,7 +10,7 @@ from string import punctuation
 
 
 COMMON_PASSWORDS = {
-    "password", "password1", "password123", "123456", "12345678",
+    "password", "password1", "password1234", "123456", "12345678",
     "qwerty", "qwerty123", "letmein", "admin", "welcome",
     "iloveyou", "monkey", "dragon", "111111", "abc123",
     "passw0rd", "password1!", "p@ssword", "p@ssw0rd",

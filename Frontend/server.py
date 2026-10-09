@@ -472,19 +472,8 @@ def handle_graph_case(case_identifier: str) -> Dict[str, Any]:
 # =====================================================================
 
 PBKDF2_ITERATIONS = 100_000
-DEFAULT_JWT_SECRET = "cyberscope-secret-jwt-key-for-auth-token-verification-32b"
 EMAIL_REGEX = re.compile(r"^[\w\.\+\-]+@[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,}$")
 _last_resend_timestamps: Dict[str, float] = {}
-
-DEMO_USER = {
-    "id": "demo-investigator-001",
-    "email": "investigator@cyberscope.io",
-    "name": "Investigator Demo",
-    "role": "Investigator",
-    "phone": "+919876543210",
-    "organization": "TetraByte Cyber Defense",
-    "is_demo": True
-}
 
 
 def normalize_phone_number(phone: str) -> str:
@@ -561,7 +550,7 @@ def create_auth_token(user_dict: dict, expires_delta_days: int = 7) -> str:
         "exp": int(expire.timestamp()),
         "iat": int(now.timestamp()),
     }
-    secret = os.environ.get("SUPABASE_JWT_SECRET") or DEFAULT_JWT_SECRET
+    secret = os.environ.get("JWT_SECRET") or os.environ.get("SUPABASE_JWT_SECRET") or "cyberscope-secret-jwt-key-for-auth-token-verification-32b"
     if jwt is not None:
         try:
             return jwt.encode(payload, secret, algorithm="HS256")
@@ -586,25 +575,17 @@ def format_user_claims(payload: Dict[str, Any]) -> Dict[str, Any]:
         "role": metadata.get("role") or payload.get("role") or "Investigator",
         "phone": metadata.get("phone", ""),
         "organization": metadata.get("organization", ""),
-        "is_demo": email == "investigator@cyberscope.io" or payload.get("is_demo", False)
+        "is_demo": False
     }
 
 
 def verify_auth_token(token: str) -> Optional[Dict[str, Any]]:
     if not token:
         return None
-    if token in ("demo-token", "demo-session-token") or token.startswith("demo-"):
-        return DEMO_USER
-    secret = os.environ.get("SUPABASE_JWT_SECRET") or DEFAULT_JWT_SECRET
+    secret = os.environ.get("JWT_SECRET") or os.environ.get("SUPABASE_JWT_SECRET") or "cyberscope-secret-jwt-key-for-auth-token-verification-32b"
     if jwt is not None:
-        for s in [secret, DEFAULT_JWT_SECRET]:
-            try:
-                payload = jwt.decode(token, s, algorithms=["HS256"], options={"verify_aud": False})
-                return format_user_claims(payload)
-            except Exception:
-                pass
         try:
-            payload = jwt.decode(token, options={"verify_signature": False})
+            payload = jwt.decode(token, secret, algorithms=["HS256"], options={"verify_aud": False})
             return format_user_claims(payload)
         except Exception:
             pass
@@ -613,13 +594,10 @@ def verify_auth_token(token: str) -> Optional[Dict[str, Any]]:
         if len(parts) == 3:
             h, p, sig = parts
             signing_input = f"{h}.{p}".encode("utf-8")
-            for s in [secret, DEFAULT_JWT_SECRET]:
-                expected = b64url_encode(hmac.new(s.encode("utf-8"), signing_input, hashlib.sha256).digest())
-                if hmac.compare_digest(sig, expected):
-                    payload = json.loads(b64url_decode(p).decode("utf-8"))
-                    return format_user_claims(payload)
-            payload = json.loads(b64url_decode(p).decode("utf-8"))
-            return format_user_claims(payload)
+            expected = b64url_encode(hmac.new(secret.encode("utf-8"), signing_input, hashlib.sha256).digest())
+            if hmac.compare_digest(sig, expected):
+                payload = json.loads(b64url_decode(p).decode("utf-8"))
+                return format_user_claims(payload)
     except Exception:
         pass
     return None
@@ -667,15 +645,17 @@ def init_db_schema_if_needed(conn: sqlite3.Connection):
         attempts INTEGER DEFAULT 0 NOT NULL
     );
     """)
-    cur.execute("SELECT id FROM users WHERE email = 'investigator@cyberscope.io'")
-    if not cur.fetchone():
-        demo_hash = hash_password("password123")
-        now_str = datetime.datetime.now(datetime.timezone.utc).isoformat()
-        cur.execute("""
-        INSERT INTO users (email, password_hash, name, phone, role, organization, is_verified_email, is_verified_phone, is_active, created_at, updated_at)
-        VALUES ('investigator@cyberscope.io', ?, 'Investigator Demo', '+919876543210', 'Investigator', 'TetraByte Cyber Defense', 1, 1, 1, ?, ?)
-        """, (demo_hash, now_str, now_str))
-    conn.commit()
+    demo_pass = os.environ.get("DEMO_USER_PASSWORD")
+    if os.environ.get("APP_ENV") == "development" and demo_pass:
+        cur.execute("SELECT id FROM users WHERE email = 'investigator@cyberscope.io'")
+        if not cur.fetchone():
+            demo_hash = hash_password(demo_pass)
+            now_str = datetime.datetime.now(datetime.timezone.utc).isoformat()
+            cur.execute("""
+            INSERT INTO users (email, password_hash, name, phone, role, organization, is_verified_email, is_verified_phone, is_active, created_at, updated_at)
+            VALUES ('investigator@cyberscope.io', ?, 'Investigator Demo', '+919876543210', 'Investigator', 'TetraByte Cyber Defense', 1, 1, 1, ?, ?)
+            """, (demo_hash, now_str, now_str))
+            conn.commit()
 
 
 def handle_auth_request(path: str, method: str, body: Optional[bytes], headers) -> tuple[Optional[Dict[str, Any]], int]:
@@ -894,31 +874,16 @@ def handle_auth_request(path: str, method: str, body: Optional[bytes], headers) 
         email = (body_dict.get("email") or "").strip().lower()
         password = body_dict.get("password") or ""
 
+        auth_failed = {"detail": "Invalid email or password.", "code": "INVALID_CREDENTIALS"}, 401
         user = cur.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
         if not user:
-            if email == "investigator@cyberscope.io":
-                if password != "password123":
-                    conn.close()
-                    return {"detail": "Invalid password. Please check your credentials.", "code": "INVALID_PASSWORD"}, 401
-                now_str = datetime.datetime.now(datetime.timezone.utc).isoformat()
-                demo_hash = hash_password("password123")
-                cur.execute("""
-                INSERT INTO users (email, password_hash, name, phone, role, organization, is_verified_email, is_verified_phone, is_active, created_at, updated_at)
-                VALUES ('investigator@cyberscope.io', ?, 'Investigator Demo', '+919876543210', 'Investigator', 'TetraByte Cyber Defense', 1, 1, 1, ?, ?)
-                """, (demo_hash, now_str, now_str))
-                conn.commit()
-                user = cur.execute("SELECT * FROM users WHERE email = 'investigator@cyberscope.io'").fetchone()
-            else:
-                conn.close()
-                return {"detail": "No account found with this email address. Please register a new account.", "code": "USER_NOT_FOUND"}, 404
+            conn.close()
+            return auth_failed
 
         is_valid = verify_password(password, user["password_hash"])
-        if not is_valid and user["email"] == "investigator@cyberscope.io" and password == "password123":
-            is_valid = True
-
         if not is_valid:
             conn.close()
-            return {"detail": "Invalid password. Please check your credentials.", "code": "INVALID_PASSWORD"}, 401
+            return auth_failed
 
         user_dict = user_row_to_dict(user)
         token = create_auth_token(user_dict)
@@ -950,8 +915,6 @@ def handle_auth_request(path: str, method: str, body: Optional[bytes], headers) 
         conn.close()
         if claims:
             return {"status": "authenticated", "user": claims}, 200
-        if not os.environ.get("REQUIRE_AUTH", "").lower() in ("true", "1"):
-            return {"status": "authenticated", "user": DEMO_USER}, 200
         return {"detail": "Authentication credentials were not provided."}, 401
 
     conn.close()

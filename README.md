@@ -334,8 +334,7 @@ npm run dev
 ```
 
 * **Frontend Console:** `http://localhost:5173`
-* **FastAPI Interactive API Docs:** `http://localhost:8000/docs`
-* **Demo Sign In Credentials:** `investigator@cyberscope.io` / `password123`
+* **FastAPI Interactive API Docs:** `http://localhost:8000/docs` (Development mode)
 
 ---
 

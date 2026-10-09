@@ -146,58 +146,17 @@ document.getElementById('signinForm').addEventListener('submit', async function(
         window.location.href = redirect;
       }, 500);
       return;
-    } else if (response.status === 404) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Sign In →';
-      showMessage(`No account found with this email. <a href="register.html?email=${encodeURIComponent(email)}">Create an account →</a>`, 'error');
-      return;
-    } else if (response.status === 401) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Sign In →';
-      showMessage('Incorrect password. Please verify your credentials or use "Forgot password?".', 'error');
-      return;
-    } else if (response.status >= 400 && response.status < 500) {
+    } else {
       const errData = await response.json().catch(function() { return {}; });
       submitBtn.disabled = false;
       submitBtn.textContent = 'Sign In →';
-      showMessage(errData.detail || errData.message || 'Authentication failed. Please verify your credentials.', 'error');
+      showMessage(errData.detail || errData.message || 'Invalid email or password.', 'error');
       return;
     }
   } catch (netErr) {
-    // Backend offline or unreachable, proceed to offline demo fallback
-  }
-
-  // Fallback: If backend is offline or unreachable, fall back to window.CyberScopeAuth.signIn({ email, password })
-  try {
-    if (window.CyberScopeAuth && typeof window.CyberScopeAuth.signIn === 'function') {
-      const res = await window.CyberScopeAuth.signIn({ email, password });
-      if (res.success) {
-        showMessage('Sign in successful. Opening your workspace...', 'success');
-        setTimeout(function() {
-          window.location.href = redirect;
-        }, 500);
-        return;
-      } else {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Sign In →';
-        if (res.status === 404) {
-          showMessage(`No account found with this email. <a href="register.html?email=${encodeURIComponent(email)}">Create an account →</a>`, 'error');
-        } else if (res.status === 401) {
-          showMessage('Incorrect password. Please verify your credentials or use "Forgot password?".', 'error');
-        } else {
-          showMessage((res.error && res.error.message) || 'Invalid email or password.', 'error');
-        }
-        return;
-      }
-    } else {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Sign In →';
-      showMessage('Authentication service is temporarily unavailable.', 'error');
-    }
-  } catch (err) {
     submitBtn.disabled = false;
     submitBtn.textContent = 'Sign In →';
-    showMessage('An error occurred during sign in: ' + err.message, 'error');
+    showMessage('Authentication server is unreachable. Please check your connection.', 'error');
   }
 });
 </script>

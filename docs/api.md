@@ -149,13 +149,7 @@ Returns public Supabase client initialization configuration:
   "supabase_url": "https://your-project.supabase.co",
   "supabase_anon_key": "eyJhbGciOiJIUzI1NiIsInR5...",
   "configured": true,
-  "auth_required": false,
-  "demo_account": {
-    "email": "investigator@cyberscope.io",
-    "password": "password123",
-    "name": "Investigator Demo",
-    "role": "Investigator"
-  }
+  "auth_required": true
 }
 ```
 

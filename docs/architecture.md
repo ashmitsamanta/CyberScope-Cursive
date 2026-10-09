@@ -82,14 +82,10 @@ CyberScope Investigation Suite (Cyber-Neon MPA + Vite)
 - Resolves browser CORS restrictions by proxying `/api/chat` through the FastAPI backend to NVIDIA NIM (`meta/llama-3.2-11b-vision-instruct`).
 - Handles upstream connection errors with automatic fallback to built-in deterministic cyber-intelligence responses.
 
-### 2.8 Supabase Authentication & Identity Architecture
-- **Supabase Auth Client (`frontend/assets/supabase-client.js`):** Unified identity and session management wrapping `@supabase/supabase-js`.
+- **Supabase Authentication & Identity Architecture:**
   - Email & password registration with investigator metadata (name, phone, role, organization).
   - Persistent JWT sessions (`localStorage` + auto-refresh tokens).
-  - In-browser configuration drawer allowing instant connection to any Supabase project or dynamic server config via `GET /api/auth/config`.
-  - Built-in zero-friction demo mode (`investigator@cyberscope.io` / `password123`) for offline evaluation and instant hackathon judging.
-- **Backend Token Verification (`backend/app/services/auth_service.py` & `backend/app/api/auth.py`):**
-  - Supabase JWT validation supporting `SUPABASE_JWT_SECRET` (HS256) and direct verification via Supabase Auth REST API.
+- **Backend Token Verification:**
+  - Mandatory JWT validation supporting `JWT_SECRET` (HS256).
   - Dependency injection `get_current_user` for securing backend routes.
-  - Graceful development fallback when `REQUIRE_AUTH=False`, with strict enforcement toggleable in `.env`.
 
