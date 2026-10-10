@@ -2658,7 +2658,7 @@ async function loadFullGraph() {
       localStorage.removeItem('cyberscopeSession');
       localStorage.removeItem('cyberscopeUser');
       localStorage.removeItem('cyberscopeAccessToken');
-      window.location.href = 'signin.html?redirect=fraud-graph.html';
+      window.location.href = 'index.html?login=1&redirect=fraud-graph.html';
       return;
     }
     if (res.ok) {
@@ -2684,7 +2684,7 @@ async function loadCaseGraph(caseId, caseLabel) {
       localStorage.removeItem('cyberscopeSession');
       localStorage.removeItem('cyberscopeUser');
       localStorage.removeItem('cyberscopeAccessToken');
-      window.location.href = 'signin.html?redirect=fraud-graph.html';
+      window.location.href = 'index.html?login=1&redirect=fraud-graph.html';
       return;
     }
     if (res.ok) {

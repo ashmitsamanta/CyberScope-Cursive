@@ -101,6 +101,21 @@ if (document.readyState === 'loading') {
   initFromParams();
 }
 
+function sanitizeRedirect(target) {
+  if (!target || typeof target !== 'string') return 'dashboard.html';
+  var clean = target.trim().split('?')[0].split('#')[0].split('/').pop();
+  var allowed = [
+    'dashboard.html', 'cases.html', 'new-case.html', 'fraud-graph.html',
+    'threat-map.html', 'entity-explorer.html', 'transaction-explorer.html',
+    'campaign-explorer.html', 'investigation-workspace.html', 'chatbot.html',
+    'index.html'
+  ];
+  if (/^[a-z0-9-]+\.html$/.test(clean) && allowed.indexOf(clean) !== -1) {
+    return clean;
+  }
+  return 'dashboard.html';
+}
+
 // 2. Form submit handling coordinating with POST /api/auth/login and fallback to window.CyberScopeAuth.signIn
 document.getElementById('signinForm').addEventListener('submit', async function(e){
   e.preventDefault();
@@ -119,7 +134,7 @@ document.getElementById('signinForm').addEventListener('submit', async function(
   submitBtn.textContent = 'Authenticating...';
 
   const params = new URLSearchParams(window.location.search);
-  const redirect = params.get('redirect') || 'dashboard.html';
+  const redirect = sanitizeRedirect(params.get('redirect'));
 
   const endpoint = (window.location.protocol === 'file:') ? 'http://127.0.0.1:8000/api/auth/login' : '/api/auth/login';
 

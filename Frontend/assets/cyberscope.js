@@ -42,8 +42,8 @@
           localStorage.removeItem('cyberscopeUser');
           localStorage.removeItem('cyberscopeAccessToken');
           var here = location.pathname.split('/').pop() || 'dashboard.html';
-          if (!location.href.includes('signin.html')) {
-            location.replace('signin.html?redirect=' + encodeURIComponent(here));
+          if (!location.href.includes('signin.html') && !location.href.includes('index.html')) {
+            location.replace('index.html?login=1&redirect=' + encodeURIComponent(here));
           }
         }
       }
@@ -67,12 +67,12 @@ function cyberscopeInitials(name) {
 
 function cyberscopeProtect() {
   var token = localStorage.getItem('cyberscopeAccessToken');
+  var here = location.pathname.split('/').pop() || 'dashboard.html';
   if (!token) {
     localStorage.removeItem('cyberscopeSession');
     localStorage.removeItem('cyberscopeUser');
     localStorage.removeItem('cyberscopeAccessToken');
-    var here = location.pathname.split('/').pop() || 'dashboard.html';
-    location.replace('signin.html?redirect=' + encodeURIComponent(here));
+    location.replace('index.html?login=1&redirect=' + encodeURIComponent(here));
     return Promise.resolve(false);
   }
 
@@ -81,8 +81,7 @@ function cyberscopeProtect() {
       localStorage.removeItem('cyberscopeSession');
       localStorage.removeItem('cyberscopeUser');
       localStorage.removeItem('cyberscopeAccessToken');
-      var here = location.pathname.split('/').pop() || 'dashboard.html';
-      location.replace('signin.html?redirect=' + encodeURIComponent(here));
+      location.replace('index.html?login=1&redirect=' + encodeURIComponent(here));
       return false;
     }
 

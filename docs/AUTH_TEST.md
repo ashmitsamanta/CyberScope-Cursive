@@ -1,81 +1,74 @@
-# CyberScope Authentication Verification Manual Test Checklist
+# CyberScope Authentication & Sign-In Popup Test Checklist
 
-This checklist documents the manual testing procedures for verifying that CyberScope's server-first authentication model and route protection work correctly.
-
----
-
-## Prerequisites
-1. Start the backend service:
-   ```bash
-   cd Backend
-   python -m uvicorn app.main:app --reload
-   ```
-2. Serve the frontend (e.g. Vite dev server or standard web server):
-   ```bash
-   cd Frontend
-   npm run dev
-   ```
+This document provides a step-by-step manual testing protocol for verifying the CyberScope sign-in popup modal, link interception, redirect sanitization, and session protection.
 
 ---
 
-## Test Cases
+## Manual Test Verification Protocol
 
-### 1. Private / Incognito Window Initial Access
-- **Action**: Open a fresh private / incognito browser window and navigate directly to `http://localhost:5173/fraud-graph.html` (or equivalent host port).
-- **Expected Behavior**:
-  - The page content remains hidden initially (`cs-pending` loader indicator is visible).
-  - Since `cyberscopeAccessToken` is absent from `localStorage`, `cyberscopeProtect()` immediately clears all session storage and executes `location.replace('signin.html?redirect=fraud-graph.html')`.
-  - The user lands on the sign-in page (`signin.html`).
-
----
-
-### 2. Manual `localStorage` Manipulation Bypass Attempt
-- **Action**: 
-  1. Open DevTools console on `signin.html` or any page.
-  2. Manually set local session flags:
-     ```js
-     localStorage.setItem('cyberscopeSession', 'active');
-     localStorage.setItem('cyberscopeUser', JSON.stringify({ email: 'attacker@example.com' }));
-     ```
-  3. Navigate to `http://localhost:5173/fraud-graph.html` or reload the page.
-- **Expected Behavior**:
-  - `cyberscopeProtect()` checks for `cyberscopeAccessToken`. If absent, or if an invalid/fake token exists, it calls `POST /api/auth/verify`.
-  - Backend `/api/auth/verify` rejects the unauthenticated attempt with `401 Unauthorized`.
-  - Frontend auth guard catches the 401 response, purges `cyberscopeSession`, `cyberscopeUser`, and `cyberscopeAccessToken` from `localStorage`, and redirects to `signin.html`.
-  - Client-side fake session flags do NOT grant access.
+### Test Case 1: Landing Page Link Interception (Signed-Out Visitor)
+1. Open a new **Private / Incognito Window**.
+2. Navigate to `index.html` (e.g. `http://localhost:5173/index.html` or local server).
+3. Ensure you are signed out (no `cyberscopeSession` or `cyberscopeAccessToken` in `localStorage`).
+4. Click on the **Fraud Graph** module card or nav link (or click the `.graph-area` interactive box).
+5. **Expected Result:**
+   - The page DOES NOT navigate away.
+   - The sign-in modal popup opens immediately over `index.html`.
+   - The modal subtitle is context-aware: `"Sign in to open the Fraud Graph"`.
+   - Focus is automatically placed in the Email Address input field.
 
 ---
 
-### 3. Valid Login & Page Access
-- **Action**:
-  1. On `signin.html`, register or log in using valid, verified credentials.
-  2. Upon successful login, observe successful token storage (`cyberscopeAccessToken`) and automatic redirection to `dashboard.html` or `fraud-graph.html`.
-- **Expected Behavior**:
-  - `/api/auth/login` returns a valid JWT Bearer token signed with `JWT_SECRET`.
-  - Protected pages successfully verify the token with `POST /api/auth/verify` (HTTP 200 `valid: true`).
-  - `document.documentElement` removes `cs-pending` class and reveals protected UI content and graphics.
-  - Subsequent API data calls attach `Authorization: Bearer <token>` and return live data.
+### Test Case 2: Successful Sign-In & Target Navigation
+1. In the open sign-in modal from Test Case 1, enter valid credentials for a registered account.
+2. Click **Sign In →**.
+3. **Expected Result:**
+   - The submit button displays `"Authenticating..."` and is disabled during the request.
+   - On 200 response, a success message appears: `"Sign in successful. Opening your workspace..."`.
+   - `localStorage` receives `cyberscopeSession` (`'active'`), `cyberscopeAccessToken`, and `cyberscopeUser`.
+   - Browser automatically navigates to the remembered target (`fraud-graph.html`).
 
 ---
 
-### 4. Token Deletion / Explicit Logout
-- **Action**:
-  1. While viewing `fraud-graph.html` or `dashboard.html`, open DevTools and delete `cyberscopeAccessToken`:
-     ```js
-     localStorage.removeItem('cyberscopeAccessToken');
-     ```
-  2. Reload the page or trigger a data request.
-- **Expected Behavior**:
-  - Page reload immediately triggers `cyberscopeProtect()`, missing token detected, redirecting to `signin.html`.
-  - If a fetch request occurs before reload, the global fetch interceptor receives a `401 Unauthorized` response from the backend, clears session keys, and redirects to `signin.html`.
+### Test Case 3: Direct Visit to Protected Page (Signed-Out Visitor)
+1. Open a new **Private / Incognito Window**.
+2. Type `/fraud-graph.html` (or `http://localhost:5173/fraud-graph.html`) directly into the browser address bar while signed out.
+3. **Expected Result:**
+   - The page automatically redirects to `index.html?login=1&redirect=fraud-graph.html`.
+   - On `index.html` load, the query parameter is stripped using `history.replaceState` (leaving clean `index.html` in address bar).
+   - The sign-in modal popup opens automatically with subtitle `"Sign in to open the Fraud Graph"`.
 
 ---
 
-### 5. Expired Token Handling
-- **Action**:
-  1. Manually tamper with `cyberscopeAccessToken` in `localStorage` or wait for token expiration (60 minutes).
-  2. Reload `fraud-graph.html` or interact with an authenticated API feature.
-- **Expected Behavior**:
-  - Backend token verification fails with `401 Unauthorized` (`Signature verification failed` or `Token has expired`).
-  - `POST /api/auth/verify` returns 401 with `{"valid": false}`.
-  - Client-side auth guard and fetch interceptor clear `localStorage` session keys and redirect to `signin.html`.
+### Test Case 4: Token Removal & Page Reload Protection
+1. Log into CyberScope and navigate to any protected section (e.g. `dashboard.html` or `cases.html`).
+2. Open Browser Developer Tools (`F12` -> Application -> Local Storage).
+3. Delete `cyberscopeAccessToken` and `cyberscopeSession`.
+4. Refresh the page (`F5` or `Ctrl+R`).
+5. **Expected Result:**
+   - The application DOES NOT display a blank page or broken UI.
+   - Session keys are cleared completely.
+   - Browser redirects to `index.html` with the sign-in popup open for the target section.
+
+---
+
+### Test Case 5: Open-Redirect & XSS Vector Resistance
+1. In the browser address bar, enter a crafted URL with a malicious redirect target:
+   `http://localhost:5173/index.html?login=1&redirect=javascript:alert(1)`
+   or
+   `http://localhost:5173/index.html?login=1&redirect=https://evil.example`
+2. **Expected Result:**
+   - The modal target URL is validated against the strict allowlist regex `^[a-z0-9-]+\.html$`.
+   - Malicious values fall back safely to `dashboard.html`.
+   - Attempting login or completing authentication never executes `javascript:` or navigates to external domains.
+
+---
+
+### Test Case 6: Public Links & Keyboard Accessibility
+1. On `index.html` while signed out, click on **Sign In**, **Register**, or anchor links (**About**, **Open Console ↗**).
+2. **Expected Result:**
+   - Public links navigate directly or smooth scroll to their respective targets without opening the modal.
+3. Open the modal popup, press `Tab` repeatedly.
+4. **Expected Result:** Focus is trapped strictly inside modal interactive elements.
+5. Press `Escape` or click the backdrop overlay / `×` button.
+6. **Expected Result:** Modal closes cleanly and body scrolling is restored.
