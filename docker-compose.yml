@@ -3,16 +3,16 @@ version: "3.8"
 services:
   backend:
     build:
-      context: ./backend
+      context: ./Backend
       dockerfile: Dockerfile
     container_name: cyberscope-backend
     restart: unless-stopped
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     environment:
       - APP_NAME=CYBERSCOPE
       - APP_ENV=production
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-cyberscope_app}:${POSTGRES_PASSWORD:-cs_sec_db_2026_x89f}@postgres:5432/${POSTGRES_DB:-cyberscope_prod}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-cyberscope_app}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/${POSTGRES_DB:-cyberscope_prod}
       - GRAPH_BACKEND=networkx
       - AI_PROVIDER=fallback
       - CORS_ORIGINS=["http://localhost:5173","http://localhost:3000","http://localhost"]
@@ -24,7 +24,7 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: ./Frontend
       dockerfile: Dockerfile
     container_name: cyberscope-frontend
     restart: unless-stopped
@@ -39,7 +39,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-cyberscope_app}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cs_sec_db_2026_x89f}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       POSTGRES_DB: ${POSTGRES_DB:-cyberscope_prod}
     # Security: Database port 5432 is restricted to internal Docker network and NOT published to host
     volumes:
