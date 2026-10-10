@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/check-dist.mjs",
+    "build": "vite build && node scripts/check-dist.mjs && node scripts/check-css-order.mjs",
     "preview": "vite preview",
     "test": "node --test"
   },
