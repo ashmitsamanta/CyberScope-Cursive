@@ -1275,6 +1275,9 @@ input.input-success {
 document.addEventListener('DOMContentLoaded', function() {
   const pwInput = document.getElementById('password');
   const pwContainer = document.getElementById('pwStrength');
+  if (!window.PasswordStrength) {
+    console.warn('[CyberScope] PasswordStrength is undefined – assets/password-strength.js failed to load.');
+  }
   if (window.PasswordStrength && pwInput && pwContainer) {
     let _pwDebounce = null;
     pwInput.addEventListener('input', function() {
