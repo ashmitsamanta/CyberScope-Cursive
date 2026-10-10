@@ -11,6 +11,6 @@
     }
   ],
   "rewrites": [
-    { "source": "/api/:path*", "destination": "https://cyberscope-cursive-1.onrender.com/api/:path*" }
+    { "source": "/api/:path*", "destination":"https://cyberscope-cursive.onrender.com/api/:path*"}
   ]
 }
